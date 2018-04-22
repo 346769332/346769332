@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>登录页</title>
+<link href="css/common.css" rel="stylesheet" type="text/css">
+<script  type="text/javascript" src="js/common/jquery-1.9.1.min.js"></script>
+<script  type="text/javascript" src="js/common/layer/layer.min.js"></script>
+<script  type="text/javascript" src="js/common/servlet.url.js"></script>
+<script type="text/javascript" src="js/common/util.js"></script>
+<script type="text/javascript" src="js/common/common.js"></script>
+<script type="text/javascript" src="js/common/loginType.js"></script>
+<script type="text/javascript" src="js/common/jq.ui.js"></script>
+<script  type="text/javascript" src="js/login.js?rand=Math.random()"></script>
+<script type="text/javascript">
+/**当页面加载完之后*/
+$(document).ready(function() {
+	$("#downLoadIos").unbind("click").bind("click",function(){
+		window.location.href=encodeURI(URL_DOWN_IOS);
+	}); 
+});
+
+</script>
+</head>
+<div class="l-top"><div class="w1000">
+<a href="#"><img src="images/logo1.png" alt=""></a>综支工作台
+<!-- 
+<a href="#" style="float: right;"  id="downLoadIos" >
+	 <div  style=" background-image: url('images/apple.jpg');width: 65px;height:55px; line-height:25px;margin-left:0px;font-size: 12px;word-wrap:break-word;word-break:keep-all;float: right;"> 
+	 	承包助手ios安装包下载
+	 </div>
+	 <img src="images/apple.jpg" style="width: 55px;float: right;">
+</a>
+ -->
+</div></div>
+<div class="l-main clearfix" style="height:520px;">
+<div class="w1000">
+<div class="left fl" style="margin-left:-20px;height:500px;"></div>
+<div class="right fl" style="margin-left:100px;margin-top:45px;"> 
+
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab">
+          <tr>
+            <td height="71" align="center" valign="top">
+            <div style="padding-top:20px;">
+                <table width="400" border="0" cellspacing="0" cellpadding="0" class="tab4">
+                  <tr>
+                    <td width="45" align="center"><img src="images/l-ico1.png" width="20" height="22"></td>
+                    <td width="301" align="left"><input type="text" name="empeeId" id="empeeId" class="input" value="请输入用户名" ></td>
+                  </tr>
+                </table>
+            </div>
+            </td>
+          </tr>
+         <tr> 
+            <td height="71" align="center" valign="top"> 
+             <div style="padding-top:20px;"> 
+                 <table width="454" border="0" cellspacing="0" cellpadding="0" class="tab4"> 
+                   <tr> 
+                     <td width="45" align="center"><img src="images/l-ico3.png"  width="20" height="22"></td> 
+                     <td width="301" align="left"><input  type="text" name="verifyCode" id="verifyCode" class="input" value="请输入验证码"> 
+                     <button id="getRandom2" style="color:#FFFDFD;border-style:none;background-color:#3f7aaa;text-decoration: underline;">点击获取</button></td> 
+                   </tr> 
+                 </table>
+             </div> 
+             </td> 
+           </tr> 
+<!--           <tr> -->
+<!--             <td height="71" align="center" valign="top"> -->
+<!--             <div style="padding-top:20px;"> -->
+<!--                 <table width="454" border="0" cellspacing="0" cellpadding="0" class="tab4"> -->
+<!--                   <tr> -->
+<!--                     <td width="45"  align="center"><img src="images/l-ico2.png" width="20" height="22"></td> -->
+<!--                     <td width="305" align="left"><input  type="passWord" name="password" id="password" class="input" ></td> -->
+<!--                   </tr> -->
+<!--                 </table> -->
+<!--             </div> -->
+<!--             </td> -->
+<!--           </tr> -->
+<!--           <tr> -->
+<!--             <td height="71" align="center" valign="top"> -->
+<!--             <div style="padding-top:20px;"> -->
+<!--                 <table width="454" border="0" cellspacing="0" cellpadding="0" class="tab4"> -->
+<!--                   <tr> -->
+<!--                     <td width="45" align="center"><img src="images/l-ico3.png"  width="20" height="22"></td> -->
+<!--                     <td width="160" align="left"><input  type="text"name="verifyCode" id="verifyCode" class="input" value="请输入验证码"></td> -->
+<!--                     <td width="105" align="center"><a href="#" class="yzmnew" id="verifyCodeTd"></a></td> -->
+<!--                   </tr> -->
+<!--                 </table> -->
+<!--             </div> -->
+<!--             </td> -->
+<!--           </tr> -->
+          <tr>
+            <td align="center">
+                <a class="but l-but" id="loginBtn">登录</a>
+                <!-- <a href="#" style="color:#FFF;padding-left: 30px;text-decoration: underline;" id="forgetPassWord">忘记密码</a> -->
+            </td>
+          </tr>
+        </table>
+
+  </div>
+</div>
+</div>
+<div class="bottom" style="margin-top: 18px;">中国电信股份有限公司陕西版权所有</div>
+</body>
+</html>
