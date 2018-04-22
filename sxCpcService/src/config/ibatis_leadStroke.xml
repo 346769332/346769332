@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="leadStroke">
+	<!-- 新增省年指标数据 -->
+	<insert id="sendSaveLeadStrokeInfo" parameterClass="java.util.HashMap">
+		INSERT INTO 
+		<isEqual property="saveType" compareValue="0">
+		lead_stroke_drafts_info
+		</isEqual>
+		<isEqual property="saveType" compareValue="1">
+		lead_stroke_info
+		</isEqual>
+		(
+		headlineInfo,
+		periodTime,
+		strokeInfo,
+		remarkInfo,
+		strokeTime,
+		ascriptionLaedId,
+		ascriptionLaedName,
+		ascriptionLaedPosition,
+		laedStrokeStatus,
+		founderId,
+		founderName,
+		strokeTimeStart,
+		strokeTimeEnd,
+		createTime,
+		weeks
+		)
+		VALUES
+		(
+		#headlineInfo#,
+		#periodTime#,
+		#strokeInfo#,
+		#remarkInfo#,
+		#strokeTime#,
+		#ascriptionLaedId#,
+		#ascriptionLaedName#,
+		#ascriptionLaedPosition#,
+		#laedStrokeStatus#,
+		#staff_Id#,
+		#staff_Name#,
+		#strokeTimeStart#,
+		#strokeTimeStart#,
+		NOW(),
+		#weeks#)
+		<selectKey resultClass="int" keyProperty="laedStrokeId">  
+        <![CDATA[ SELECT LAST_INSERT_ID() AS laedStrokeId ]]> 
+        </selectKey>
+	</insert>
+	<!--发布行程时同时要发草稿  -->
+	<insert id="sendSaveLeadStrokeDraftsInfo" parameterClass="java.util.HashMap">
+	INSERT INTO lead_stroke_drafts_info(
+		headlineInfo,
+		periodTime,
+		strokeInfo,
+		remarkInfo,
+		strokeTime,
+		ascriptionLaedId,
+		ascriptionLaedName,
+		ascriptionLaedPosition,
+		laedStrokeStatus,
+		founderId,
+		founderName,
+		strokeTimeStart,
+		strokeTimeEnd,
+		createTime,
+		weeks
+		)(select 
+		headlineInfo,
+		periodTime,
+		strokeInfo,
+		remarkInfo,
+		strokeTime,
+		ascriptionLaedId,
+		ascriptionLaedName,
+		ascriptionLaedPosition,
+		#laedStrokeStatus#,
+		founderId,
+		founderName,
+		strokeTimeStart,
+		strokeTimeEnd,
+		createTime,weeks from lead_stroke_info where laedStrokeId in ($laedStrokeIds$))
+	</insert>
+	<!--查询领导行程 -->
+	<select id="queryLeadStorkeInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  HEADLINEINFO,
+			  (
+			    CASE
+			      WHEN PERIODTIME = '0' 
+			      THEN '下午' 
+			      WHEN PERIODTIME = '1' 
+			      THEN '上午' 
+			    END
+			  ) PERIODTIME,
+			  STROKEINFO,
+			  REMARKINFO,
+			  STROKETIME,
+			  ASCRIPTIONLAEDID,
+			  ASCRIPTIONLAEDNAME,
+			  ASCRIPTIONLAEDPOSITION,
+			  LAEDSTROKESTATUS,
+			  DATE_FORMAT(STROKETIMESTART, "%Y/%m/%d") STROKETIMESTART,
+			  FOUNDERID,
+			  FOUNDERNAME
+		FROM
+			  lead_stroke_drafts_info
+		WHERE  1=1
+		<isNotEmpty prepend="AND" property="startDate">
+			STROKETIMESTART  <![CDATA[>=]]> #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+			STROKETIMESTART <![CDATA[<=]]> #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="ascriptionLaedId">
+			ASCRIPTIONLAEDID=#ascriptionLaedId# 
+		</isNotEmpty>
+	</select>
+	<!--删除领导行程 -->
+	<delete id="delLeadStorkeInfo" parameterClass="java.util.HashMap">
+		DELETE FROM
+		<isEqual property="saveType" compareValue="0">
+		lead_stroke_drafts_info
+		</isEqual>
+		<isEqual property="saveType" compareValue="1">
+		lead_stroke_info
+		</isEqual>
+		  WHERE 
+		 <isNotEmpty  property="startDate">
+			STROKETIMESTART  <![CDATA[>=]]> #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+			STROKETIMESTART <![CDATA[<=]]> #endDate#
+		</isNotEmpty>
+		AND ASCRIPTIONLAEDID=#ascriptionLaedId# 
+	</delete>
+	<!--查询领导行程汇总 -->
+	<select id="qryLeadStorkeListInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		 select 
+		 CASE c.weeks WHEN 1  THEN CONCAT(#startDate#,' (星期一)')
+       WHEN 2  THEN  CONCAT(DATE_FORMAT(DATE_SUB(#startDate#,INTERVAL -1 DAY),"%Y/%m/%d"),' (星期二)')
+       WHEN 3  THEN  CONCAT(DATE_FORMAT(DATE_SUB(#startDate#,INTERVAL -2 DAY),"%Y/%m/%d"),' (星期三)')
+       WHEN 4  THEN  CONCAT(DATE_FORMAT(DATE_SUB(#startDate#,INTERVAL -3 DAY),"%Y/%m/%d"),' (星期四)')
+       WHEN 5  THEN  CONCAT(DATE_FORMAT(DATE_SUB(#startDate#,INTERVAL -4 DAY),"%Y/%m/%d"),' (星期五)')
+       WHEN 6  THEN  CONCAT(DATE_FORMAT(DATE_SUB(#startDate#,INTERVAL -5 DAY),"%Y/%m/%d"),' (星期六)')
+       WHEN 7  THEN  CONCAT(DATE_FORMAT(DATE_SUB(#startDate#,INTERVAL -6 DAY),"%Y/%m/%d"),' (星期天)')
+      ELSE  STROKETIME END STROKETIME,
+	  ASCRIPTIONLAEDID,  ASCRIPTIONLAEDNAME ,ASCRIPTIONLAEDPOSITION,
+	   targetTop,PERIODTIME,weeks,HEADLINEINFO,STROKEINFO,
+	   LAEDSTROKESTATUS,STROKETIMESTART,FOUNDERID,FOUNDERNAME,pertime 
+		 from 
+		(
+		select aa.targetId ASCRIPTIONLAEDID,aa.targetName ASCRIPTIONLAEDNAME,
+		aa.targetPosition ASCRIPTIONLAEDPOSITION,aa.targetTop,aa.PERIODTIMES as PERIODTIME,aa.weeks,
+		b.HEADLINEINFO,b.STROKEINFO,b.STROKETIME,b.LAEDSTROKESTATUS,
+		b.STROKETIMESTART,b.FOUNDERID,b.FOUNDERNAME,aa.pertime
+		from
+		(SELECT 
+		 a.targetId,
+		 a.targetName,
+		 a.targetPosition,
+		 a.targetTop,
+		 a.id ,
+		 weeks,
+		 (CASE
+	      WHEN c.periodtime = '0' 
+	      THEN '下午' 
+	      WHEN c.periodtime = '1' 
+	      THEN '上午' 
+	     END) PERIODTIMES,
+	     c.periodtime pertime
+		  FROM
+		  (SELECT 
+		    i.targetId,
+		    i.targetName,
+		    i.targetPosition,
+		    i.targetTop,
+		    i.id 
+		  FROM
+          LEAD_STROKE_AUTH_INFO i 
+         GROUP BY i.targetId) a INNER JOIN lead_stroke_modle c ON a.id = c.id) aa
+         left join
+		(SELECT
+			  SI.HEADLINEINFO,
+			  (
+			    CASE
+			      WHEN SI.PERIODTIME = '0' 
+			      THEN '下午' 
+			      WHEN SI.PERIODTIME = '1' 
+			      THEN '上午' 
+			    END
+			  ) PERIODTIMES,
+			  SI.STROKEINFO,
+			  SI.REMARKINFO,
+			  SI.STROKETIME,
+			  SI.ASCRIPTIONLAEDID,
+			  SI.ASCRIPTIONLAEDNAME,
+			  SI.ASCRIPTIONLAEDPOSITION,
+			  SI.LAEDSTROKESTATUS,
+			  DATE_FORMAT(SI.STROKETIMESTART, "%Y/%m/%d") STROKETIMESTART,
+			  SI.FOUNDERID,
+			  SI.FOUNDERNAME,
+			  SI.weeks,
+			  SAI.targetTop,
+			  SI.PERIODTIME
+			FROM
+			  LEAD_STROKE_INFO  SI,
+			  LEAD_STROKE_AUTH_INFO SAI
+			WHERE 1 = 1 
+			  AND SAI.TARGETID = SI.ASCRIPTIONLAEDID
+			  AND SAI.LOGINID = SI.FOUNDERID
+			  AND SI.LAEDSTROKESTATUS = 1
+		<isNotEmpty prepend="AND" property="startDate">
+			SI.STROKETIMESTART  <![CDATA[>=]]> #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+			SI.STROKETIMESTART <![CDATA[<=]]> #endDate#
+		</isNotEmpty>
+		<isNotEmpty property="stroketCount1" prepend="">
+			<isEqual property="stroketCount1" compareValue="0"><!-- 判断周天为0 无数据 -->
+			   AND STROKETIME != #endDate7#
+				<isEqual property="stroketCount" compareValue="0"><!-- 判断周六为0 无数据 -->
+				  AND STROKETIME != #endDate6#
+				</isEqual>
+			</isEqual>
+		</isNotEmpty>
+		ORDER BY SI.STROKETIMESTART,SI.PERIODTIME DESC ,SAI.targetTop
+		) b
+		ON  aa.targetId = b.ASCRIPTIONLAEDID 
+        AND b.weeks = aa.weeks
+        AND b.PERIODTIME=aa.pertime
+       
+        order by  aa.weeks,aa.pertime DESC ,aa.targetTop ) c
+        WHERE 1=1
+         <isNotEmpty property="stroketCount1" prepend="">
+			<isEqual property="stroketCount1" compareValue="0"><!-- 判断周天为0 无数据 -->
+			   AND c.weeks !=7
+				<isEqual property="stroketCount" compareValue="0"><!-- 判断周六为0 无数据 -->
+				  AND c.weeks !=6
+				</isEqual>
+			</isEqual>
+		</isNotEmpty>
+        ORDER BY c.weeks,c.pertime DESC,c.targetTop  
+	</select>
+	<!--查询领导行程汇总领导  不管有没有行程，将领导都查出来 -->
+	<select id="qryLeadStorkeheadlineInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<!--SELECT 
+			  SI.ASCRIPTIONLAEDNAME,
+			  SI.ASCRIPTIONLAEDPOSITION,
+			  SAI.TARGETTOP
+		FROM
+			  LEAD_STROKE_INFO  SI,
+			  LEAD_STROKE_AUTH_INFO SAI
+		WHERE  SI.ASCRIPTIONLAEDID = SAI.TARGETID 
+		<isNotEmpty prepend="AND" property="startDate">
+			SI.STROKETIMESTART  <![CDATA[>=]]> #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+			SI.STROKETIMESTART <![CDATA[<=]]> #endDate#
+		</isNotEmpty>
+		    GROUP BY SI.ASCRIPTIONLAEDID
+  			ORDER BY SAI.TARGETTOP  -->
+  		    select  targetId,
+  		    targetName ASCRIPTIONLAEDNAME,
+  		    targetPosition ASCRIPTIONLAEDPOSITION,
+  		    targetTop TARGETTOP
+  		    from LEAD_STROKE_AUTH_INFO
+  		    GROUP BY targetId
+  			ORDER BY targetTop
+	</select>
+	<!--查询秘书及领导权限-->
+	<select id="qryLeadAuthInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  TARGETID,
+			  TARGETNAME,
+			  TARGETPOSITION,
+			  TARGETTOP 
+			FROM
+			  LEAD_STROKE_AUTH_INFO 
+			WHERE LOGINID = #staff_id#
+	</select>
+	<!--查询秘书及领导权限分页-->
+	<select id="qryLeadAuthInfos" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  TARGETID,
+			  TARGETNAME,
+			  TARGETPOSITION,
+			  TARGETTOP 
+			FROM
+			  LEAD_STROKE_AUTH_INFO 
+			WHERE LOGINID = #staff_id#
+			ORDER BY TARGETTOP
+		<isNotEmpty prepend="" property="pageSize">
+			limit $limit$,$pageSize$
+		</isNotEmpty>
+	</select>
+	<!-- 查询秘书及领导权限总数量 -->
+	<select id="qryLeadAuthInfosCount" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT  COUNT(*)
+		FROM  (
+		SELECT 
+			  TARGETID,
+			  TARGETNAME,
+			  TARGETPOSITION,
+			  TARGETTOP 
+			FROM
+			  LEAD_STROKE_AUTH_INFO 
+			WHERE LOGINID = #staff_id#
+		 )t
+	</select>
+	<!--校验领导行程 -->
+	<select id="validateLeadAuthInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  HEADLINEINFO,
+			  (
+			    CASE
+			      WHEN PERIODTIME = '0' 
+			      THEN '下午' 
+			      WHEN PERIODTIME = '1' 
+			      THEN '上午' 
+			    END
+			  ) PERIODTIME,
+			  STROKEINFO,
+			  REMARKINFO,
+			  STROKETIME,
+			  ASCRIPTIONLAEDID,
+			  ASCRIPTIONLAEDNAME,
+			  ASCRIPTIONLAEDPOSITION,
+			  LAEDSTROKESTATUS,
+			  DATE_FORMAT(STROKETIMESTART, "%Y/%m/%d") STROKETIMESTART,
+			  FOUNDERID,
+			  FOUNDERNAME 
+		FROM
+			  LEAD_STROKE_INFO
+		WHERE  1=1
+		<isNotEmpty prepend="AND" property="startDate">
+			STROKETIMESTART  <![CDATA[>=]]> #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+			STROKETIMESTART <![CDATA[<=]]> #endDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="staff_id">
+		    ASCRIPTIONLAEDID=#ascriptionLaedId# 
+		</isNotEmpty>
+	</select>
+	<!-- 查询周六周日是否有数据 -->
+	<select id="judgmentWeekendsIsNull" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			 SUM(
+			    CASE
+			      WHEN strokeInfo != '' AND stroketime LIKE '%六%' 
+			      THEN 1 
+			      ELSE 0 
+			    END
+			  ) stroketCount,
+			  
+			 SUM(
+			    CASE
+			      WHEN strokeInfo != '' AND stroketime LIKE '%天%' 
+			      THEN 1 
+			      ELSE 0 
+			    END
+			  ) stroketCount1
+			FROM
+			  LEAD_STROKE_INFO 
+			WHERE 1 = 1 
+			  AND LAEDSTROKESTATUS = 1 
+			  AND STROKETIMESTART <![CDATA[>=]]> #startDate# 
+			  AND STROKETIMESTART <![CDATA[<=]]> #endDate#
+			  AND (stroketime LIKE '%六%'  OR stroketime LIKE '%天%' )
+	</select>
+	<!-- 查询所有领导 -->
+	<select id="qryLeadStorkeAllInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT * FROM lead_stroke_auth_info GROUP BY TARGETID ORDER BY TARGETTOP;
+	</select>
+</sqlMap>

@@ -1,0 +1,44 @@
+﻿<script type="text/javascript" src="js/taskBook/makeTaskBook.js"></script>
+<div class="list-main" id="makeTaskBookPage">
+
+	<h2>责任书制定</h2>
+
+	<dl class="bd-list">
+		<dt style="width:50px;">年份：</dt>
+		<dd>
+			<input id="yearDate" type="text" class="w120" readonly>
+		</dd>
+		<dt>责任书类型：</dt>
+		<dd>
+			<select id="bookType" class="w130" style="width: 156px;height:26px;">全部</select>
+		</dd>
+		<dt>责任书状态：</dt>
+		<dd>
+			<select id="bookState" class="w130" style="width: 156px;height:26px;">
+                 <option dicId ="">全部</option>
+                 <option dicId ="0">待发布</option>
+                 <option dicId ="1">已发布</option>
+            </select>
+		</dd>
+		<dd>
+			<a href="#" class="butInit" id="search">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+	<div id="listPage">
+		<table class="tab2 mt10" border="1px solid black" cellspacing="0" cellpadding="0" style="width:80%;margin:0 auto">
+			<thead>
+				<tr>
+				    <td></td>
+					<td>责任书类型</td>
+					<td>责任书状态</td>
+					<td>操作</td>
+				</tr>
+				
+			</thead>
+			<tbody id="taskListBody">
+			</tbody>
+		</table>
+		<div class="page mt10" id="taskListFoot"></div>
+	</div>
+</div>

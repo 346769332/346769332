@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="reprot">
+    
+    
+    <!-- 查询配置条件控件 -->
+    <select id="select_cond_control_config" parameterClass="java.util.Map" resultClass="java.util.LinkedHashMap" >
+        
+        SELECT 
+		  a.cond_id,
+		  a.control_id,
+		  a.control_name,
+		  a.control_type,
+		  a.default_value,
+		  a.control_base,
+		  b.seq 
+		FROM
+		  tb_cpc_report_cond a,
+		  tb_cpc_report_cond_search_rel b 
+		WHERE a.cond_id = b.cond_id 
+		  AND b.report_id = #report_id# 
+		order by b.seq 
+    </select>
+    
+    <!-- 查询执行配置信息 -->
+    <select id="select_proc_config" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+        SELECT 
+		  proc_id,
+		  proc_tag_name,
+		  proc_seq,
+		  report_id 
+		FROM
+		  tb_cpc_report_proc 
+		WHERE proc_name = #proc_name#
+		ORDER BY proc_seq 
+    </select>
+    <!-- 执行存储过程 -->
+    <procedure id="proc_dynamic_exec" parameterClass="java.util.Map">
+         {call $proc_tag_name$}
+    </procedure>
+    
+    
+    <!-- 查询待执行的内容 -->
+    <select id="select_report_proc" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+        SELECT 
+		  proc_id,
+		  proc_tag_name,
+		  proc_seq,
+		  report_id 
+		FROM
+		  tb_cpc_report_proc 
+    </select>
+    
+    
+    <select id="select_report_sub_rel" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+        SELECT 
+		  report_id,
+		  column_id,
+		  sub_report_id,
+		  show_in 
+		FROM
+		  tb_cpc_report_sub_rel 
+		where
+		  report_id = #report_id#
+    </select>
+    
+    <!-- 查询执行sql -->
+    <select id="select_report_sql" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+        SELECT 
+		  report_id,
+		  report_name,
+		  search_sql ,
+		  page_size,
+		  has_print
+		FROM
+		  tb_cpc_report_search 
+		WHERE
+		  1=1
+		<isNotEmpty prepend="AND" property="report_id" >
+		    report_id = #report_id#
+		</isNotEmpty>
+		  
+    </select>
+    
+    <!-- 动态sql执行 -->
+    <select id="select_dynamic_sql" parameterClass="java.util.Map" remapResults="true" resultClass="java.util.LinkedHashMap">
+       <![CDATA[ $search_sql$ ]]>
+    </select>
+    
+    <select id="select_dynamic_sql_count" parameterClass="java.util.Map" resultClass="java.util.HashMap">
+        select count(1) totalSize  from
+        (<![CDATA[ $search_sql_from$ ]]>) aa
+    </select>
+</sqlMap>

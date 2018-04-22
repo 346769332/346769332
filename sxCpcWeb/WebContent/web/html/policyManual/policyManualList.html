@@ -1,0 +1,75 @@
+<script type="text/javascript" src="js/policyManual/policyManualList.js"></script>
+<div class="list-main" id="policyManualListPage">
+ 	<!-- 标题 -->
+ 	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;综合管理&nbsp;&nbsp;--&nbsp;&nbsp;政策手册</div>
+	
+	<div class="seach-box mt20  ">
+	    <ul class="hx-list  clearfix">
+	        <li>政策类型:<select id="policyId" class="w100"><option>选择</option></select></li>
+	        <li id="childLi" style="display: none;">政策子类：<select id="polChilId" class="w100"><option>选择</option></select></li>
+	        <li>政策标题：<input id="polContent" type="text" class=" w100"></li>
+	        <li>发布时间：<input id="sendDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-20px;width: 20px;" id="clearSendDate">
+	       		 至<input id="endDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-20px;width: 20px;" id="clearEndDate">
+	       	</li>
+	        <li><a href="javascript:void(0)"class="but ml20" id="senior">查询</a></li>
+			<!-- 	        
+				<li><a href="javascript:void(0)"class="but hs_bg" id="reset">重置</a></li> 
+			-->
+	    </ul>
+	    <!-- 
+	    	<div class="lable-title fr"><a  href="javascript:void(0)" style="color:#141DE6;cursor: pointer;text-decoration:underline" id="export">导出Excel</a></div>
+	     -->
+	</div>
+	
+	<!-- 按钮操作 -->
+	<div class="lable-box" id="operButtion">
+		<a  href="javascript:void(0)"class="lable" id="addPolicyManual">新增政策</a>
+		<a  href="javascript:void(0)"class="lable btn-success" id="delPolicyManual">删除政策</a>
+		<a  href="javascript:void(0)"class="lable btn-info" id="relPolicyManual">审批政策</a>
+	</div>
+	
+	<div class="clear"></div>
+	
+	<!-- 角色列表 -->
+	<div style="margin-top:5px;" id="roleDataQuery">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10">
+			<thead>
+				<tr>
+					<th style="width:2%;text-align: right;"></th>
+					<!-- 
+						<td style="width:6%;">政策类型</td>
+						<td style="width:8%;">子类型</td>
+						<th style="width:6%;">销售目的</th>
+						<td style="width:8%;">目标客户</td>
+						<td style="width:6%;">主推渠道</td>
+						<td style="width:6%;">销售形态</td>
+						<td style="width:6%;">政策卖点</td>
+						<td style="width:6%;">政策内容</td>
+						<td style="width:8%;">起售时间</td>
+						<td style="width:8%;">截止时间</td>
+						<td style="width:6%;">状态</td>
+						<td style="width:6%;">审批结论</td>
+						<td style="width:8%;">审批意见</td>
+					 -->
+					 	<td style="width:10%;">政策类型</td>
+						<td style="width:25%;">政策标题</td>
+						<th style="width:6%;">政策内容</th>
+						<td style="width:10%;">政策发起时间</td>
+						<td style="width:10%;">政策发起人</td>
+						<td style="width:6%;">状态</td>
+						<td style="width:6%;">审批结论</td>
+						<td style="width:15%;">审批意见</td>
+				</tr>
+			</thead>
+			<tbody id="policyManualListBody">
+				
+			</tbody>
+		</table>
+		<div class="page mt10" id="policyManualListFoot"></div>
+	</div>
+</div>
+
+<div class="list-main" id="shenpiPage" style="display:none"></div>
+
+ 
+

@@ -1,0 +1,75 @@
+﻿<script type="text/javascript" src="js/zTreeJs/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="js/zTreeJs/jquery.ztree.exedit-3.5.js"></script>
+<script type="text/javascript" src="js/zTreeJs/jquery.ztree.excheck-3.5.js"></script>
+<script type="text/javascript" src="js/zTreeJs/jquery.browser.js"></script>
+<script type="text/javascript" src="js/common/jquery-form.js"></script>
+<script type="text/javascript" src="js/taskBook/taskBookList.js"></script>
+<link rel="stylesheet" href="css/tree/demo.css"  type="text/css"/>
+<link rel="stylesheet" href="css/tree/zTreeStyle/zTreeStyle.css" type="text/css"/>
+<style type="text/css">
+	.ztree li span.button.add {margin-left:2px; margin-right: -1px; background-position:-144px 0; vertical-align:top; *vertical-align:middle}
+    .level0{width:350px;}
+</style>
+<div class="list-main" id="taskBookListPage">
+
+	<h2>责任书查询</h2>
+
+	<dl class="bd-list">
+		<dt class="w50">年份：</dt>
+		<dd>
+		<!-- 
+			<input id="yearDate" type="text" class=" w120">
+			 -->
+		<select id="yearDate" class="w130" style="width: 156px;height:26px;"></select>	 
+		</dd>
+		<dt>责任书类型：</dt>
+		<dd>
+			<select id="bookType" class="w130" style="width: 156px;height:26px;">全部</select>
+		</dd>
+		<dt>责任书状态：</dt>
+		<dd>
+			<select id="bookState" class="w130" style="width: 156px;height:26px;">全部</select>
+		</dd>
+		<dt>归属OBU：</dt>
+		<dd>
+			<input id="OBUName" type="text" class=" w130">
+		</dd>
+		<dt>承包人姓名：</dt>
+		<dd>
+			<input id="contractorName" type="text" class=" w130">
+		</dd>
+		<dd>
+			<a href="#" class="butInit" id="search">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+	
+    <div style="overflow:hidden;width:100%;height:auto">
+     	<div id="tabs-left" style="width:24%; float:left">	
+		   <ul id="treeDemo" class="ztree" style="height:500px;width:93%"></ul>
+		</div>
+		<div style="width:70%;height:30px; border:0px solid #dedede;margin:10px;margin-right: 20px;float:right;" class="fr">
+		     <span>您选择的是：</span><input id="obu" type="text" style="width:200px;" readonly>
+		</div>
+		<div id="listPage" style="width:70%;height:520px; border:0px solid #dedede;margin:10px;margin-right: 20px;float:right;" class="fr">
+		  
+			<table width="100%" border="0" cellspacing="0" cellpadding="0"
+				class="tab2 mt10">
+				<thead>
+					<tr>
+						<td>责任书编号</td>
+						<td>归属OBU</td>
+						<td>承包人姓名</td>
+						<td>承包人联系电话</td>
+						<td>责任书类型</td>
+						<td>责任书状态</td>
+						<td>操作</td>
+					</tr>
+				</thead>
+				<tbody id="taskListBody">
+				</tbody>
+			</table>
+			<div class="page mt10" id="taskListFoot"></div>
+		</div>
+    </div>
+</div>

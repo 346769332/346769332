@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="useAuth">
+
+ <!-- 根据数据ID获取配置下的角色数据集合 -->
+    <sql id="sql_data_role">
+        SELECT DISTINCT 
+		    c.o_rel_id value_id,
+		    c.o_type value_type,
+		    b.role_id
+		  FROM
+		    tb_cpc_sys_data_r_rel a,
+		    tb_cpc_sys_role b,
+		    tb_cpc_sys_role_o_rel c 
+		  WHERE a.role_id = b.role_id 
+		    AND b.role_id = c.role_id 
+		    AND a.data_id in (#data_id#)
+		    <isNotEmpty prepend="AND" property="o_type">
+		        c.o_type = #o_type#
+		    </isNotEmpty>
+		   
+    </sql>
+	<!-- 查询功能点 -->
+	<select id="queryFun" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT 
+		  f.fun_id,
+		  f.fun_name,
+		  f.fun_url,
+		  f.menu_id,
+		  f.fun_path,
+		  f.status,
+		  f.param,
+		  f.def_index,
+		  rl.node_id,
+		  rl.flow_id,
+		  m.menu_id,
+		  m.menu_name,
+		  m.menu_url,
+		  m.status 
+		FROM
+		  tb_cpc_sys_role_a_rel r 
+		  LEFT JOIN tb_cpc_sys_auth a 
+		    ON r.a_id = a.a_id 
+		  LEFT JOIN tb_cpc_sys_auth_f_rel fr 
+		    ON r.a_id = fr.a_id 
+		  LEFT JOIN tb_cpc_sys_fun f 
+		    ON fr.f_rel_id = f.fun_id 
+		  LEFT JOIN tb_cpc_sys_menu m 
+		    ON f.menu_id = m.menu_id 
+		  LEFT JOIN tb_cpc_flow_f_rel rl 
+		    ON f.fun_id = rl.fun_id 
+		WHERE a.a_status = 'Y' 
+		  AND a.a_status = 'Y' 
+		  AND fr.f_status = 'Y' 
+		  AND f.status = 'Y' 
+		  AND fr.f_type = 'FUN' 
+		<isNotEmpty prepend="AND" property="qryColSet">
+			<iterate property="qryColSet" conjunction="or" close=")"
+				open="(">
+				r.role_id = #qryColSet[].roleId#
+			</iterate>
+		</isNotEmpty>
+		GROUP BY f.fun_id
+		order by f.def_index
+	</select>
+	
+	
+	<!-- 查询菜单 -->
+	<select id="queryMenu" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT
+		m.menu_id,
+		m.menu_name,
+		m.menu_url,
+		m.fun_url,
+		m.fun_path,
+		m.param,
+		m.def_index,
+		m.status
+		FROM
+		tb_cpc_sys_role_a_rel r LEFT JOIN tb_cpc_sys_auth a ON r.a_id = a.a_id LEFT JOIN
+		tb_cpc_sys_auth_f_rel fr ON r.a_id = fr.a_id LEFT JOIN tb_cpc_sys_menu
+		m ON fr.f_rel_id = m.menu_id
+		WHERE a.a_status ='Y'
+		AND a.a_status='Y'
+		AND m.`status`='Y'
+		AND fr.f_status='Y'
+		AND fr.f_type = 'MENU'
+		<isNotEmpty prepend="AND" property="qryColSet">
+			<iterate property="qryColSet" conjunction="or" close=")"
+				open="(">
+				r.role_id = #qryColSet[].roleId#
+			</iterate>
+		</isNotEmpty>
+		GROUP BY m.menu_id
+		order by m.def_index
+	</select>
+
+	<!-- 查询用户角色 -->
+	<select id="queryRole" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT
+		orl.role_id,
+		role.role_name,
+		role.role_desc
+		FROM
+		tb_cpc_sys_role_o_rel orl
+		LEFT JOIN tb_cpc_sys_role role
+		ON orl.role_id = role.role_id
+		WHERE role.status = 'Y'
+		<isNotEmpty prepend="AND" property="qryUserColSet">
+			 (
+			<iterate property="qryUserColSet" conjunction="or">
+			   <![CDATA[
+			    (orl.o_type = #qryUserColSet[].relType# 
+			    and orl.o_rel_id  = #qryUserColSet[].relValue# )
+			    ]]>
+			</iterate>
+			)
+		</isNotEmpty>
+	</select>
+
+	<!-- 查询用户角色下的数据权限 -->	
+	<select id="queryRoleData" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+			SELECT 
+		   d.data_id,
+		   d.data_name,
+		   d.data_type,
+		   d.data_desc
+		  FROM
+		    tb_cpc_sys_role_a_rel r 
+		    LEFT JOIN tb_cpc_sys_auth a 
+		      ON r.a_id = a.a_id 
+		    LEFT JOIN tb_cpc_sys_auth_f_rel fr 
+		      ON r.a_id = fr.a_id 
+		    LEFT JOIN tb_cpc_sys_data d 
+		      ON fr.f_rel_id = d.data_id 
+		  WHERE a.a_status = 'Y' 
+		    AND a.a_status = 'Y' 
+		    AND d.status = 'Y' 
+		    AND fr.f_status = 'Y' 
+		    AND fr.f_type = 'DATA' 
+		    <isNotEmpty prepend="AND" property="qryUserColSet">
+			 (
+			<iterate property="qryUserColSet" close=")" open="(" conjunction="or">
+			   <![CDATA[
+			    r.role_id = #qryUserColSet[].roleId# 
+			    ]]>
+			</iterate>
+			)
+		</isNotEmpty>
+		  GROUP BY  d.data_id
+	</select>
+	
+	
+	<!-- 根据角色查询用户拥有的角色 -->
+	<select id="queryPoolByRole" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT 
+		  p.calim_limit,
+		  p.default_eval,
+		  p.default_eval_time,
+		  p.default_mob_tel,
+		  p.login_code,
+		  p.pool_id,
+		  p.pool_name,
+		  p.urge_span_time 
+		FROM
+		  (SELECT * FROM tb_cpc_pool_opts o WHERE o.rel_id in 
+		    <iterate property="qryColSet" conjunction="," close=")" open="(">
+				 #qryColSet[].roleId#
+		    </iterate>
+			<isNotEmpty property="orgId">
+			 and o.rel_value=#orgId#
+			</isNotEmpty>
+			) opts
+		  LEFT JOIN tb_cpc_pool p 
+		    ON opts.pool_id = p.pool_id 
+	</select>
+	
+	<!-- 根据角色查询功能以及 -->
+	<select id=""></select>
+
+    
+    <!-- 查询数据权限 -->
+    <select id="select_data_auth" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT 
+		  e.*,
+		  a.*,
+		  c.*
+		FROM
+		  tb_cpc_sys_role a,
+		  tb_cpc_sys_role_a_rel b,
+		  tb_cpc_sys_auth c,
+		  tb_cpc_sys_auth_f_rel d,
+		  tb_cyc_sys_data e
+		WHERE a.role_id = b.role_id 
+		  AND b.a_id = c.a_id 
+		  AND c.a_id = d.a_id 
+		  AND d.f_rel_id = e.data_id 
+		  AND d.f_type = 'DATA'
+		  AND a.status = 'Y' 
+		  AND b.a_status = 'Y' 
+		  AND c.a_status = 'Y' 
+		  AND d.f_status = 'Y' 
+		  AND e.status = 'Y' 
+		  AND e.data_type= #data_type#
+    </select>
+    
+    <!-- 查询数据配置角色 -->
+    <select id="query_data_role" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+    	<include refid="sql_data_role"/>
+    </select>
+    
+    <!-- 查询部门配置的角色下的员工 -->
+    <select id="query_orgId_staff" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+    	 SELECT s.STAFF_ID FROM sys_staff s WHERE s.DEPARTMENT_CODE IN (#orgLst#)
+    </select>
+    
+    <!-- 查询用户角色的主页信息 -->
+	<select id="qryHomePageInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT DISTINCT
+		e.fun_path,
+		e.fun_url,
+		b.o_type
+		FROM
+		tb_cpc_sys_role_o_rel b
+		LEFT JOIN tb_cpc_sys_role_a_rel c
+		ON b.role_id = c.role_id
+		LEFT JOIN tb_cpc_sys_auth_f_rel d
+		ON c.a_id = d.a_id
+		LEFT JOIN tb_cpc_sys_fun e
+		ON d.f_rel_id = e.fun_id
+		WHERE d.f_type = 'fun'
+		AND d.b_status = 'main'
+		<isNotEmpty prepend="AND" property="qryUserColSet">
+			(
+			<iterate property="qryUserColSet" conjunction="or">
+				b.o_rel_id = #qryUserColSet[].relValue#
+			</iterate>
+			)
+		</isNotEmpty>
+		ORDER BY b.o_type DESC
+	</select>
+    
+</sqlMap>

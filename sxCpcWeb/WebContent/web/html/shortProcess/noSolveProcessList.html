@@ -1,0 +1,52 @@
+<script type="text/javascript" src="js/shortProcess/noSolveProcessList.js"></script>
+
+<div class="list-main" id="demandListPage">
+	<!-- 0:代表短流程需求查询标识 ,1:代表历史短流程查询标识-->
+	<input type="hidden" name="flag" value="0"  id="flag"/>
+	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;待处理短流程需求列表</div>
+	<dl class="bd-list">
+		<dt style="margin-top: 10px;">需求编号:</dt>
+		<dd>
+			<input id="demandCode" name="demandCode" type="text" class="w130">
+		</dd>
+		<dt style="margin-top: 10px;">需求名称:</dt>
+		<dd>
+			<input id="demandName" name="demandName" type="text" class="w130">
+		</dd>
+		<dt style="margin-top: 10px;width: 120px">所属短流程名称:</dt>
+		<dd>
+			<input id="workflowName" name="workflowName" type="text" class="w130">
+		</dd>
+		<dt style="margin-top: 10px;">是否超时:</dt>
+		<dd>
+			<select style="width: 156px;height:26px;" name="overTime" id="overTime">
+		    	<option value="">-请选择-</option>
+		    	<option value="1">是</option>
+		    	<option value="0">否</option>    	
+		    </select>
+		</dd>
+		<dd>
+			<a href="javascript:void(0)" class="but ml20" id="search">查询</a>
+	        <a href="javascript:void(0)" class="but ml20" id="reset">重置</a>
+		</dd>
+	</dl>
+	<div id="dateQuery"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10 d_top">
+		<thead>
+			<tr>
+				<td style="width:10%;">需求编号</td>
+				<td style="width:15%;">需求名称</td>
+				<td style="width:10%;">需求状态</td>
+				<td style="width:15%;">所属短流程</td>
+				<td style="width:10%;">当前处理部门</td>
+				<td style="width:10%;">当前处理人</td>
+				<td style="width:10%;">是否超时</td>
+				<td style="width:10%;">操作</td>
+			</tr>
+		</thead>
+		<tbody id="demandListBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="demandListFoot"></div>
+</div>

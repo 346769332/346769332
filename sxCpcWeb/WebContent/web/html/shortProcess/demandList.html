@@ -1,0 +1,61 @@
+<script type="text/javascript" src="js/shortProcess/demandList.js"></script>
+
+<div class="list-main" id="demandListPage">
+	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;短流程需求查询</div>
+	<div class="bd-list">
+		<!-- 0:代表短流程需求查询标识 ,1:代表历史短流程查询标识-->
+		<input type="hidden" name="flag" value="0"  id="flag"/>
+		<div class="form-group">
+		    <label class="form-label">需求编号:</label>
+		    <input id="demandCode" name="demandCode"  type="text" class=" w130" style="width: 220px;">
+		</div>
+		<div class="form-group">
+		    <label class="form-label">需求名称:</label>
+		    <input id="demandName" name="demandName" type="text" class=" w130" style="width: 220px;">
+		</div>
+		<div class="form-group">
+		    <label class="form-label">需求状态:</label>
+		    <select  class="select_w153" id="demandStatus" name="demandStatus" style="width: 220px;">
+		    	<option value="">---请选择---</option>
+		    	<option value="1000">审批中</option>
+		    	<option value="1001">审批完结</option>
+		    	<option value="1002">草稿</option>
+		    </select>
+		</div>
+		<div class="form-group">
+		    <label class="form-label">是否超时:</label>
+		    <select  class="select_w153" name="overTime" id="overTime"style="width: 220px;">
+		    	<option value="">---请选择---</option>
+		    	<option value="1">是</option>
+		    	<option value="0">否</option>
+		    </select>
+		</div>
+		<div class="form-group">
+		    <label class="form-label">所属短流程名称:</label>
+		    <input id="workflowName" name="workflowName" type="text" class=" w130"style="width: 222px;" />
+		</div>
+		<div class="form-search" style=" float: right;margin-left: 10px;">
+		    <a href="#" class="but" id="search">查询</a>&nbsp;
+		    <a href="#" class="but" id="reset">重置</a>
+		</div>
+	</div>
+	<div id="dateQuery"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10 d_top">
+		<thead>
+			<tr>
+				<td style="width:10%;">需求编号</td>
+				<td >需求名称</td>
+				<td style="width:12%;">需求状态</td>
+				<td style="width:12%;">所属短流程</td>
+				<td style="width:16%;">当前处理部门</td>
+				<td style="width:10%;">当前处理人</td>
+				<td style="width:7%;">是否超时</td>
+				<td style="width:15%;">操作</td>
+			</tr>
+		</thead>
+		<tbody id="demandListBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="demandListFoot"></div>
+</div>

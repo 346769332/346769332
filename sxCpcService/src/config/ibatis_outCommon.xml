@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="outcommom">
+	 <select id="selectUserSecondaryList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+     	SELECT sy.staff_id hrid,sy.staff_name realname,sy.login_code username,sy.password password,sy.mob_tel mobile,sy.email email,
+     	sy.region_id localnet,sy.department organization,DATE_FORMAT(sy.state_date,'%Y-%m-%d %H:%i') state_date FROM SYS_STAFF sy WHERE 1=1
+     
+     </select>
+	  <!-- 新增工号信息 -->
+	 <insert id="addStaffInfo" parameterClass="java.util.HashMap">
+	     INSERT INTO SYS_STAFF (STAFF_ID, STAFF_NAME, LOGIN_CODE, PASSWORD, SYSTEM_FROM, MOB_TEL, EMAIL, REGION_ID,
+		  DEPARTMENT, POST, STATE, STATE_DATE,login_state ) 
+		 VALUES (#hrid#, #realname#, #username#, #password#, null, #mobile#, #email#, #latnId#, 
+		  #organization#, null, 1, now(), 'Y')
+	 </insert>
+	 <update id="updateUserInfo" parameterClass="java.util.HashMap">
+	 	update SYS_STAFF t set t.STAFF_NAME=#realname#,
+	 	t.PASSWORD=#password#,
+	 	t.EMAIL=#email#,
+	 	t.MOB_TEL=#mobile#,
+	 	t.REGION_ID=#localnet#,
+	 	t.login_code=#username#,
+	 	t.STATE_DATE=date_format(#modifytime#,'%Y-%c-%d %H:%i'),
+	 	t.DEPARTMENT=#organization#
+	 	where t.STAFF_ID=#hrid#
+	 </update>
+	 <!-- 删除人员 -->
+	  <delete id="delUserInfo" parameterClass="java.util.HashMap">
+	  DELETE FROM SYS_STAFF  WHERE login_code=#username# 
+	  </delete>
+	  <!-- role -->
+	 <select id="selectroleinfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	 	SELECT k.ROLE_ID,k.ROLE_DESC,k.LATN_ID,DATE_FORMAT(k.create_time,'%Y-%m-%d %H:%i') CREATE_TIME,DATE_FORMAT(k.modify_time,'%Y-%m-%d %H:%i') MODIFY_TIME 
+	 	FROM tb_cpc_sys_role k
+	 </select>
+	 <insert id="insertroleInfo" parameterClass="java.util.HashMap">
+		INSERT INTO TB_CPC_SYS_ROLE 
+			(role_id,role_desc,latn_id,create_time,STATUS) VALUES
+			(#name1#,#description#,#lcoalnet#,DATE_FORMAT(#createdate#,'%Y-%m-%d %H:%i'),'Y');
+	 </insert>
+	 <update id="updateroleInfo" parameterClass="java.util.HashMap">
+	 UPDATE tb_cpc_sys_role r SET
+		r.role_desc=#description#,
+		r.latn_id=#lcoalnet#,
+		r.create_time=date_format(#createdate#,'%Y-%m-%d %H:%i')
+		WHERE  r.role_id=#name1#
+	 </update>
+	 <delete id="deleteroleInfo" parameterClass="java.util.HashMap">
+	 	DELETE FROM tb_cpc_sys_role  WHERE role_id=#name1# 
+	 </delete>
+	 <!--  -->
+	 <insert id="insertResRoleUsersecondaryList" parameterClass="java.util.HashMap">
+		insert into tb_cpc_sys_role_o_rel 
+			(role_id,o_rel_id,o_type)VALUES
+			(#rolename#,(SELECT staff_id FROM sys_staff WHERE login_code=#username#),'STAFF')
+	 </insert>
+	 <delete id="deleteResRoleUsersecondaryList" parameterClass="java.util.HashMap">
+	 	DELETE FROM tb_cpc_sys_role_o_rel WHERE role_id=#rolename#
+		AND o_rel_id=(SELECT staff_id FROM sys_staff WHERE login_code=#username#)
+		AND o_type='STAFF'
+	 </delete>
+	 <!--  -->
+     <select id="selectroleInfosecondaryList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT a.role_id,c.login_code FROM tb_cpc_sys_role_o_rel a
+		LEFT JOIN  tb_cpc_sys_role b ON a.role_id=b.role_id
+		LEFT JOIN  sys_staff c ON c.staff_id=a.o_rel_id
+		WHERE 1=1 AND b.status='Y'
+		AND c.login_state='Y'
+     </select>
+	 <select id="selectOrganizationList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	  	SELECT t.org_id id,t.pid parentid,t.org_name name1,DATE_FORMAT(t.create_date,'%Y-%m-%d %H:%i') modifytime FROM sys_org t WHERE t.state='1'
+	 </select>
+	 <select id="getordercount" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	 	<!--SELECT COUNT(DISTINCT a.DEMAND_ID)  countq
+		FROM ACT_DEMAND_TASK a 
+		WHERE a.TASK_STATUS = 1 
+		AND a.OPERATOR_ID = #name#
+		 91001427 -->
+		 SELECT COUNT(DISTINCT a.DEMAND_ID) countq
+FROM ACT_DEMAND_TASK a ,sys_staff s
+WHERE a.TASK_STATUS = 1 
+AND a.OPERATOR_ID = s.STAFF_ID
+AND s.LOGIN_CODE =#name#
+	 </select>
+</sqlMap>

@@ -1,0 +1,175 @@
+﻿<script type="text/javascript" src="js/order/comprehensiveQryD.js"></script>
+<div class="list-main" id="comprehensiveQryDPage">
+	<form  style="height: 0px;" id="exportForm" >
+		<input type="hidden" name="type" value="saveComprehensiveDemandList">
+		<input type="hidden" name="demand_id" value="需求单号">
+		<input type="hidden"  name="demand_theme" value="需求主题">
+		<input type="hidden"  name="demand_type_name" value="需求类型">
+		<input type="hidden"  name="promoters" value="发起人">
+		<input type="hidden"  name="create_time" value="发起时间">
+		<input type="hidden"  name="opt_name" value="当前处理人">
+		<input type="hidden"  name="curr_node_name" value="最新状态">
+		<input type="hidden"  name="pool_name" value="工单首问部门">
+		<input type="hidden"  name="department" value="发单人部门">
+		<input type="hidden"  name="tree_name" value="发单人归属区县局">
+		<input type="hidden"  name="over_eval" value="结果评价">
+		<input type="hidden"  name="over_time" value="工单结束时间">
+		<input type="hidden"  name="flag" value="是否超时">
+		<input type="hidden"  name="surplusTimeD" value="超时时长">
+		<input type="hidden"  name="eval_time" value="时间评价">
+		<input type="hidden"  name="eval_atti" value="态度评价">
+	</form>
+	<h2>综合查询</h2>
+
+	<dl class="bd-list">
+	    <dt>本地网：</dt>
+		<dd>
+			<select id="latnId" class="w130" style="width: 156px;height:26px;"></select>
+		</dd>
+		<dt>需求单号：</dt>
+		<dd>
+			<input id="demandId" type="text" class=" w130">
+		</dd>
+		<dt>需求类型：</dt>
+		<dd>
+			<select  id="demandType" class="w130" style="width: 156px;height:26px;"> </select>
+		</dd>
+		<dt>主题搜索：</dt>
+		<dd>
+			<input id="themeSeach" type="text" class=" w130">
+		</dd>
+		<dt>内容搜索：</dt>
+		<dd>
+			<input id="contentSearch" type="text" class=" w130">
+		</dd>
+		<dt>发起人名称：</dt>
+		<dd>
+			<input id="sendUserName" type="text" class=" w130" readonly>
+		</dd>
+		<dt>发起人电话：</dt>
+		<dd>
+			<input id="sendUserTel" type="text" class=" w130">
+		</dd>
+		<dt>发起人部门：</dt>
+		<dd>
+			<input id="sendUserDept" type="text" class=" w130">
+		</dd>
+		<dt>发起人区县局：</dt>
+		<dd>
+			<input id="sendUserArea" type="text" class=" w130">
+		</dd>
+		<dt>曾处理人名称：</dt>
+		<dd>
+			<input id="optName" type="text" class=" w130">
+		</dd>
+		<dt>曾处理人电话：</dt>
+		<dd>
+			<input id="optTel" type="text" class=" w130">
+		</dd>
+		<dt>曾处理人部门：</dt>
+		<dd>
+			<input id="optDept" type="text" class=" w130">
+		</dd>
+		<dt>工单首问部门：</dt>
+		<dd>
+			<select id="firstOptDept" class="w130" style="width: 156px;height:26px;"></select>
+		</dd>
+		<dt>处理结果评价：</dt>
+		<dd>
+			<select id="evalResult" class="w130" style="width: 156px;height:26px;"></select>
+		</dd>
+		<!-- 
+		<dt>认领超时标识：</dt>
+		<dd>
+			<select id="calimTimeOutFlag" class="w130" style="width: 156px;height:26px;"></select>
+		</dd>
+		 -->
+		<dt>办结超时标识：</dt>
+		<dd>
+			<select id="overTimeOutFlag" class="w130" style="width: 156px;height:26px;"></select>
+		</dd>
+		<dt>最新状态：</dt>
+		<dd>
+			<select id="newStatusCd" class="w130" style="width: 156px;height:26px;"></select>
+		</dd>
+		<dt>发起开始时间：</dt>
+		<dd>
+			<input id="sendBeginDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearSendBeginDate">
+		</dd>
+		<dt>发起结束时间：</dt>
+		<dd>
+			<input id="sendEndDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearSendEndDate">
+		</dd>
+		<dt>认领开始时间：</dt>
+		<dd>
+			<input id="calimLimitBeginDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearCalimLimitBeginDate">
+		</dd>
+		<dt>认领结束时间：</dt>
+		<dd>
+			<input id="calimLimitEndDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearCalimLimitEndDate">
+		</dd>
+		<dt>办结开始时间：</dt>
+		<dd>
+			<input id="overLimitBeginDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearOverLimitBeginDate">
+		</dd>
+		<dt>办结截至时间：</dt>
+		<dd>
+			<input id="overLimitEndDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearOverLimitEndDate">
+		</dd>
+		<!-- 
+			<dd>
+				<a href="#" class="butInit" id="senior">查询</a>
+			</dd>
+		 -->
+	</dl>
+	<div class="clear"></div>
+	<div style="text-align:center; margin-bottom:20px;">
+		<a href="#" class="butInit " id="senior" >查询</a>
+		<a  href="javascript:void(0)" style="color:#141DE6;cursor: pointer;text-decoration:underline;float: right;" id="export">导出Excel</a>
+	</div>
+	<div class="clear"></div>
+	<div style="margin-top:5px;width:100%;" id="dateQuery" >
+		
+		<table style="width:100%;table-layout:fixed;">
+			<tbody>
+				<tr>
+					<td>
+					<div id="titleDiv" style="overflow-x: auto; height: auto; width: 100%;" >
+						<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10" style="table-layout:fixed;float:left;">
+							<thead>
+								<tr>
+									<td width="100">需求单号</td>
+									<td width="100">需求主题</td>
+									<td width="100">需求类型</td>
+									<td width="50">发起人</td>
+									<td width="200">发起时间</td>
+									<td width="100">当前处理人</td>
+									<td width="100">最新状态</td>
+									<td width="200">工单首问部门</td>
+									<td width="150">发单人部门</td>
+									<td width="200">发单人归属区县局</td>
+									<td width="100">结果评价</td>
+									<td width="100">时间评价</td>
+									<td width="100">态度评价</td>
+									<td width="200">工单结束时间</td>
+									<!-- 
+									<td width="100">认领是否超时</td>
+									<td width="100">认领超时时长</td>
+									 -->
+									<td width="100">办理是否超时</td>
+									<td width="100">超时时长</td>
+								</tr>
+							</thead>
+							 <tbody id="orderLstBody">
+							 </tbody>
+						</table>
+						
+					</div>
+					</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		<div class="page mt10" id="comprehensiveQryFoot"></div>
+	</div>
+</div>

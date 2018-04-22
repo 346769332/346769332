@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="pushInfo">
+	<!--查询本地网 -->
+	<select id="searchland" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT S.REGION_ID, S.REGION_NAME FROM SYS_REGION S where 1=1
+		<isNotEmpty prepend="AND" property="region_id">
+			s.REGION_ID in
+			($region_id$)
+		</isNotEmpty>
+		ORDER BY S.REGION_ID
+
+
+	</select>
+	<!-->查询部门 -->
+	<select id="searchdeppt" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT
+		o.dept_id ORG_ID,
+		o.dept_id ORG_CODE,
+		o.dept_name ORG_NAME,
+		o.latn_id REGION_ID
+		FROM
+		act_workflow_dept_info o
+		WHERE
+		1=1
+		<isNotEmpty prepend="AND" property="region_id">
+			o.latn_id=#region_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="org_Name">
+			o.dept_name LIKE CONCAT('%', #org_Name#, '%') 
+		</isNotEmpty>
+		ORDER BY O.dept_id
+	</select>
+	<!-- 查询处理人 -->
+	<select id="qryStaffPage" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT * FROM ( SELECT
+		S.STAFF_ID,
+		S.STAFF_NAME,
+		S.MOB_TEL,
+		O.dept_id AS
+		DEPARTMENT_ID,
+		S.dept_id as DEPARTMENT_CODE,
+		S.REGION_ID,
+		O.dept_name as ORG_NAME
+		FROM SYS_STAFF
+		S, act_workflow_dept_info O
+		WHERE O.dept_id = S.dept_id
+		AND S.dept_id
+		=#department_code#
+		) A WHERE 1=1
+		<isNotEmpty prepend="" property="pageSize">
+			limit $limit$,$pageSize$
+		</isNotEmpty>
+	</select>
+	<!-- 查询处理人总数 -->
+	<select id="qryStaffPageCount" resultClass="java.lang.String"
+		parameterClass="java.util.HashMap">
+		select count(1) from (
+		SELECT s.staff_id,
+		s.staff_name,
+		s.mob_tel,
+		s.dept_id,
+		s.region_id,
+		o.dept_name
+		from sys_staff s,
+		act_workflow_dept_info o
+		WHERE o.dept_id = s.dept_id
+		AND s.dept_id
+		=#department_code#
+		)b
+	</select>
+	<!-- 查询pushId -->
+	<select id="qry_PushInfoId" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+		SELECT nextval('seq_push_id') AS PUSH_ID FROM dual_test
+	</select>
+	<!-- 新增推送消息 -->
+	<insert id="addPushInfo" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_cpc_push_info
+		(
+		pushId,
+		sendToId,
+		sendToName,
+		pushTheme,
+		pushContent,
+		attachmentName,
+		attachmentPath,
+		otherAttName,
+		createrId,
+		createrName,
+		createTime,
+		latnId,
+		pushLevel
+		)
+		VALUES
+		(
+		#pushId#,
+		#sendToId#,
+		#sendToName#,
+		#pushTheme#,
+		#pushContent#,
+		#attachmentName#,
+		#attachmentPath#,
+		#otherAttName#,
+		#createrId#,
+		#createrName#,
+		NOW(),
+		#latnId#,
+		#pushLevel#)
+	</insert>
+	<!-- 查询push消息列表 -->
+	<select id="qryPushListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 	  CPI.PUSHID,
+				  CPI.SENDTOID,
+				  CPI.SENDTONAME,
+				  CPI.PUSHTHEME,
+				  CPI.PUSHCONTENT,
+				  CPI.ATTACHMENTNAME,
+				  CPI.ATTACHMENTPATH,
+				  CPI.OTHERATTNAME,
+				  CPI.CREATERID,
+				  ST.LOGIN_CODE,
+				  CPI.CREATERNAME,
+				  DATE_FORMAT(CPI.CREATETIME, "%Y-%m-%d") DCREATE_TIME,
+  				  CPI.PUSHLEVEL 
+		FROM  TB_CPC_PUSH_INFO CPI, SYS_STAFF ST
+		WHERE 1=1
+		AND ST.STAFF_ID = CPI.CREATERID
+		<isNotEmpty property="themeSeach" prepend="and">
+			CPI.PUSHTHEME LIKE CONCAT('%', #themeSeach#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="sendDate" prepend="and">
+			CPI.CREATETIME <![CDATA[>=]]>#sendDate#
+		</isNotEmpty>
+		<isNotEmpty property="endDate" prepend="and">
+			CPI.CREATETIME <![CDATA[<]]>#endDate#
+		</isNotEmpty>
+		ORDER BY CPI.createTime DESC
+		<isNotEmpty prepend="" property="minSize">
+			limit $minSize$,$maxSize$
+		</isNotEmpty>
+	</select>
+	<!-- 查询push消息列表总数 -->
+	<select id="qryPushListSum" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+		select count(*) from (
+		SELECT 	  CPI.PUSHID,
+				  CPI.SENDTOID,
+				  CPI.SENDTONAME,
+				  CPI.PUSHTHEME,
+				  CPI.PUSHCONTENT,
+				  CPI.ATTACHMENTNAME,
+				  CPI.ATTACHMENTPATH,
+				  CPI.OTHERATTNAME,
+				  CPI.CREATERID,
+				  ST.LOGIN_CODE,
+				  CPI.CREATERNAME,
+				  DATE_FORMAT(CPI.CREATETIME, "%Y-%m-%d") DCREATE_TIME,
+  				  CPI.PUSHLEVEL
+		FROM  TB_CPC_PUSH_INFO CPI, SYS_STAFF ST
+		WHERE 1=1
+		AND ST.STAFF_ID = CPI.CREATERID
+		<isNotEmpty property="themeSeach" prepend="and">
+			CPI.PUSHTHEME LIKE CONCAT('%', #themeSeach#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="sendDate" prepend="and">
+			CPI.CREATETIME <![CDATA[>=]]>#sendDate#
+		</isNotEmpty>
+		<isNotEmpty property="endDate" prepend="and">
+			CPI.CREATETIME <![CDATA[<]]>#endDate#
+		</isNotEmpty>
+		ORDER BY CPI.createTime DESC)D
+	</select>
+	<!-- 查询接收人信息 -->
+	<select id="getSendToInfoList" resultClass="java.util.HashMap"  parameterClass="java.util.HashMap">
+		SELECT   T.*  FROM
+		(SELECT 
+			  STAFF_NAME,
+			  DEPT_NAME 
+			FROM
+			  SYS_STAFF 
+			WHERE 1=1
+			<isEqual property="pushLevels" compareValue="1">
+				<isNotEmpty prepend="and" property="sendToIds">
+				 DEPT_ID = #sendToIds#
+				</isNotEmpty>
+			</isEqual>
+			<isEqual property="pushLevels" compareValue="2">
+				<isNotEmpty prepend="and" property="sendToIds">
+				STAFF_ID IN ($sendToIds$)
+				</isNotEmpty>
+			</isEqual>
+			
+		 )t where 1=1
+		<isNotEmpty prepend="" property="pageSize">
+			limit $limit$,$pageSize$
+		</isNotEmpty>
+	</select>
+	<!-- 查询接收人信息总数 -->
+	<select id="getSendToInfoListCount" resultClass="String"  parameterClass="java.util.HashMap">
+		SELECT  COUNT(*)  FROM( 
+				SELECT 
+					  STAFF_NAME,
+					  DEPT_NAME 
+					FROM
+					  SYS_STAFF 
+					WHERE 1=1
+					<isEqual property="pushLevels" compareValue="1">
+						<isNotEmpty prepend="and" property="sendToIds">
+						 DEPT_ID = #sendToIds#
+						</isNotEmpty>
+					</isEqual>
+					<isEqual property="pushLevels" compareValue="2">
+						<isNotEmpty prepend="and" property="sendToIds">
+						STAFF_ID IN ($sendToIds$)
+						</isNotEmpty>
+					</isEqual>
+		)t
+	</select>
+	<!-- 查询推送接口时，同一部门的staffId -->
+	<select id="getSendToStaffId" resultClass="String"  parameterClass="java.util.HashMap">
+				SELECT 
+					  GROUP_CONCAT(SSV.MMS_STAFF_ID) AS STAFF_ID
+					FROM
+					  SYS_STAFF SS,
+ 					  SYS_STAFF_VIEW SSV 
+					WHERE 1=1
+					 AND SS.STAFF_ID = SSV.LPORTAL_STAFF_ID
+					<isEqual property="pushLevels" compareValue="1">
+						<isNotEmpty prepend="and" property="sendToIds">
+						 SS.DEPT_ID = #sendToIds#
+						</isNotEmpty>
+					</isEqual>
+					<isEqual property="pushLevels" compareValue="2">
+						<isNotEmpty prepend="and" property="sendToIds">
+						SS.STAFF_ID IN ($sendToIds$)
+						</isNotEmpty>
+					</isEqual>
+	</select>
+</sqlMap>

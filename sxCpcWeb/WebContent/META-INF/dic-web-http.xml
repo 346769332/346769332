@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	
+	
+	 <bean id="com.tydic.auth.httpClient4Auth" class="com.tydic.auth.client.utils.AuthHttpClientProxy" init-method="init" lazy-init="true">
+	  <!--   <property name="restful"><ref bean="com.tydic.auth.restful4Auth"/></property>-->
+	</bean>  
+	<bean id="configManager" class="com.tydic.auth.client.utils.AuthConfigManagerClient" lazy-init="true"/>
+	
+</beans>

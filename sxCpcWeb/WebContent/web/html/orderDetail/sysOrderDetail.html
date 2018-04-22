@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>综支工作台</title>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<link href="../../../web/css/common.css" rel="stylesheet" type="text/css">
+<link href="../../../web/css/jquery.datetimepicker.css" rel="stylesheet" type="text/css">
+<script  type="text/javascript" src="../../../web/js/common/jquery-1.9.1.min.js"></script>
+<script  type="text/javascript" src="../../../web/js/common/layer/layer.min.js"></script>
+<script  type="text/javascript" src="../../../web/js/common/servlet.url.js"></script>
+<script type="text/javascript" src="../../../web/js/common/util.js"></script>
+<script type="text/javascript" src="../../../web/js/common/common.js"></script>
+<script type="text/javascript" src="../../../web/js/common/jq.ui.js"></script>
+<script type="text/javascript" src="../../../web/js/common/jquery.datetimepicker.js"></script>
+<script type="text/javascript" src="../../../web/js/orderDetail/sysOrderDetail.js"></script>
+ <script type="text/javascript" src="/CpcWeb/web/js/orderDetail/sysRegion.js"></script>
+ 
+
+</head>
+
+<body id="sysInfo">
+<div id='Layer_Loading' 
+			style="position: fixed; left: 48%; top: 40%; width: 110px; height: 75px; padding-top: 35px; margin-left: -55px; margin-top: -37px; text-align: center;  border-radius: 8px; background: #000; opacity: 0.6; filter:alpha(opacity=60); z-index: 99999999; visibility: hidden;" align='absmiddle'>
+	<img alt='正在加载...' src='../../../web/images/loading.gif'>
+	</div>
+<div id="_SysDialogBGDiv" class="backgroudDiv" style="z-index: 99999;">
+	<div>
+   		<div></div>
+	</div>
+</div>
+<div id='sysRegionDiv'></div>
+<div class="list-main" id='sysInfo_list_main'>
+<div class="list-nav f18 mt10"><span name="flowName"></span></div>
+<div>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0"  class="tab5 mt10 lines">
+        <thead>
+            <tr>
+                <th colspan="4"><span class="fl" id='flow_theme'></span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th align="right">专业系统单号</th>
+                <td id="flow_record_id"></td>
+                <th align="right"> 发起时间</th>
+                <td id="create_time"></td>
+            </tr>
+            <tr>
+              <th align="right">发单人</th>
+              <td id="opter_name">&nbsp;</td>
+              <th align="right">发单人部门</th>
+              <td id="opter_org_name">&nbsp;</td>
+            </tr>
+            <tr>
+              <th align="right">处理状态</th>
+              <td id="opt_status">&nbsp;</td>
+              <th align="right">专业系统</th>
+              <td id="out_sys_id">&nbsp;</td>
+            </tr>
+            <tr>
+              <th align="right">处理意见</th>
+              <td colspan="3" id="opt_remark" style='width:100px;word-wrap:break-word;word-break:break-all;'> </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div >
+<table width="100%" border="0" cellspacing="0" cellpadding="0"  class="tab5 mt10 lines f14">
+        <thead>
+            <tr>
+                <th colspan="9"><span class="fl">流程信息</span></th>
+            </tr>
+        </thead>
+        <tbody id="recordOfSysInfo">
+            <tr >
+                <th align="center">序号</th>
+                <th align="center">当前环节</th>
+                <th align="center">处理人</th>
+                <th align="center">处理时间</th>
+                <th align="center">环节处理意见</th>
+                <th align="center">环节处理人部门</th>
+                <th align="center">流程流转状态</th>
+            </tr>
+        </tbody>
+    </table>
+</div>
+   
+</div>
+
+
+</body>
+</html>

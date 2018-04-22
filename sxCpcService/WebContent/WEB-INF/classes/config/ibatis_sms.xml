@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="sms">
+    
+    <!-- 获取序列 -->
+    <select id="select_sms_record_id" resultClass="String">
+        select nextval('seq_sms_record_id') from dual_test;
+    </select>
+    
+    <!-- 插入短信过程记录表 -->
+	<insert id="insert_sms_record" parameterClass="java.util.HashMap">
+	    insert into tb_cpc_sms_record(
+	    	sms_id  ,
+			busi_id ,
+			BUsi_num,
+			sms_msg ,
+			inn_msg ,
+			inn_time ,
+			status 
+	    )values(
+	    	#sms_id#,
+	    	#busi_id# ,
+			#busi_num#,
+			#sms_msg# ,
+			#inn_msg# ,
+			#inn_time# ,
+			#status#  
+	    )
+	</insert>
+	
+	<!-- 插入短信过程记录表 -->
+	<update id="update_sms_record" parameterClass="java.util.HashMap">
+	    update 
+	    	tb_cpc_sms_record
+	    set 
+	    	out_time = #out_time#,
+	    	out_msg = #out_msg#,
+	    	status = #status#
+	    where 
+	    	sms_id = #sms_id#
+	</update>
+	
+	<select id="select_sms_model" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+	    	* 
+	    FROM 
+	    	tb_cpc_sms_model 
+	    WHERE 
+	    	1=1
+	    <isNotEmpty  prepend="AND" property="smsModelId" >
+	    	model_id = #smsModelId#
+	    </isNotEmpty>
+	    AND is_use = 'Y'    
+	</select>
+	
+	<!-- 插入【统一接触平台】实时短信表 ORACLE-->
+	<insert id="insert_ecp_sms_ot" parameterClass="java.util.HashMap">
+	    insert into  UMPUSER.TB_ECP_ADVICE_INFO_OT (
+	    	FLOW_CODE, 
+	    	TEL, 
+	    	SEND_CONTENT, 
+	    	GET_FLAG, 
+	    	GET_TIME, 
+	    	CREATE_TIME, 
+	    	BUSINESS_ID, 
+	    	RESERVE, 
+	    	LATN_ID
+	    ) values (
+	    	umpuser.seq_ecp_advice_info_ot.nextval, 
+	    	#busi_num#,
+			#sms_msg# ,
+	    	0,
+	    	null, 
+	    	sysdate, 
+	    	7197, 
+	    	'', 
+	    	290)
+	</insert>
+	
+	
+	<!-- 查询最近[处理短信的上行]时间 -->
+	<select id="select_last_up_sms_service" resultClass="String" parameterClass="java.util.HashMap">
+	    SELECT 
+	      MAX(recv_time) recv_time
+	    FROM
+	      tb_cpc_sms_up_record
+	</select>
+	<!-- 查询上行短信 -->
+	<select id="select_up_sms_service" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			msg_id		,
+			msg_content	,
+			src_term_id	,
+			dest_term_id,
+			recv_time
+		FROM
+		  	sms_receive
+		WHERE 
+			dest_term_id = '10001' 
+		AND recv_time > #lastUpRecvTime#
+		AND recv_time <![CDATA[<=]]> NOW()
+	</select>
+	 
+	
+	<!-- 插入上行处理表 -->
+	<insert id="insert_up_sms_service" parameterClass="java.util.HashMap">
+	    
+	    insert into tb_cpc_sms_up_record(
+		    msg_id      ,
+			busi_id     ,
+			msg_content ,
+			opt_type    ,
+			opt_desc    ,
+			src_term_id ,
+			dest_term_id,
+			recv_time   ,
+			create_time ,
+			up_status   ,
+			up_desc     
+	    )values(
+	    	#msg_id#      ,
+			#busi_id#     ,
+			#msg_content# ,
+			#opt_type#    ,
+			#opt_desc#    ,
+			#src_term_id# ,
+			#dest_term_id#,
+			#recv_time#   ,
+			#create_time# ,
+			#up_status#   ,
+			#up_desc#     
+	    )
+	</insert>
+	
+	<!-- 修改上行处理表 -->
+	<update id="update_up_sms_service" parameterClass="java.util.HashMap">
+	    update 
+	    	tb_cpc_sms_up_record
+	    set
+	    	up_status 	= #up_status#,
+	    	up_desc		= #up_desc#
+	    where 
+	    	msg_id = #msg_id#
+	</update>
+	
+	<!-- 查询即将超时的汇总【需求单】 -->
+	<select id="select_willTime_demand_total" resultClass="java.util.LinkedHashMap">
+	    SELECT 
+		  IFNULL(c.login_code,CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci) loginCode,
+		  b.mob_tel mobTel,
+		  COUNT(1) willTotalCount,
+		  0 overTotalCount,
+		  COUNT(1) totalSize
+		FROM
+		  tb_cpc_demand a,
+		  tb_cpc_flow_record b LEFT JOIN sys_staff c ON CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci= c.staff_id
+		WHERE a.demand_id = b.busi_id 
+		  AND a.curr_record_id = b.record_id 
+		  AND b.record_status = 0 
+		  AND a.over_limit >= NOW()
+		  AND a.over_limit <![CDATA[<]]> CONCAT( ADDDATE(CURDATE(),1),' 00:00:00')
+		  
+		  GROUP BY login_code,opt_id, b.mob_tel 
+	</select>
+	
+	<!-- 查询已经超时的汇总【需求单】 -->
+	<select id="select_overTime_demand_total" resultClass="java.util.LinkedHashMap">
+	    SELECT 
+		  IFNULL(c.login_code,CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci) loginCode,
+		  b.mob_tel mobTel,
+		  COUNT(1) overTotalCount,
+		  0 willTotalCount,
+		  COUNT(1) totalSize
+		FROM
+		  tb_cpc_demand a,
+		  tb_cpc_flow_record b LEFT JOIN sys_staff c ON CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci= c.staff_id
+		WHERE a.demand_id = b.busi_id 
+		  AND a.curr_record_id = b.record_id 
+		  AND b.record_status = 0 
+		  AND a.over_limit <![CDATA[<=]]> NOW()
+		  
+		  GROUP BY login_code,opt_id, b.mob_tel 
+	</select>
+	
+	<!-- 查询即将超时的汇总【服务单】 -->
+	<select id="select_willTime_service_total" resultClass="java.util.LinkedHashMap">
+	    SELECT 
+		  IFNULL(c.login_code,CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci) loginCode,
+		  b.mob_tel mobTel,
+		  COUNT(1) willTotalCount,
+		  0 overTotalCount,
+		  COUNT(1) totalSize
+		FROM
+		  tb_cpc_service a,
+		  tb_cpc_flow_record b LEFT JOIN sys_staff c ON CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci= c.staff_id
+		WHERE a.service_id = b.busi_id 
+		  AND a.curr_record_id = b.record_id 
+		  AND b.record_status = 0 
+		  AND a.over_limit >= NOW()
+		  AND a.over_limit <![CDATA[<]]> CONCAT( ADDDATE(CURDATE(),1),' 00:00:00')
+		  
+		  GROUP BY login_code,opt_id, b.mob_tel 
+	</select>
+	
+	<!-- 查询已经超时的汇总【服务单】 -->
+	<select id="select_overTime_service_total" resultClass="java.util.LinkedHashMap">
+	    SELECT 
+		  IFNULL(c.login_code,CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci) loginCode,
+		  b.mob_tel mobTel,
+		  COUNT(1) overTotalCount,
+		  0 willTotalCount,
+		  COUNT(1) totalSize
+		FROM
+		  tb_cpc_service a,
+		  tb_cpc_flow_record b LEFT JOIN sys_staff c ON CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci= c.staff_id
+		WHERE a.service_id = b.busi_id 
+		  AND a.curr_record_id = b.record_id 
+		  AND b.record_status = 0 
+		  AND a.over_limit <![CDATA[<=]]> NOW()
+		  
+		  GROUP BY login_code,opt_id, b.mob_tel 
+	</select>
+	
+	<!-- 查询指定时间段内即将超时需求单 -->
+	<select id="select_overTime_demand_set" resultClass="java.util.LinkedHashMap" parameterClass="java.util.HashMap" >
+		SELECT 
+			  a.demand_id 		busiId,
+			  a.demand_theme	busiTheme,
+			  a.demand_details	busiDetails,
+			  DATE_FORMAT(a.over_limit, "%Y-%m-%d %T") overLimit,
+			  IFNULL(c.staff_name,p.staff_name) staff_name,
+			  b.mob_tel  mobTel
+		FROM
+			  tb_cpc_demand a,
+			  tb_cpc_flow_record b 
+			  LEFT JOIN sys_staff c 
+			    ON CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci= c.staff_id
+			  LEFT JOIN (SELECT p.pool_id,ss.staff_id,ss.staff_name,ss.mob_tel FROM tb_cpc_pool p,sys_staff ss WHERE CONVERT(p.login_code USING utf8) COLLATE utf8_unicode_ci = ss.login_code) p
+				ON b.opt_id = p.pool_id
+		WHERE a.demand_id = b.busi_id 
+		  AND a.curr_record_id = b.record_id 
+		  AND b.record_status = 0 
+		  AND b.mob_tel IS NOT NULL
+		  AND a.over_limit >= #startTime#
+		  AND a.over_limit <![CDATA[<]]> #endTime#
+	</select>
+	
+	<!-- 查询指定时间段内即将超时服务单 -->
+	<select id="select_overTime_service_set" resultClass="java.util.LinkedHashMap" parameterClass="java.util.HashMap" >
+	    SELECT 
+		  a.service_id 		busiId,
+		  a.service_theme 	busiTheme,
+		  a.service_desc	busiDetails,
+		  DATE_FORMAT(a.over_limit, "%Y-%m-%d %T") overLimit,
+		  IFNULL(c.staff_name,p.staff_name) staff_name,
+		  b.mob_tel mobTel
+		FROM
+		  tb_cpc_service a,
+		  tb_cpc_flow_record b 
+		   LEFT JOIN sys_staff c 
+		    ON CONVERT(b.opt_id  USING utf8) COLLATE utf8_unicode_ci= c.staff_id
+		   LEFT JOIN (SELECT p.pool_id,ss.staff_id,ss.staff_name,ss.mob_tel FROM tb_cpc_pool p,sys_staff ss WHERE CONVERT(p.login_code USING utf8) COLLATE utf8_unicode_ci = ss.login_code) p
+				ON b.opt_id = p.pool_id
+		WHERE a.service_id = b.busi_id 
+		  AND a.curr_record_id = b.record_id 
+		  AND b.record_status = 0 
+		  AND b.mob_tel IS NOT NULL
+		  AND a.over_limit >= #startTime#
+		  AND a.over_limit <![CDATA[<=]]> #endTime#
+	</select>
+	
+	
+	<!-- 认领超时提醒短信 -->
+	<select id="select_calim_limit_sms" resultClass="java.util.LinkedHashMap" parameterClass="java.util.HashMap">
+	   SELECT 
+		  b.demand_theme busiTheme,
+		  b.demand_id    busiId,
+		  a.mob_tel      mobTel,
+		  IFNULL(s.login_code,a.opt_id)   loginCode
+		FROM
+		  tb_cpc_flow_record a 
+		  LEFT JOIN tb_cpc_demand b 
+		    ON a.busi_id = b.demand_id
+		  LEFT JOIN sys_staff s 
+		    ON CONVERT(a.opt_id USING utf8) COLLATE utf8_unicode_ci = s.staff_id 
+		WHERE 
+			record_status = 0 
+		AND 
+		(
+			(curr_node_id = 100101
+				AND b.calim_limit >= #startDate#
+	   			AND b.calim_limit <![CDATA[<]]>= #endDate#
+			)or 
+			(curr_node_id = 200102
+				AND (select attr_value  from tb_cpc_record_proc i WHERE attr_id = '14' and i.record_id=a.record_id limit 1) >= #startDate#
+				AND (select attr_value  from tb_cpc_record_proc i WHERE attr_id = '14' and i.record_id=a.record_id limit 1) <![CDATA[<]]>= #endDate#
+			)
+		)
+	   
+	    
+	</select>
+	
+	<!-- 查询用户 -->
+	<select id="select_staff" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+	    	* 
+	    FROM 
+	    	sys_staff 
+	    WHERE 
+	    	1=1
+	    <isNotEmpty  prepend="AND" property="loginCode" >
+	    	login_code = #loginCode#
+	    </isNotEmpty>   
+	</select>
+	
+	<!-- 查询需求单 -->
+	<select id="select_demand" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+	    	* 
+	    FROM 
+	    	tb_cpc_demand 
+	    WHERE 
+	    	1=1
+	    <isNotEmpty  prepend="AND" property="busiId" >
+	    	demand_id = #busiId#
+	    </isNotEmpty>   
+	</select>
+	
+	<!-- 查询服务单 -->
+	<select id="select_service" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+	    	* 
+	    FROM 
+	    	tb_cpc_service 
+	    WHERE 
+	    	1=1
+	    <isNotEmpty  prepend="AND" property="busiId" >
+	    	service_id = #busiId#
+	    </isNotEmpty>   
+	</select>
+	
+</sqlMap>

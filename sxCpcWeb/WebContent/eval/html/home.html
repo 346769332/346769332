@@ -1,0 +1,132 @@
+﻿<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title></title>
+    
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/animate.min.css" rel="stylesheet">
+	<link href="../css/common.css" rel="stylesheet">
+	<link href="../css/style.min.css" rel="stylesheet">
+	<link href="../font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<link href="../css/evaluation.css" rel="stylesheet">
+	<script src="../js/jquery-2.1.1.js"></script>
+	<script src="../js/pace.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script src="../js/jq.ui.js"></script>
+	<script src="../js/common.js"></script>
+	<script src="../js/servlet.url.js"></script>
+	<script src="../js/iscroll.js"></script>
+	
+	
+	
+	
+	<script src="../js/icenter_plugin/cordova.js"></script>
+	
+	<!-- 多角色门户start<script src="../js/icenter_plugin/R.js"></script>  <script src="../cordova.js"></script>-->
+	<script src="../js/icenter_plugin/util.js"></script>
+	<script src="../js/icenter_plugin/icenter_plugin.js"></script>
+	
+	<!-- 多角色门户end -->
+	<script src="../js/json2.js"></script>
+	<script src="../js/validateTel.js"></script>
+
+	<script src="../js/pages/home.js"></script>
+	
+	
+</head>
+
+<body>
+
+<div id="showDialogDiv">
+<div class="modal fade" id="myModal_1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="dialogTitle"></h4>
+      </div>
+      <div class="modal-body" id="dialogMsg">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>	
+<div class="row border-bottom ng-scope">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <h3 class="text-center p-xs m-b-none">咸阳逆评及电子红包的激励</h3>
+        <div class="navbar-header m-t-n-xxl">
+ 
+             <a class="navbar-minimalize minimalize-styl-2 " id="backA"><span class="glyphicon glyphicon-chevron-left" ></span> </a>
+              
+        </div>
+        
+        <div class="navbar-header pull-right m-t-n-xxl m-r-md">
+             <a class="navbar-minimalize minimalize-styl-2 " id="homeEnvelope">
+             
+             	<span style="font-size:20px" class="glyphicon glyphicon-envelope" ></span>
+             	<span id="newsList">0</span> 
+             	
+             </a>
+        </div>
+         
+		
+    </nav>
+</div>
+
+<div id="scrollDiv" class="container-fluid wrapper">
+	<div id="scroller" class="scroller">
+	
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+		<!-- 逆评应用 -->
+  		<div class="panel panel-default">
+    		<div class="panel-heading" style=" background-color: #F2F1F1;" role="tab" id="heading1">
+      			<h4 class="panel-title">
+	        		<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse1" aria-expanded="true" aria-controls="collapse1">
+	          			您好！欢迎使用逆评应用！
+	               		
+	        		</a>
+      			</h4>
+    		</div>
+		  </div>
+	         <div class="dlc" >
+			    <div class="dlc_c">
+			        <dl>
+			            <dt >
+			               <a id="evalDept">支撑部门评价</a>
+			            </dt>
+			             <dt>
+			               <a id="evalManager">领导班子评价</a>
+			             </dt>
+			            <dt>
+			               <a id="sendMoney">我要打赏</a>
+			             </dt>
+			            
+			        </dl>
+			    </div>
+	        </div>
+  	</div>
+  		
+  	</div>
+  		
+</div>
+
+</body>
+</html>
+<script>
+window.onerror = function(msg, url, line) {
+    var idx = url.lastIndexOf("/");
+    if(idx > -1) {
+        url = url.substring(idx+1);
+    }
+    alert("ERROR in " + url + " (line #" + line + "): " + msg);
+    return false;
+};
+</script>

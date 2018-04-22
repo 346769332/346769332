@@ -1,0 +1,69 @@
+<!DOCTYPE>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>咸阳逆评及电子红包的激励</title>
+<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/animate.min.css" rel="stylesheet">
+<link href="../css/style.min.css" rel="stylesheet">
+<link href="../font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<style>
+body{ padding:0px; margin:0px; background:url(../images/bg.jpg) repeat;}
+.nr{ width:90%; margin:10px auto;}
+.shod{ box-shadow: 0px 0px 5px  rgba(0, 0, 0,0.3); border:none; width:100%; height:40px;padding-left: 10px; border-radius: 7px; font-size:14px;}
+.dl{ box-shadow: 0px 0px 5px  rgba(0, 0, 0,0.3); border:none; width:100%; height:40px;border-radius: 7px; font-size:14px;background:-webkit-gradient(linear, 0 0, 0 100%, from(＃006ac2), to(＃0366b7)); background:-moz-linear-gradient(top, ＃006ac2,＃0366b7);background:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#006ac2), to(#0366b7));color:#FFF; font-size:16px;}
+.left{ float:left;}
+.right{ float:right}
+.clear{ clear:both;}
+
+
+
+.inpt{ background:url(../images/input.png) no-repeat center; }
+
+.inpt input{font-size: 12px;border: 1px solid #fff;color: #d7d7d7;height: 22px;line-height: 22px;width: 102px;padding-left: 10px;}
+</style>
+	<script type="text/javascript" src="../js/jquery-2.1.1.js"></script>
+	<script type="text/javascript" src="../js/jq.ui.js"></script>
+ 	<script type="text/javascript" src="../js/pages/login.js"></script>
+	<script type="text/javascript" src="../js/common.js"></script>
+    <script  type="text/javascript" src="../js/servlet.url.js"></script>
+    <script  type="text/javascript" src="../js/jquery.cookie.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+ 	<script src="../cordova.js"></script>
+ 	
+
+</head>
+
+<body>
+<div id="lockScreen"  style="display:none"><div  class="showbg"></div><div class="loading"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div>
+<div id="versionDiv"></div>
+<div style="font-size:14px; color:555;">当前系统版本号：<span id="loginVersion"></span></div>
+<div id='login'>
+	<div style=" width:30%; height:auto; margin:10px auto; margin-top:20%;"><img src="../images/logo.png" width="100%" /></div>
+    <table class="nr">
+    	<tr>
+        	<td height="70"><input type="text" id='userName' class="shod" placeholder="用户名"></td>
+        </tr>
+        <tr>
+        	<td height="70"><input type="password" id='userPasswrod' class="shod" placeholder="密码"></td>
+        </tr>
+        <tr>
+        	<td height="70"><button class="dl">登   录</button></td>
+        </tr>
+        <tr>
+            <td height="70" >
+            <div style="font-size:14px; color:555;"><input type="checkbox" id="rembPwd"/>记住工号、密码</div>
+            
+            <div class="clear"></div>
+    		</td>
+        </tr>
+    </table>
+    
+</div>
+    <div style=" width:30%; height:auto; margin:10px auto; margin-top:20%;"><img src="../images/dxlogo.png" width="100%" /></div>
+</body>
+</html>

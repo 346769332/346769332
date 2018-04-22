@@ -1,0 +1,32 @@
+<script type="text/javascript" src="js/sysReport/searchReportPublic.js"></script>
+<div class="list-main" id="searchReportPublicContent" style="width:95%">
+
+	<h2 id="titleH">报表</h2>
+	
+	<!-- 查询条件 -->
+	<div class="seach-box ">
+		<div style="float:left; width:80%">
+			<form id="controlForm">
+			    <ul id="controlUl" class="hx-list  clearfix">
+			    </ul>
+		    </form>
+	    </div>
+	    <div class="lable-title fr">
+	    	<a href="javascript:void(0)" class="but ml20" id="searchReportA">查询</a>
+	    	<a  href="#" id="printReportA" style="color: #4782DD; text-decoration: underline;margin-right:20px;display:none;">开始打印</a>
+	    	<a  href="#" id="excelReportA" style="color: #4782DD; text-decoration: underline;">导出Excel</a>
+	    </div>
+	</div>
+	<!-- 报表列表 -->
+	<div id="searchReportPublicTableDiv" style="margin-top:5px;">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10" style="table-layout:fixed">
+			<thead id="searchReportPublicHead">
+			</thead>
+			<tbody id="searchReportPublicBody">
+				
+			</tbody>
+		</table>
+		<div class="page mt10" id="demandReportFooter"></div>
+	</div>
+	<form id="execlForm"></form>
+</div>

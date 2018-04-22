@@ -1,0 +1,189 @@
+﻿<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>综支工作台</title>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<link href="/CpcWeb/web/css/common.css" rel="stylesheet" type="text/css">
+ <link href="/CpcWeb/web/css/jquery.datetimepicker.css" rel="stylesheet" type="text/css"> 
+<!--   <link href="/CpcWeb/web/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+ --><script type="text/javascript" src="/CpcWeb/web/js/common/jquery-1.9.1.min.js"></script>
+<!--[if lt IE 8 ]><script src="/CpcWeb/web/js/common/json2.js"></script><![endif]-->
+<script  type="text/javascript" src="/CpcWeb/web/js/common/layer/layer.min.js"></script>
+<script  type="text/javascript" src="/CpcWeb/web/js/common/servlet.url.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/util.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/common.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/jq.ui.js"></script>
+ <script type="text/javascript" src="/CpcWeb/web/js/common/jquery.datetimepicker.js"></script> 
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/common/bootstrap.min.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+ -->
+
+<script type="text/javascript" src="/CpcWeb/web/js/common/orderDealData.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/orderDetail/orderDetail.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/orderDetail/sysRegion.js"></script>
+</head>
+
+<body id="demandInfo">
+<div id='Layer_Loading' 
+			style="position: fixed; left: 48%; top: 40%; width: 110px; height: 75px; padding-top: 35px; margin-left: -55px; margin-top: -37px; text-align: center;  border-radius: 8px; background: #000; opacity: 0.6; filter:alpha(opacity=60); z-index: 99999999; visibility: hidden;" align='absmiddle'>
+	<img alt='正在加载...' src='/CpcWeb/web/images/loading.gif'>
+	</div>
+<div id="_SysDialogBGDiv" class="backgroudDiv" style="z-index: 99999;">
+	<div>
+   		<div></div>
+	</div>
+</div>
+<div id='sysRegionDiv'></div>
+<div class="list-main" id='demandInfo_list_main'>
+<div class="list-nav f18 mt10"><span name ="flowName">已认领>处理</span></div>
+<div class="left_con">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0"  class="tab5 mt10 lines">
+        <thead>
+            <tr>
+                <th colspan="4"><span class="fl" id='demand_theme'>需求主题：主题名称</span><span class="fr" id="urge_count"></span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th align="right">需求单号</th>
+                <td id="demand_id"></td>
+                <th align="right"> 发起时间</th>
+                <td id="create_time"></td>
+            </tr>
+            <tr>
+              <th align="right">发单人</th>
+              <td id="promoters">&nbsp;</td>
+              <th align="right">发单人部门</th>
+              <td id="department">&nbsp;</td>
+            </tr>
+            <tr>
+              <th align="right">联系电话</th>
+              <td id="tel">&nbsp;</td>
+              <th align="right">需求类型</th>
+              <td id="demand_type">&nbsp;</td>
+            </tr>
+            <tr id="sendRank" style="display:none">
+              <th align="right">发单等级</th>
+              <td id="demandRank" colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+              <th align="right">实际办结时间</th>
+              <td id="over_time">&nbsp;</td>
+              <th align="right">评价结果</th>
+              <td id="over_eval">&nbsp;</td>
+            </tr>
+            <tr>
+             <th align="right">处理剩余时间</th>
+             <td id="calimSurplusTime"></td>
+             <th align="right">处理时限</th>
+             <td id="limit_time"></td>
+            </tr>
+            	
+            <tr>
+              <th align="right">需求详情</th>
+              <td colspan="3" id="demand_details" style="width:100px;word-wrap:break-word;word-break:break-all;"> </td>
+            </tr>
+            <tr>
+              <th align="right">附件信息</th>
+              <td colspan="3" id="fileInfo" style="width:100px;word-wrap:break-word;word-break:break-all;"> </td>
+            </tr>
+            <!-- 
+            <tr>
+              <th align="right">上传图片</th>
+              <td colspan="3" style='width:100px;word-wrap:break-word;word-break:break-all;'><div id="demand_img"></div></td>
+            </tr>
+             -->
+        </tbody>
+    </table>
+    <div class="list-nav f18 mt10"><span>处理信息</span></div>
+    <div class="" id="dispose" style="display: none;">
+    	<!--tab切换 begin-->	 
+       <div class="gy_tab mt10">
+        <ul name="dispose">
+           <!--  <li name="split" style="display: none;"><a href="#">处理</a></li> -->
+            <!-- <li class="hover" name="backOrder" style="display: none;"><a href="#">回单</a></li>
+            <li name="turnSent" style="display: none;"><a href="#">内部转派</a></li>
+            <li name="followUp" style="display: none;"><a href="#" >跟进</a></li>
+            <li name="sport" style="display: none;"><a href="#">上报</a></li> -->
+           <li name="split" style="display: none;"><a href="#">派单处理</a>
+            <li class="hover" name="backOrder" style="display: none;"><a href="#">结单确认</a></li>
+            <li name="turnSent" style="display: none;"><a href="#">内部转派</a></li>
+            <li name="followUp" style="display: none;"><a href="#" >跟进督办</a></li>
+            <li name="sport" style="display: none;"><a href="#">上报省公司</a></li>
+            <li name="followSent" style="display: none;"><a href="#">指派</a></li>
+            <li name="goBack" style="display: none;"><a href="#">打回</a></li>
+        </ul>
+       </div>
+      <!-- 拆分 -->
+      <div class="tctj" name="split" style="display:none;">
+      </div>
+   <!--回单 begin--> 
+       <div class="tctj" name="backOrder" style="display: none;">
+       </div>
+      <!-- 转派 -->
+      <div class="tctj" name="turnSent" style="display:none;">
+      </div>
+       <!--跟进 begin--> 
+       <div class="tctj" name="followUp" style="display:none;">
+      </div>
+      <!--指派-->
+      <div class="tctj" name="followSent" style="display:none;">
+      </div>
+      <!--打回-->
+      <div class="tctj" name="goBack" style="display:none;">
+      </div>
+      <!-- 上报 -->
+      <div class="tctj" name="sport" style="display:none;">
+      </div>
+    </div>
+    
+    
+       <div class="" id="onlyClaim" style="display: none;">
+       </div>
+       <div class="" id="opted" style="display: none;">
+       </div>
+     <div class="" id="allHandle" style="display: none;">
+       <div class="gy_tab mt10">
+        <ul name="allHandle">
+            <li class="hover" name="claim" style="display: none;"><a href="#">认领</a></li>
+            <li name="toSend" style="display: none;"><a href="#" >分发</a></li>
+        </ul>
+       </div>
+        <div class="tctj" name="claim" style="display: none">
+        </div>
+        
+        <div class="tctj" name="toSend" style="display:none;">
+      </div>
+       </div>
+       
+</div>
+<div class="right_con">
+<table width="100%" border="0" cellspacing="0" cellpadding="0"  class="tab5 mt10 lines f14">
+        <thead>
+            <tr>
+                <th colspan="9">
+                	<span class="fl">流程信息</span>
+                	<span class="fr"><a name="recordOfDemandDetailInfoView" style="color: #0e5895;text-decoration: underline;">查看详情</a></span>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="recordOfDemandInfo">
+            <tr >
+                <th align="center" style="width: 10%;">序号</th>
+                <th align="center" style="width: 12%;">当前<br> 环节</th>
+                <th align="center" style="width: 10%;">操作</th>
+                <th align="center" style="width: 24%;">处理 <br> 人</th>
+                <th align="center" style="width: 20%;">处理<br> 时间</th>
+                <th align="center" style="width: 10%;">环节<br> 耗时</th>
+                <th align="center" style="width: 10%;">催单<br> 次数</th>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</div>
+
+
+</body>
+</html>

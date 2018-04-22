@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+			http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
+	
+	 
+	<bean id="crmService" class="com.tydic.sale.service.crm.impl.CrmServiceImpl" lazy-init="true">
+	    <property name="cpcServiceClient" ref="cpcServiceClient" />
+	</bean>
+	
+	<bean id="cpcServiceClient" class="com.tydic.sale.webService.client.CpcServiceClient" lazy-init="true">
+	</bean>
+	
+	<bean id="evalTimer" class="com.tydic.sale.service.crm.impl.EvalTimerImpl" lazy-init="true">
+	    <property name="crmService" ref="crmService"/>
+	</bean>
+	  
+</beans>

@@ -1,0 +1,52 @@
+<script type="text/javascript" src="js/sysManage/staffList.js"></script>
+<div class="list-main" id="staffListPage">
+ 	<!-- 标题 -->
+ 	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;系统管理&nbsp;&nbsp;--&nbsp;&nbsp;工号管理</div>
+	
+	
+	<div class="seach-box mt20  ">
+	    <ul class="hx-list  clearfix">
+	        <li>本地网:<select id="latnId" class="w100"> <!--  <option>乌鲁木齐</option> --></select></li>
+	        <li>员工编码：<input type="text" id="loginCode"  class=" w100"></li>
+	        <li>员工姓名：<input type="text" id="staffName" class="w100"></li>
+	        <li>所属部门：<input type="text" id="staffOrg" class="w100"></li>
+	        <li>状态：<select id="staffState" class="w100">  <option>选择</option></select></li>
+	        <li><a href="javascript:void(0)" class="but ml20" id="senior">查询</a></li>
+	        <li><a href="javascript:void(0)" class="but hs_bg" id="reset">重置</a></li>
+	    </ul>
+	</div>
+	
+	<!-- 按钮操作 -->
+	<div class="lable-box">
+		<a  href="javascript:void(0)" class="lable" id="addStaffInfo">新增工号</a>
+		<a  href="javascript:void(0)" class="lable btn-success" id="staffAuthBtn">权限指派</a>
+		<a  href="javascript:void(0)" class="lable btn-info" id="updateStaffStateBtn">资料变更</a>
+	</div>
+	
+	<div class="clear"></div>
+	
+	<!-- 工号列表 -->
+	<div style="margin-top:5px;" id="staffDataQuery">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10">
+			<thead>
+				<tr>
+					<th style="width:2%;text-align: right;"></th>
+					<td style="width:10%;">工号</td>
+					<td style="width:10%;">编码</td>
+					<th style="width:15%;">姓名</th>
+					<td style="width:10%;">电话</td>
+					<td style="width:15%;">邮箱</td>
+					<td style="width:20%;">部门</td>
+					<td style="width:10%;">本地网</td>
+					<td style="width:10%;">状态</td>
+<!-- 					<td style="width:10%;">操作</td> -->
+				</tr>
+			</thead>
+			<tbody id="staffListBody">
+				
+			</tbody>
+		</table>
+		<div class="page mt10" id="staffListFoot"></div>
+	</div>
+
+</div>

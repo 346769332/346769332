@@ -1,0 +1,151 @@
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/createWorkflow.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/css/GooFlow2.css"/>
+<!-- <link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow2.css"/> -->
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/data.js"></script>
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/jquery.min.js"></script> -->
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFunc.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/json2.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow.js"></script>
+<script type="text/javascript">
+/*********************************************加载流程图begin***********************************************/
+var property={
+		width:1000,//1200
+		height:410,//600
+		toolBtns:["start round","node","end round","task round","chat","state","plug","join","fork","complex mix"],
+		haveHead:true,
+		headBtns:["new","open","save","undo","redo","reload"],// 如果haveHead=true，则定义HEAD区的按钮
+		haveTool:true,
+		haveGroup:true,
+		useOperStack:true
+	};
+	var remark={
+		cursor:"选择指针",
+		direct:"结点连线",
+		start:"入口结点",
+		node:"自动结点",
+		"end":"结束结点",
+		"task":"任务结点",
+		chat:"决策结点",
+		state:"状态结点",
+		plug:"附加插件",
+		fork:"分支结点",
+		"join":"联合结点",
+		"complex mix":"复合结点",
+		group:"组织划分框编辑开关"
+	};
+	var demo;
+		demo=$.createGooFlow($("#workflow"),property);
+		demo.setNodeRemarks(remark);
+		demo.onItemDel=function(id,type){
+			return confirm("确定要删除该单元吗?");
+		};
+	$("#workflow .GooFlow_head .GooFlow_head_btn .ico_new").parent().hide();
+	$("#workflow .GooFlow_head .GooFlow_head_btn .ico_open").parent().hide();
+	$("#workflow .GooFlow_head .GooFlow_head_btn .ico_save").parent().hide();
+	$("#workflow .GooFlow_head .GooFlow_head_btn .ico_reload").parent().hide();
+/*********************************************加载流程图end***********************************************/
+</script>
+
+<style type="text/css">
+	#workflow .GooFlow_head{
+		display: none;
+	}
+	#workflow .GooFlow_head .GooFlow_head_btn .ico_new{
+		display: block;
+	}
+	
+	#workflow #workflow_btn_mutiselect{
+		display: none;
+	}
+	#workflow #workflow_btn_task{
+	display: none;
+	}
+	#workflow #workflow_btn_chat{
+	display: none;
+	}
+	#workflow #workflow_btn_state{
+	display: none;
+	}
+	#workflow #workflow_btn_plug{
+	display: none;
+	}
+	#workflow #workflow_btn_join{
+	display: none;
+	}
+	#workflow #workflow_btn_fork{
+	display: none;
+	}
+	#workflow #workflow_btn_complex{
+	display: none;
+	}
+	#workflow #workflow_btn_group{
+	display: none;
+	}
+	#workflow .GooFlow_work{
+	margin: 0px 2px 2px 0px;
+	}
+	
+</style>
+<div class="list-main" id='createWorkflowPage'>
+	<div class="page-title mt10"><img src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;新建短流程</div>
+	<div  >
+		<table  border="0" cellspacing="0" cellpadding="0"  style="width:100%" >
+			<tbody>
+				<tr>
+					<td style="height:40px;" colspan="6">
+						流程名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="workflowName" name="workflowName" type="text" style="width:200px">
+						<!---->  流程分类&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<select id="workflowClass" name="workflowClass" style="width:200px;height: 28px">
+						</select>
+						流程类型&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<select id="workflowType" name="workflowType" style="width:200px;height: 28px">
+						</select>
+					</td>
+				</tr>
+				<!--
+				<tr>
+					<td style='width:30px;'>流程单类型</td>
+					<td  style="width:500px;height:30px;"   >
+						<input type="radio" name="workflowSingleType" style="width:30px;height: 15px" value="0">渠道工号审批流程&nbsp;&nbsp;&nbsp;
+						<input type="radio" name="workflowSingleType" style="width:30px;height: 15px" value="2">内联单流程&nbsp;&nbsp;&nbsp;
+						<input type="radio" name="workflowSingleType" style="width:30px;height: 15px" value="1">会签流程
+					</td>
+					<td style='width:100px;'>流程定制类型</td>
+					<td  style="height:30px;"   >
+						<span id="workflowCustomType_0"><input type="radio" name="workflowCustomType"  style="width:30px;height: 15px" value="0">省定制&nbsp;&nbsp;&nbsp;</span>
+						<span id="workflowCustomType_1"><input type="radio" name="workflowCustomType"  style="width:30px;height: 15px" value="1">省市协同定制&nbsp;&nbsp;&nbsp;</span>
+						<span id="workflowCustomType_2"><input type="radio" name="workflowCustomType"  style="width:30px;height: 15px" value="2">市定制&nbsp;&nbsp;&nbsp;</span>
+					</td>
+				</tr>  -->
+				<tr>
+					<td style='width:85px;'>使用本地网</td>
+					<td colspan="5" style="height:50px;text-align: left" id="allWlan" >
+					</td>
+				</tr>
+
+				<tr>
+					<td colspan="6" style="height:45px;">
+					短流程需求模板
+						<input id="workflowTemplate" type="text" style="width:45%" readonly="readonly">
+						<input id="workflowTemplateId" type="hidden" style="width:45%">
+						<a href="#" class="but" id="chooseTemplate">选择</a>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="6">
+						<div id="workflow" >
+						</div>
+					</td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td align="center" colspan="6" style="height:40px;">
+						<a href="#" class="but" id="saveDraft">下一步</a>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>

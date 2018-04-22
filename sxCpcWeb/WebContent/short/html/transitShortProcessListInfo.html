@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <title></title>
+	<link rel="stylesheet" type="text/css" href="../css/scrollbar.css">
+    <link href="../css/css.css" rel="stylesheet" type="text/css">
+	<link href="../css/dlc.css" rel="stylesheet" type="text/css">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/animate.min.css" rel="stylesheet">
+	<link href="../css/common.css" rel="stylesheet">
+	<link href="../css/style.min.css" rel="stylesheet">
+	<link href="../font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<script src="../js/jquery-2.1.1.js"></script>
+	<script src="../js/pace.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script src="../js/jq.ui.js"></script>
+	<script src="../js/common.js"></script>
+	<script src="../js/servlet.url.js"></script>
+	<script src="../js/iscrolls.js"></script>
+	<script src="../js/icenter_plugin/cordova.js"></script>
+	<script src="../js/icenter_plugin/icenter_plugin.js"></script>
+	<script src="../js/icenter_plugin/cordova_plugins.js"></script>
+	
+	<script src="../js/validateTel.js"></script>
+	<script src="../js/pages/transitShortProcessListInfo.js"></script>
+
+<style type="text/css" media="all">
+body,ul,li {
+	padding:0;
+	margin:0;
+	border:0;
+}
+
+body {
+	font-size:12px;
+	-webkit-user-select:none;
+    -webkit-text-size-adjust:none;
+	font-family:helvetica;
+}
+
+#header {
+	position:absolute;
+	top:0; left:0;
+	width:100%;
+	height:45px;
+	padding:0;
+	color:#eee;
+	font-size:20px;
+	text-align:center;
+}
+#wrapper {
+	position:absolute; z-index:1;
+	top:45px; bottom:15px; left:0;
+	width:100%;
+	background:#e6e6e6;
+	overflow:auto;
+}
+
+#scroller {
+	position:relative;
+/*	-webkit-touch-callout:none;*/
+	-webkit-tap-highlight-color:rgba(0,0,0,0);
+
+	float:left;
+	width:100%;
+	padding:0;
+}
+
+
+</style>
+</head>
+
+<body class="bodyBackColor">
+<div id="showDialogDiv">
+<div class="modal fade" id="myModal_1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="dialogTitle"></h4>
+      </div>
+      <div class="modal-body" id="dialogMsg" style='margin-left:0px;'>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div id="header">
+	<div class="background-img">
+        <div class="header_top">
+                <div class="zuo_img" >
+                    <div><img src="../images/zjt.png"/>
+                    <a id="backA">返回</a></div>
+                </div>
+            <h1 class="biaoti">在途需求列表</h1>
+            <a id="backB"><img src="../images/home_on.png" style="padding: 8px;width: 40px;  float: right; margin-top: -8px;"></a>
+        </div>
+    </div>
+</div>
+<div id="wrapper" style="overflow: hidden;">
+<div id="scroller">
+<!--d_list-->
+<div class="shu_box"></div>
+<ul id="transitDetailDiv"></ul>
+<!--
+<div class="syrd" style="margin:10px;"> 
+	<div class="cd_box">
+        <ul><a id="urgeDemandBtn">催单</a></ul>
+        <li><a id="evalDemandBtn">评价</a></li>
+	</div>
+</div>-->
+ </div>
+ </div>
+</body>
+</html>

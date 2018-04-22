@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="base">
+
+ 	<insert id="insert_sequence" parameterClass="java.util.HashMap">
+	    
+		insert into sequence(
+		      seq_name     ,
+		      idx_val      ,
+		      table_name   ,
+ 		      seq_desc  
+		)values(
+			 #seq_name#,
+			 #idx_val#,
+			 #table_name#,
+			 #seq_desc#
+		)
+	</insert>
+	
+    <!-- 查询出账银行信息 -->
+    <select id="select_bank_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        select 
+        	BANK_CODE,
+        	BANK_NAME
+        from 
+        	FORE_BANK_INFO
+        where
+        	order_type = 1
+    </select>
+    
+	<!-- 查询止付对账基础信息 -->
+	<select id="select_zf_full_record" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		/**止付对账*/
+		select 
+		  a.record_id,
+		  a.file_id,
+		  a.acc_nbr      b_acc_nbr,
+		  a.wo_serialno  b_wo_serialno,
+		  a.serial_no    b_serial_no,
+		  a.amt          b_amt,
+		  a.pulish_amt   b_pulish_amt,
+		  a.pre_offer_cd b_pre_offer_cd,
+		  a.cust_name    b_cust_name,
+		  a.certi_no     b_certi_no,
+		  a.bank_cd      b_bank_cd,
+		  a.check_type   b_check_type,
+		   
+		  b.SERIAL_ID	  c_serial_no,
+		  b.CUST_NAME     c_CUST_NAME,
+		  b.CERTI_TYPE    c_CERTI_TYPE,
+		  b.CERTI_NUM     c_certi_no,
+		  b.ACC_NBR       c_ACC_NBR,
+		  b.SALE_ORDER_ID c_wo_serialno,
+		  b.PRE_OFFER_CD  c_PRE_OFFER_CD,
+		  b.AMT           c_AMT,
+		  b.BANK_CD       c_BANK_CD,
+		  b.STATUS_CD     c_STATUS_CD    
+	    from 
+	    	SALE_BANK_CHECK_RECORD a
+	    	full outer join SALE_BANK_ADMIT_INST b
+	    	on a.wo_serialno = b.sale_order_id 
+	    where 
+	    	(	(a.create_time > to_date(#cycleDate#,'yyyymmdd')-1
+		  	  	and  a.create_time <![CDATA[<]]> to_date(#cycleDate#,'yyyymmdd')+1)
+		 		or
+		  		(b.create_date > to_date(#cycleDate#,'yyyymmdd')-1
+		  	  	and  b.create_date <![CDATA[<]]> to_date(#cycleDate#,'yyyymmdd')+1)
+		 	)
+		 	and
+		 		(a.check_type = "01" or a.check_type is null)
+		 	and 
+		 		(b.STATUS_CD in("1000","1006") or b.STATUS_CD is null)
+		 	and
+		 		a.bank_cd  = #bankCd#
+	</select>
+	
+	<!-- 查询[正常/欠费]解止付 -->
+	<select id="select_jzf_record" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		 select 
+		  a.record_id,
+		  a.file_id,
+		  a.acc_nbr      b_acc_nbr,
+		  a.wo_serialno  b_wo_serialno,
+		  a.serial_no    b_serial_no,
+		  a.amt          b_amt,
+	      a.pulish_amt   b_pulish_amt,
+	      a.pre_offer_cd b_pre_offer_cd,
+	      a.cust_name    b_cust_name,
+	      a.certi_no     b_certi_no,
+	      a.bank_cd      b_bank_cd,
+	      a.check_type   b_check_type,
+	       
+	      b.SERIAL_ID     c_serial_no,
+	      b.CUST_NAME     c_CUST_NAME,
+	      b.CERTI_TYPE    c_CERTI_TYPE,
+	      b.CERTI_No      c_certi_no,
+	      b.ACC_NBR       c_ACC_NBR,
+	      b.unfre_id      c_wo_serialno,
+	      b.PRE_OFFER_CD  c_PRE_OFFER_CD,
+	      b.AMT           c_AMT,
+	      b.UNFRE_CASH    c_pulish_amt,
+	      b.BANK_CD       c_BANK_CD,
+	      b.STATUS_CD     c_STATUS_CD    
+	    from 
+	        SALE_BANK_CHECK_RECORD a
+	        full outer join SALE_BANK_ADMIT_UNFRE_REQUEST b
+	        on a.wo_serialno = b.unfre_id 
+	    where 
+	        (  (a.create_time > to_date(#cycleDate#,'yyyymmdd')-1
+	            and  a.create_time <![CDATA[<]]> to_date(#cycleDate#,'yyyymmdd')+1)
+	         or
+	          (b.create_date > to_date(#cycleDate#,'yyyymmdd')-1
+	            and  b.create_date <![CDATA[<]]> to_date(#cycleDate#,'yyyymmdd')+1)
+	       )
+	       and
+	         (a.check_type in('02','03') or a.check_type is null)
+	       and 
+	         (b.STATUS_CD in("1100","1300") or b.STATUS_CD is null)
+	       and
+	 		 a.bank_cd = #bankCd#
+	</select>
+	
+	
+	<!--插入 成功表 -->
+	<insert id="insert_succ_record" parameterClass="java.util.HashMap">
+	    
+		insert into SALE_BANK_CHECK_SUCC_RECORD(
+		      RECORD_ID   ,
+		      LOG_ID      ,
+		      CREATE_TIME ,
+		      ACC_NBR     ,
+		      WO_SERIALNO ,
+		      SERIAL_NO   ,
+		      AMT         ,
+		      PULISH_AMT  ,
+		      PRE_OFFER_CD,
+		      CUST_NAME   ,
+		      CERTI_NO    ,
+		      BANK_CD     
+		)values(
+			#RECORD_ID#   ,
+			#LOG_ID#      ,
+			#CREATE_TIME# ,
+			#ACC_NBR#     ,
+			#WO_SERIALNO# ,
+			#SERIAL_NO#   ,
+			#AMT#         ,
+			#PULISH_AMT#  ,
+			#PRE_OFFER_CD#,
+			#CUST_NAME#   ,
+			#CERTI_NO#    ,
+			#BANK_CD#     
+		)
+	</insert>
+	<!--插入 失败表 -->
+	<insert id="insert_diff_record" parameterClass="java.util.HashMap">
+	    
+		insert into SALE_BANK_CHECK_DIFF_RECORD(
+		      RECORD_ID   ,
+		      LOG_ID      ,
+		      CREATE_TIME ,
+		      ACC_NBR     ,
+		      WO_SERIALNO ,
+		      SERIAL_NO   ,
+		      AMT         ,
+		      PULISH_AMT  ,
+		      PRE_OFFER_CD,
+		      CUST_NAME   ,
+		      CERTI_NO    ,
+		      BANK_CD     ,
+		      DIFF_DESC   
+		)values(
+			#RECORD_ID#   ,
+			#LOG_ID#      ,
+			#CREATE_TIME# ,
+			#ACC_NBR#     ,
+			#WO_SERIALNO# ,
+			#SERIAL_NO#   ,
+			#AMT#         ,
+			#PULISH_AMT#  ,
+			#PRE_OFFER_CD#,
+			#CUST_NAME#   ,
+			#CERTI_NO#    ,
+			#BANK_CD#     ,
+			#DIFF_DESC#
+		)
+	</insert>
+	
+	<!--插入 log表 -->
+	<insert id="insert_record_log" parameterClass="java.util.HashMap">
+		insert into SALE_BANK_CHECK_LOG(
+			LOG_ID     ,
+			create_time,
+			bank_cd    ,
+			total_count,
+			check_type ,
+			succ_count ,
+			dif_count  ,
+			file_id    		
+		)values(
+			#LOG_ID#     ,
+			#create_time#,
+			#bank_cd#    ,
+			#total_count#,
+			#check_type# ,
+			#succ_count# ,
+			#dif_count#  ,
+			#file_id#    
+		)
+	</insert>
+	
+	
+</sqlMap>

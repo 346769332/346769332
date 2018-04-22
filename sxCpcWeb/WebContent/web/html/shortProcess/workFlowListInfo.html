@@ -1,0 +1,55 @@
+﻿<script type="text/javascript" src="js/shortProcess/workflowListInfo.js"></script>
+<div class="list-main" id="workflwoListPage">
+ 	<!-- 标题 -->
+ 	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;流程配置</div>
+	
+	
+	<div class="seach-box mt20  ">
+	    <ul class="hx-list  clearfix">
+	        <li>流程编号：<input type="text" id="workflowNbr" class="w100"></li>
+	        <li>流程名称：<input type="text" id="workflowName" class="w100"></li>
+	        <li>流程状态：
+		        <select id="workflowState" class="w100">
+		        	<option>==请选择==</option>
+		        	<option value="1001">草稿</option>
+		        	<option value="1000">已发布</option>
+		        	<option value="1002">暂停</option>
+		        	<option value="1003">作废</option>
+		        	<option value="1010">父流程</option>
+		        </select>
+	        </li>
+	        <li>本地网:<select id="latnId" class="w100"></select></li>
+	     </ul>
+	     <ul class="hx-list  clearfix">
+	        <li><a href="javascript:void(0)" class="but ml20" id="search">查询</a></li>
+	        <li><a href="javascript:void(0)" class="but ml20" id="reset">重置</a></li>
+	    </ul>
+	</div>
+	<div class="clear"></div>
+	<div style="width:24%;height:520px; border:1px solid #dedede;margin: 10px;float:left;margin-left: 10px;" class="list-main" id='first'>
+	    <div id="processDiv" style="margin-left:5px;" ></div>
+	</div>
+	<div style="width:70%;height:520px; border:0px solid #dedede;margin:10px;margin-right: 20px;float:right;" class="fr">
+		<!-- 工号列表 -->
+	<div style="margin-top:5px;" id="staffDataQuery">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10">
+			<thead>
+				<tr>
+<!-- 					<th style="width:5%;text-align: right;"></th> -->
+					<td style="width:13%;">流程编号</td>
+					<th style="width:45%;">流程名称</th>
+					<th style="width:10%;">流程状态</th>
+					<td style="width:10%;">定制类型</td>
+					<th style="width:12%;">适用本地网</th>
+					<td style="width:10%;">操作</td>
+				</tr>
+			</thead>
+			<tbody id="workflowListBody">
+				
+			</tbody>
+		</table>
+		<div class="page mt10" id="workflowListFoot"></div>
+	</div>
+	</div>
+
+</div>

@@ -1,0 +1,43 @@
+<script type="text/javascript" src="js/shortProcess/singatureNoSolveProcessList.js"></script>
+
+<div class="list-main" id="demandListPage">
+	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;会签待处理需求</div>
+	<div class="bd-list">
+		<!-- 0:代表 待处理会签标识 ,1:代表已处理会签标识-->
+		<input type="hidden" name="flag" value="0"  id="flag"/>
+		<div class="form-group">
+		    <label class="form-label">需求编号:</label>
+		    <input id="demandCode" name="demandCode"  type="text" class=" w130"  style="width: 220px;">
+		</div>
+		<div class="form-group">
+		    <label class="form-label">需求名称:</label>
+		    <input id="demandName" name="demandName" type="text" class=" w130"  style="width: 220px;">
+		</div>
+		<div class="form-group">
+		    <label class="form-label">所属短流程名称:</label>
+		    <input id="workflowName" name="workflowName" type="text" class=" w130"  style="width: 222px;"/>
+		</div>
+		<div class="form-search" style=" float: right;margin-left: 10px;">
+		    <a href="#" class="but" id="search">查询</a>
+		    <a href="#" class="but" id="reset">重置</a>
+		</div>
+	</div>
+	<div id="dateQuery"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10 d_top">
+		<thead>
+			<tr>
+				<td style="width:10%;">需求编号</td>
+				<td style="width:15%;">需求名称</td>
+				<td style="width:10%;">需求状态</td>
+				<td style="width:15%;">所属短流程</td>
+				<td style="width:10%;">当前处理部门</td>
+				<td style="width:10%;">当前处理人</td>
+				<td style="width:10%;">操作</td>
+			</tr>
+		</thead>
+		<tbody id="demandListBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="demandListFoot"></div>
+</div>

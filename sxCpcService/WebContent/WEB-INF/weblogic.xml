@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<weblogic-web-app>
+	<context-root>/CpcService</context-root>
+		 <session-descriptor>
+     <timeout-secs>300</timeout-secs>
+	     <persistent-store-type>replicated_if_clustered</persistent-store-type>
+	</session-descriptor>
+</weblogic-web-app>
+

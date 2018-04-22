@@ -1,0 +1,95 @@
+<script type="text/javascript" src="js/notification/addNotification.js"></script>
+<script type="text/javascript" src="js/common/jquery-form.js"></script>
+<div class="list-main" id="demandListPage">
+	<div class="page-title mt10">
+		<img src="images/home.png" alt="">&nbsp;PUSH消息&nbsp;&nbsp;--&nbsp;&nbsp;PUSH消息
+	</div>
+	<div class="bd-list">
+		
+		<div class="tanchu_box" id="disposeJobInfoPage"style="width:100%;height:450px;">
+		<h3 style="background: #eaf6ff;color: #0e5895;font-weight: bold;">选择部门/人员</h3>
+			<div style="overflow:hidden;width:100%;height:auto">
+				<div>
+					<table border="0" class="table1" cellspacing="0" cellpadding="0"
+						style="border-width:0;border-collapse:collapse">
+						<tr>
+							<td>部门名称:&nbsp;&nbsp;&nbsp;<input type="text"id="selectOrgName" placeholder="请输入部门名称" style="width:200px;">
+								&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="but" id="selectOrgNameSearch">查询</a> 
+								&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="but" id="infoSubmit">确认</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+					<div style="width:30%;border:1px solid #dedede;margin: 10px;float:left;margin-left: 10px;margin-top: 20px;background-color:#f0f6e4;"class="list-main">
+						<div id="processDiv" style="margin-left:5px;height:330px; "></div>
+					</div>
+					<div id="executerInfo"style="width:65%;height:330px; border:1px solid #dedede;margin-top: 20px;float:right;" class="fr">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0"class="tab2 mt10">
+							<thead>
+								<tr>
+									<th style="width:10%;"><input type="checkbox"  id="selectallAuthorInfo" style="width: 10%;">选择</th>
+									<th style="width:15%;">姓名</th>
+									<th style="width:10%;">部门</th>
+									<th style="width:15%;">联系电话</th>
+								</tr>
+							</thead>
+							<tbody id="chooseDeptAndExecuterBody"></tbody>
+						</table>
+						<div class="page mt10" id="chooseDeptAndExecuterFoot"></div>
+					</div>
+			</div>
+		</div>
+	</div>
+	<div class="seach-box mt20" style="border-top: solid  1px #888;"> 
+	    	<table width="100%" border="0" cellspacing="0" cellpadding="0"class="tab5 mt10 lines">
+			<thead>
+				<tr>
+					<td colspan="2"><span class="fl">PUSH消息</span></td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td style="width:30%">主题</td>
+					<td><input id="notificationName" type="text" placeholder='最多允许输入50个汉字' style="width: 95%;" maxlength='50'></td>
+				</tr>
+				<tr>
+					<td style="width:30%">内容</td>
+					<td>
+					<textarea id='notificationDesc' placeholder='最多允许输入200个汉字' style='line-height:25px;width: 95%;' maxlength='200'></textarea>
+					</td>
+				<tr/>
+				<tr>
+					<td style="width:30%">已选部门/人员</td>
+					<td><input id="notificationDept" type="text"  style="width: 95%;" disabled="disabled">
+					<input id="notificationDeptId" type="text"  style="width: 95%;display: none;" disabled="disabled"></td>
+				<tr/>
+				<!--  
+				<tr>
+					<td>选择图片</td>
+					<td  style="vertical-align: middle;">
+					<form id="attachForm" enctype="multipart/form-data" method="post" >
+						<table>
+				            <tr><td><input type="file" style="width:465px;" id="attachment" accept="image/*" name="attachment" multiple="multiple" />
+				            <input type="button" class="but" id="attachSub"  style="width:100px;" value="浏览" /></td></tr>
+				        </table>
+				        </form>
+				    </td>
+				</tr>
+				<tr>
+					<td>图片：</td>
+					<td>
+						<div id="attachmentInfo" name="attachmentInfo" style="width:800px;"></div>
+				    </td>
+	   			</tr>-->
+			</tbody>
+			<tfoot>
+				<tr>
+					<td align="center" colspan="2">
+					<a href="javascript:void(0)" class="but ml20" id="submitInfo">提交</a>
+		    		<a href="javascript:void(0)" class="but hs_bg" id="reset">重置</a>  
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>

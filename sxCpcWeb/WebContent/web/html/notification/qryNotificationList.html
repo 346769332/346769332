@@ -1,0 +1,43 @@
+﻿<script type="text/javascript" src="js/notification/qryNotificationList.js"></script>
+<div class="list-main" id="qryNotificationListPage">
+
+	<div class="page-title mt10">
+		<img src="images/home.png" alt="">&nbsp;PUSH消息&nbsp;&nbsp;--&nbsp;&nbsp;PUSH消息查询
+	</div>
+
+	<dl class="bd-list">
+		<dt style="margin:8px 5px;width:80px;">主题搜索：</dt>
+		<dd>
+			<input id="themeSeach" type="text" class=" w130">
+		</dd>
+		<dt style="width: 100px;">推送时间：</dt>
+		<dd>
+			<input id="sendDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearSendDate">
+		</dd>
+		<dt style="width: 30px;">至</dt>
+		<dd>
+			<input id="endDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearEndDate">
+		</dd>
+		<dd>
+			<a href="javascript:void(0)" class="but" id="senior">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10">
+		<thead>
+			<tr>
+				<td>序号</td>
+				<td>主题</td>
+				<td>内容</td>
+				<td>推送时间</td>
+				<td>推送人工号</td>
+				<td>推送人姓名</td>
+				<td colspan="2">操作</td>
+			</tr>
+		</thead>
+		<tbody id="pushLstBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="pushLstFoot"></div>
+</div>

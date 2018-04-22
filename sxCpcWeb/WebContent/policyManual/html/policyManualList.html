@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>政策手册</title>
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/animate.min.css" rel="stylesheet">
+	<link href="../css/common.css" rel="stylesheet">
+	<link href="../css/style.min.css" rel="stylesheet">
+	<link href="../font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<script src="../js/jquery-2.1.1.js"></script>
+	<script src="../js/pace.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script src="../js/jq.ui.js"></script>
+	<script src="../js/common.js"></script>
+	<script src="../js/servlet.url.js"></script>
+	<script src="../js/iscroll.js"></script>
+	<script src="../js/json2.js"></script>
+	<script src="../js/icenter_plugin/cordova.js"></script>
+	<script src="../js/icenter_plugin/icenter_plugin.js"></script>
+	<script src="../js/validateTel.js"></script>
+	<script src="../js/pages/policyManualList.js"></script>
+	<style type="text/css">
+		th,td{height:40px;cursor: pointer;padding:0px;border:0px;border-bottom: 1px solid #e7eaec;}
+	</style>
+</head>
+
+<body>
+	<div id="showDialogDiv">
+	<div class="modal fade" id="myModal_1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="dialogTitle"></h4>
+	      </div>
+	      <div class="modal-body" id="dialogMsg">
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	</div>
+	<div id="lockScreen"  style="display:none"><div  class="showbg"></div><div class="loading"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div>
+	
+	<div id="policyManualListPage">
+		<!-- 标头 -->
+		<div class="row border-bottom ng-scope" id="header">
+		    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+		    	<h3 class="text-center p-xs m-b-none" id="headerTitle">政策手册</h3>
+		        <div class="navbar-header m-t-n-xxl">
+		             <a class="navbar-minimalize minimalize-styl-2 " id="backA">
+		             	<img src="../images/icon_back.png">
+		             </a>
+		        </div>
+		        <div class="navbar-header pull-right m-t-n-xxl m-r-md">
+		             <a class="navbar-minimalize minimalize-styl-2 " id="homeEnvelope">
+		             	<img src="../images/icon_home.png">
+		             </a>
+		        </div>
+		    </nav>
+		</div>
+		<div id="scrollDiv"  class="container-fluid wrapper" style="top:50px;bottom: 0px">
+			<div id="scroller" class="scroller" >
+				<div id="pullDown">
+				    <span class="pullDownIcon"></span><span class="pullDownLabel"></span>
+				</div>
+				<!--内容  -->
+				<div id="contentDiv"></div>
+				<div id="pullUp">
+			    	<span class="pullUpIcon"></span><span class="pullUpLabel"></span>
+			   </div>
+			</div>
+		</div>
+		
+		<div  class="row footer" id="foot" style="cursor: pointer;padding: 0;">
+		</div>
+	</div>
+</body>
+</html>

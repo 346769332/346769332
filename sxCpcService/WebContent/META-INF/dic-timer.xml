@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+			http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
+
+	
+    <!--准实时 推送超时短信【每5分钟】
+	<bean id="overTimeQusiSmsTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="overTimeQusiSmsJob"/>
+		<property name="cronExpression">
+			<value>0 0/5 * * * ?</value>
+		</property>
+	</bean>
+	<bean id="overTimeQusiSmsJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">  
+            <ref bean="sMSService" />  
+        </property>  
+        <property name="concurrent" value="false" />  
+        <property name="targetMethod" value="overTimeQusiTime" />  
+	</bean>
+	
+	
+	推送五星评价【每月1号】
+	<bean id="starEvalTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="starEvalJob"/>
+		<property name="cronExpression">
+			<value>0 0 0 1 * ?</value>
+		</property>
+	</bean>
+	<bean id="starEvalJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">  
+            <ref bean="backService" />  
+        </property>  
+        <property name="concurrent" value="false" />  
+        <property name="targetMethod" value="starEvalOnTime" />  
+	</bean>-->
+	
+    
+	<!--  定时 提前上行短信【每10分钟】
+	<bean id="upSmsTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="smsJob"/>
+		<property name="cronExpression">
+			<value>0 0/10 * * * ?</value>
+		</property>
+	</bean>
+	<bean id="smsJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">  
+            <ref bean="sMSService" />  
+        </property>  
+        <property name="concurrent" value="false" />  
+        <property name="targetMethod" value="upSmsOpt" />  
+	</bean>
+	-->
+	<!-- 定时 推送超时短信【每天9:30分钟】
+	<bean id="totalSmsTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="totalSmsJob"/>
+		<property name="cronExpression">
+			<value>0 30 9 * * ?</value>
+		</property>
+	</bean>
+	<bean id="totalSmsJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">  
+            <ref bean="sMSService" />  
+        </property>  
+        <property name="concurrent" value="false" />  
+        <property name="targetMethod" value="overTimeRemind" />  
+	</bean>
+	-->
+	
+	<!-- 关闭消息【每天1点开始】
+	<bean id="overNewsTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="overNewsJob"/>
+		<property name="cronExpression">
+			<value>0 0 1 * * ?</value>
+		</property>
+	</bean>
+	<bean id="overNewsJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">  
+            <ref bean="backService" />  
+        </property>  
+        <property name="concurrent" value="false" />  
+        <property name="targetMethod" value="overNewsOnTime" />  
+	</bean>
+	 -->
+	
+	
+	<!--注册定时器引擎【每5分钟开始】 -->
+	<bean id="timerTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="timerJob"/>
+		<property name="cronExpression">
+			<value>0 0/5 * * * ?</value>
+		</property>
+	</bean>
+	<bean id="timerJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">  
+            <ref bean="timerEngine" />  
+        </property>  
+        <property name="concurrent" value="false" />  
+        <property name="targetMethod" value="runTimerSet" />  
+	</bean>
+	<!-- 定时器引擎-->
+	<bean id="timerEngine" class="com.tydic.timer.TimerEngine">
+	    <property name="cpcDao" ref="cpcDao" />
+	</bean> 
+	
+	
+	
+	
+	<!-- 定时器注册 -->
+	<bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		 <property name="triggers">
+			<list>
+			    <!-- <ref bean="timerTrigger"/> -->
+			    
+			    
+			    
+			   
+			    <!-- 
+			    <ref bean="overNewsTrigger"/>
+			     <ref bean="totalSmsTrigger"/>
+			    <ref bean="upSmsTrigger"/>
+			    <ref bean="starEvalTrigger"/>
+			   	<ref bean="overTimeQusiSmsTrigger"/> -->
+			</list>
+		</property>
+	</bean>
+</beans>

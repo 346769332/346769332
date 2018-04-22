@@ -1,0 +1,45 @@
+@charset "utf-8";
+/* CSS Document */
+.wyqd{width:99%;min-width:1200px;background-color:#fff;margin:0 auto;margin:10px 0px 0px 5px;border-radius:4px 4px 0px 0px;}
+.wyqd_header .w_16{ font-size:16px; color:#000; padding:8px 10px; text-align:left;background-color:#eaf7ff;border-bottom:solid 1px #dedede;paddding-bottom:500px;}
+.wyqd_left{overflow:hidden;}
+.qd_box{font-size:14px;color:#5c5c5c;padding:0px 10px;float:left;}
+.qd_box dt{padding:5px 23px;}
+.qd_box dd{position:relative;}
+.qd_box dd img{width: 150px;}
+.qd_box dd a{position:absolute;top: 2px;left:37px;} 
+.qd_box img{width:105px;}
+/**/
+.dwqd{overflow:hidden;margin: 10px 5px 25px 5px;}
+.tw_box dd a{font-size:14px;color:#fff;padding:0px;text-align: center;width:9%;line-height:25px;float:left;margin:0px 8px;color:#fff;border-radius:3px;}
+.tw_box dd a:active{font-size:14px;background:#47b3da;border: solid 1px #0087b7;}
+.tw_box dd a:hover{font-size:14px;background:#47b3da;border: solid 1px #0087b7;}
+.tw_box dd a:focus{font-size:14px;background:#47b3da;border: solid 1px #0087b7;}
+h1{text-align:center;font-size:16px;margin-bottom: 10px}
+/*biaoti*/
+.biaoti{overflow:hidden;margin:auto;width:90%}
+.biaoti p{float:left;width:43%;font-size:14px;}
+/*cbmb_box*/
+.table_box{border:solid 1px #000;margin:auto;position:relative;border-top:0px;}
+.table_box .ts_box{overflow:hidden;}
+.ts_box p{float:left;width:49.5%;border-right:solid 1px #000;}
+.cbmb_box td{line-height:30px;width:15%;text-align:center;    border-right: solid 1px #000;  border-top: solid 1px #000;}
+.mb{position:absolute;top:15px;left:8%}
+.jl{position:absolute;top:100px;left:8%}
+/*cbjl_box*/
+.cbjl_box{margin:auto;}
+.xssr{position:absolute;top:0px;left:38%}
+.hj{position:absolute;top:125px;left:39%}
+.cbjl_box td{line-height:30px;width:15%;text-align:center; border-right: solid 1px #000;  border-top: solid 1px #000;}
+/*fz */
+
+.fz ul{overflow:hidden;}
+.fz li{float:left;width:49.5%;}
+.fz .fz_b{border-right:solid 1px #000;}
+/*foot*/
+.foot{overflow:hidden;margin:auto;width:90%}
+.foot p{float:left;width:35%;font-size:14px;padding:10px 60px}
+.foot_t{overflow:hidden;margin:auto;width:80%;padding-bottom:50px;}
+.foot_t p{float:left;width:37%;font-size:14px;padding:0px 60px}
+.inpt_boxone{width:150px; border:none; color: #585858; text-align: center; border: 1px solid #dedede;}
+.inpt_boxtwo{width:80px; border:none; color: #585858; text-align: center; border: 1px solid #dedede;}

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Crm-ODM-SaleWeb4WS" default="default" basedir="." xmlns:sonar="antlib:org.sonar.ant">
+	<!--// project directories //-->
+	<!-- 查看环境变量  -->
+	<property environment="env" />
+	<!--获取widow,unix的环境变量-->
+	<property name="ant.home" value="${env.ANT_HOME}" />
+	<echo message="${env.ANT_HOME}\build.properties" />
+	<property file="${env.ANT_HOME}\build.properties" />
+	<!--获取环境变量中的Ant_home变量值-->
+	<!-- 配置基本属性(路径配置) -->
+	<property name="dir.project" value="." />
+	<property name="dir.project.src" value="${dir.project}/src" />
+	<!--<property name="dir.project.lib" value="${dir.project}/lib" />-->
+	<property name="dir.project.web_module" value="${dir.project}/WebContent" />
+	<property name="dir.project.web_module_lib" value="${dir.project.web_module}/WEB-INF/lib" />
+
+	<!--// compile, build and deploy directories //-->
+	<property name="dir.project.build" value="${dir.project}" />
+	<property name="dir.project.build.class" value="${dir.project.build}/classes" />
+	<property name="dir.project.target" value="target" />
+	<property name="dir.project.target.classes" value="${dir.project.target}/classes" />
+	<property name="dir.project.build.web_module" value="${dir.project.build}/WebContent" />
+	<property name="dir.project.build.web_module_class" value="${dir.project.build.web_module}/WEB-INF/classes" />
+
+	<!--// J2EE Container //-->
+	<property name="version" value="1.0" />
+	<property name="opt.compile.source" value="1.6" />
+	<property name="opt.compile.target" value="1.6" />
+	<property name="opt.compile.encoding" value="UTF-8" />
+	<property name="opt.compile.deprecation" value="on" />
+	<property name="opt.compile.debug" value="on" />
+	<property name="opt.compile.optimize" value="off" />
+	<!--// Web Module Name //-->
+	<property name="deploy.file.web_module" value="${project.name}" />
+	<!-- 配置运行时classpath-->
+	<path id="CLASSPATH">
+		<!--// Depended Libraries //-->
+		<fileset dir="${dir.project.web_module_lib}">
+			<include name="*.jar" />
+		</fileset>
+		<!--
+		<fileset dir="${dir.project.lib}">
+			<include name="**/*.jar" />
+		</fileset>
+		-->
+		<!--// Project classes //-->
+		<pathelement location="${dir.project.target.classes}" />
+	</path>
+
+
+	<path id="sonar-ant-path">
+
+		<!--// Depended Libraries //-->
+		<fileset dir="${dir.project.web_module_lib}">
+			<include name="sonar-ant-task-*.jar" />
+		</fileset>
+	</path>
+
+	<filter token="version" value="${version}" />
+	<filter token="date" value="${TODAY}" />
+	<!-- 清理文件 -->
+	<target name="clean">
+		<!--<delete dir="${dir.project.build}" />
+		<delete dir="${dir.project.build.web_module}" />
+		<delete dir="${dir.project.build.class}" />
+		-->
+		<delete dir=".sonar" />
+		<delete dir="${dir.project.target}" />
+	</target>
+	<!-- 任务初始化-->
+	<target name="init">
+		<mkdir dir="${dir.project.build}" />
+		<mkdir dir="${dir.project.build.class}" />
+		<mkdir dir="${dir.project.target}" />
+		<mkdir dir="${dir.project.target.classes}" />
+	</target>
+
+	<!-- 配置编译任务-->
+	<target name="compile" depends="init">
+		<!--// compile the Java source //-->
+		<javac srcdir="${dir.project.src}" destdir="${dir.project.target.classes}" encoding="utf-8" source="${opt.compile.source}" target="${opt.compile.source}" deprecation="${opt.compile.deprecation}" debug="${opt.compile.debug}" optimize="{opt.compile.optimize}">
+			<!-- 
+			<src path="src" />
+			<src path="src-gen" />
+			<src path="conf" />
+             -->
+			<classpath refid="CLASSPATH" />
+			<include name="**/*.java" />
+		</javac>
+		<!--// copy the classpath resources //-->
+		<copy todir="${dir.project.target.classes}">
+			<fileset dir="${dir.project.src}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+	<echo message="=== ${ant.home}===" />
+	<!-- Define the Sonar target   -->
+	<target name="sonar" depends="compile">
+		<!-- Define the Sonar project properties  -->
+		<property name="sonar.jdbc.url" value="${sonar-jdbc-url}" />
+		<property name="sonar.jdbc.driverClassName" value="${sonar-jdbc-driverClassName}" />
+		<property name="sonar.jdbc.username" value="${sonar-jdbc-username}" />
+		<property name="sonar.jdbc.password" value="${sonar-jdbc-password}" />
+		<property name="sonar.host.url" value="${sonar-host-url}" />
+		<property name="sonar.projectKey" value="Crm-iCRM:iCRM-EmarketClient" />
+		<property name="sonar.projectName" value="Crm-ODM-SaleWeb4WS" />
+		<property name="sonar.projectVersion" value="3.X" />
+		<property name="sonar.language" value="java" />
+		<property name="sonar.sources" value="${dir.project.src}" />
+		<property name="sonar.sourceEncoding" value="UTF-8" />
+		<property name="sonar.binaries" value="${dir.project.target.classes}" />
+
+
+		<taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml">
+			<!--  Update the following line, or put the "sonar-ant-task-*.jar" file in your "$HOME/.ant/lib" folder -->
+			<classpath path="${ant.home}/lib/sonar-ant-task-*.jar" />
+		</taskdef>
+
+		<!-- Execute Sonar  -->
+		<sonar:sonar key="${sonar.projectKey}" version="${sonar.projectVersion}" xmlns:sonar="antlib:org.sonar.ant" />
+	</target>
+
+
+	<target name="build" depends="clean, init, compile">
+		<copy todir="${dir.project.build.web_module}">
+			<fileset dir="${dir.project.web_module}">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<copy todir="${dir.project.build.web_module_class}">
+			<fileset dir="${dir.project.target.classes}">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<!--
+		<copy todir="${dir.project.build.web_module}/WEB-INF/lib">
+			<fileset dir="${dir.project.lib}">
+				<include name="**/*.jar" />
+			</fileset>
+		</copy>
+		-->
+	</target>
+	<!--  打包war -->
+	<target name="war">
+		<war destfile="${dir.project.target}/${deploy.file.web_module}.war" webxml="${dir.project.build.web_module}/WEB-INF/web.xml">
+			<fileset dir="${dir.project.build.web_module}">
+				<include name="**" />
+			</fileset>
+		</war>
+	</target>
+	<target name="default" depends="clean,build" />
+
+</project>

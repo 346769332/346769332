@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>组织机构</title>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<link href="/CpcWeb/web/css/common.css" rel="stylesheet" type="text/css">
+ <script  type="text/javascript" src="/CpcWeb/web/js/common/jquery-1.9.1.min.js"></script>
+
+<script  type="text/javascript" src="/CpcWeb/web/js/common/servlet.url.js"></script>
+
+<script type="text/javascript" src="/CpcWeb/web/js/common/jq.ui.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/util.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/common.js"></script>
+<style>
+	.close_span {
+		background: url(/CpcWeb/web/images/ico+.gif) no-repeat left 4px;
+		padding-left:20px;
+	}
+	
+	.open_span {
+		background: url(/CpcWeb/web/images/ico-.gif) no-repeat left 4px;
+		padding-left:20px;
+	}
+</style>
+</head>
+<body  >
+<div class="list-main" id ='sysRegion'>
+ <table width="100%" border="0" cellspacing="0" cellpadding="0"  class="tab5 mt10 lines f14">
+        <thead>
+            <tr>
+                <th  ><span class="fl">组织机构</span>  <!--  <a href="#" class="but" id='return'>返回</a>-->
+                </th>
+            </tr>
+        </thead>
+                
+        <tbody id="sysRegionInfo">
+            <tr >
+                <td  >
+                                            员工姓名<input id="search_staff_name" type="text" style="width:100px;">
+                                            渠道名称<input id="search_org_name" type="text" style="width:100px;"> 
+                                            员工电话<input id="search_staff_phone" type="text" style="width:100px;"> 
+                 <a href="#" class="but" id='choose'>查询</a>
+                 <!--<a href="#" class="but" id='reback'>确认选中</a>-->
+                 <a href="#" class="but" id='return'>返回</a>
+                 </td>
+            </tr>
+            <tr id="checkUserLst" style="display: none;"/>
+            <tr id="submitButton" style="display: none;">
+            	<td><a href="#" class="but" id="submit">确认</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+</body>
+</html>

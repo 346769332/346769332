@@ -1,0 +1,59 @@
+<script type="text/javascript" src="js/order/serviceProcessedList.js"></script>
+<div class="list-main" id="serviceProcessedLstPage">
+
+	<h2>已处理</h2>
+
+	<dl class="bd-list">
+		<dt>主题搜索：</dt>
+		<dd>
+			<input id="themeSeach" type="text" class=" w130">
+		</dd>
+		<dt>发起人：</dt>
+		<dd>
+			<input id="sendUserName" type="text" class=" w130" readonly>
+		</dd>
+		<dt>最新状态：</dt>
+		<dd>
+			<select id="newStatusCd" class="w130" style="width:185;height:26px;"></select>
+		</dd>
+		<dt>发起时间：</dt>
+		<dd>
+			<input id="sendDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearSendDate">
+		</dd>
+		<dt>办结截止时间：</dt>
+		<dd>
+			<input id="endDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearEndDate">
+		</dd>
+		<dd>
+			<a href="#" class="butInit" id="senior">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+	<div style="margin-top:5px;" id="dateQuery">
+		<a href="#" class="but" id="today">今    天</a>
+		<a href="#" class="butInit" id="week">近一周</a>
+		<a href="#" class="butInit" id="month">近一月</a>
+	<div class="clear"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10">
+		<thead>
+			<tr>
+				<td>服务单号</td>
+				<td>需求主题</td>
+				<!-- <td>需求类型</td> -->
+				<th>发起人</th>
+				<td>发起时间</td>
+				<!--  <td>回单时间</td>-->
+				<!-- <td>办结剩余时间</td> -->
+				<td>当前处理人</td>
+				<td>最新状态</td>
+				<td>操作</td>
+			</tr>
+		</thead>
+		<tbody id="orderLstBody">
+			
+		</tbody>
+	</table>
+	<div class="page mt10" id="orderLstFoot"></div>
+</div>
+</div>

@@ -1,0 +1,71 @@
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/demanHistorydListDetail.js"></script>
+
+<!-- <link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow2.css"/> -->
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/data.js"></script> -->
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/jquery.min.js"></script> -->
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFunc.js"></script> -->
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/json2.js"></script> -->
+<!-- <link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/default.css"/> -->
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow.js"></script> -->
+<!-- <style type="text/css"> -->
+<!-- 	#workflow .GooFlow_head{display:none;} -->
+<!-- 	#workflow .GooFlow_tool{display:none;} -->
+<!-- </style> -->
+<div class="list-main" id='demandDetailInfo'>
+<div class="page-title mt10"><img src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;历史短流程需求详细信息</div>
+	<div class="bd-list">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0"
+			class="tab5 mt10 lines">
+			<tbody>
+				<tr>
+					<td style="width:60px">短流程名称</td>
+					<td style="width:150px"><input id="workflowName" type="text" readonly="readonly"></td>
+					<td style="width:60px">需求名称</td>
+					<td style="width:150px"><input id="demandName" type="text" readonly="readonly"></td>
+				</tr>
+				<tr>
+				</tr>
+				<tr>
+					<td>发起人</td>
+					<td><input id="releasePersonName" type="text" disabled="disabled" style="width: 95%;"></td>
+					<td>发起人部门</td>
+					<td><input id="releaseDeptName" type="text" disabled="disabled" style="width: 95%;"></td>
+				</tr>	
+				<tr>
+					<td>需求描述</td>
+					<td colspan="3">
+						<textarea id="demandDesc"
+							style="line-height:25px;width:340px" placeholder=""
+							maxlength="800" readonly="readonly">
+						</textarea>
+					</td>
+					
+				</tr>
+				<tr>	
+				<td>附件</td>
+					<td colspan="3"><div id="attachment"></div></td>
+					
+					
+					
+				</tr>	
+				<tr>
+					<td>星级评价</td>
+					<td id="starEvaluate"></td>
+					<td>评价说明</td>
+					<td><input type="text" id="evaluateInfo" readonly="readonly"></td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td align="center" colspan="4">						
+						<a href="#" class="but" id="back">返回</a>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+	<div class="page mt10" id="demandDetailInfoFoot"></div>
+	<div  id="workflow"  >
+	</div>
+	
+	<div id="processRecord"><span>短流程处理记录：</span></div>
+</div>

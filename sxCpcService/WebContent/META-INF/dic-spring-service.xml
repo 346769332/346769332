@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:http-conf="http://cxf.apache.org/transports/http/configuration"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+			http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
+		
+
+	<bean id="outcommonService" class="com.tydic.sale.service.crm.service.impl.OutcommonServiceImpl" >
+  		<property name="cpcDao" ref="cpcDao"></property>
+  	</bean>
+	<bean id="useAuthService" class="com.tydic.sale.service.crm.service.impl.UseAuthServiceImpl" >
+  		<property name="cpcDao" ref="cpcDao"></property>
+  	</bean>
+	<bean id="evalMonService" class="com.tydic.sale.service.crm.service.impl.EvalMonServiceImpl" >
+  		<property name="cpcDao" ref="cpcDao"></property>
+  	</bean>
+  	
+  	<bean id="searchService" class="com.tydic.sale.service.crm.service.impl.SearchServiceImpl" >
+  		<property name="cpcDao" ref="cpcDao"></property>
+  	</bean>
+  	
+  	<bean id="sMSService" class="com.tydic.sale.service.crm.service.impl.SMSServiceImpl" >
+  		<property name="cpcDao" ref="cpcDao"></property>
+  	</bean>
+	  
+	<bean id="flowService" class="com.tydic.sale.service.crm.service.impl.FlowServiceImpl" >
+		<property name="cpcDao" ref="cpcDao"></property>
+	</bean>
+	
+	<bean id="reportService" class="com.tydic.sale.service.crm.service.impl.ReportServiceImpl" >
+		<property name="cpcDao" ref="cpcDao"></property>
+	</bean>
+	  
+	<bean id="backService" class="com.tydic.sale.service.crm.service.impl.BackServiceImpl" >
+  		<property name="cpcDao" ref="cpcDao"></property>
+  		<property name="sMSService" ref="sMSService"></property>
+  		
+  	</bean>
+  	
+ 	<bean id="sysManageService" class="com.tydic.sale.service.crm.service.impl.SysManageServiceImpl" >
+		<property name="cpcDao" ref="cpcDao"></property>
+	</bean>
+	
+ 	<bean id="policyManualService" class="com.tydic.sale.service.crm.service.impl.PolicyManualServiceImpl" >
+		<property name="cpcDao" ref="cpcDao"></property>
+	</bean>
+ 	
+ 	<bean id="appVersionService" class="com.tydic.sale.service.crm.service.impl.AppVersionServiceImpl" >
+		<property name="cpcDao" ref="cpcDao"></property>
+	</bean>
+ 	<bean id="taskBookService" class="com.tydic.sale.service.crm.service.impl.TaskBookServiceImpl">
+ 	    <property name="cpcDao" ref="cpcDao"></property>
+ 	</bean>
+ 	<bean id="shortProcessService" class="com.tydic.sale.service.crm.service.impl.ShortProcessServiceImpl">
+ 	    <property name="cpcDao" ref="cpcDao"></property>
+ 	    <property name="sMSService" ref="sMSService"></property>
+ 	</bean>
+ 	<bean id="commonMethodService" class="com.tydic.sale.service.crm.service.impl.CommonMethodServiceImpl">
+ 	    <property name="cpcDao" ref="cpcDao"></property>
+ 	</bean>
+ 	<bean id="notificationService" class="com.tydic.sale.service.crm.service.impl.NotificationServiceImpl">
+ 	    <property name="cpcDao" ref="cpcDao"></property>
+ 	</bean>
+	<bean id="cpcDao" class="com.tydic.sale.service.crm.dao.impl.CpcDaoImpl">
+		<property name="sqlMapClientTemplate"> <ref bean="sqlMapClientTemplate" />
+		</property>
+	</bean>
+	<bean id="leadStrokeService" class="com.tydic.sale.service.crm.service.impl.LeadStrokeServiceImpl">
+ 	    <property name="cpcDao" ref="cpcDao"></property>
+ 	</bean>
+</beans>

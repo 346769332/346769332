@@ -1,0 +1,4438 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="shortProcess">
+	<!-- 短流程需求查询总数量 :begin -->
+	<select id="getDemandListSum" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT COUNT(*)
+		FROM ACT_DEMAND_INFO ADI, ACT_WORKFLOW_INFO AWI,
+		ACT_DEMAND_TASK
+		I,sys_staff s
+		WHERE ADI.WORKFLOW_ID = AWI.WORKFLOW_ID
+		AND ADI.DEMAND_ID = I.DEMAND_ID
+		AND S.STAFF_ID=ADI.DEMAND_SUMIT_PID
+		AND
+		I.TASK_ID IN (SELECT MAX(T.TASK_ID)
+		FROM ACT_DEMAND_TASK T
+		,ACT_DEMAND_INFO Z
+		WHERE T.DEMAND_ID = Z.DEMAND_ID AND
+		ADI.DEMAND_ID=Z.DEMAND_ID )
+		AND ADI.IS_EVALUATE=0
+		<isNotEmpty prepend="AND" property="staffId">
+			(ADI.DEMAND_SUMIT_PID=#staffId# or I.OPERATOR_ID=#staffId#)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="is_evaluate">
+			ADI.IS_EVALUATE=#is_evaluate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+
+				I.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+
+				I.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="latn_id">
+			ADI.LATN_ID=#latn_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			ADI.DEMAND_STATUS =
+			#demandStatus#
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="overTime" > -->
+		<!-- ADI.OVER_TIME = #overTime# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="promoters">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #promoters#, '%')
+		</isNotEmpty>
+	</select>
+	<!-- 短流程需求查询总数量 :endji节点处理人查询页面 -->
+	<select id="getDemandListSum_fun" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT COUNT(*) FROM (
+		SELECT ADI.DEMAND_ID,
+		ADI.DEMAND_NAME,
+		ADI.DEMAND_STATUS,
+		ADI.DEMAND_CODE,
+		ADI.DEMAND_DESC,
+		ADI.WORKFLOW_ID,
+		ADI.OVER_TIME,
+		ADI.STAR_EVALUATE,
+		ADI.EVALUATE_INFO,
+		ADI.UNIFIED_AUTHENTICATION,
+		DATE_FORMAT(ADI.DCREATE_TIME, "%Y-%m-%d %T") DCREATE_TIME,
+		AWI.WORKFLOW_NAME,
+		AWI.TEMPLATE_ID,
+		AWI.WCREATOR_ID,
+		I.TASK_ID,
+		I.OPERATOR_ID,
+		I.OPERATOR_NAME,
+		I.OPERATOR_DEPT,
+		I.OPERATOR_DEPT_ID,
+		I.URGE_COUNT,
+		DATE_FORMAT(I.END_TIME, "%Y-%m-%d %T") END_TIME,
+		ADI.LATN_ID,
+		ADI.DEMAND_SUMIT_PID,
+		ADI.DEMAND_SUMIT_PNAME,
+		S.DEPARTMENT,
+		I.IS_SINGATURE,
+		'' AUTHORITY_START_TIME,
+		'' AUTHORITY_END_TIME,
+		I.ERA_OPERATOR_ID,
+		I.ERA_OPERATOR_NAME,
+		I.ERA_OPERATOR_DEPT_ID,
+		I.ERA_OPERATOR_DEPT,
+		DATE_FORMAT( I.URGE_TIME, "%Y-%m-%d %T") URGE_TIME
+		FROM
+		  ACT_DEMAND_INFO ADI,
+		  ACT_WORKFLOW_INFO AWI,
+		  ACT_DEMAND_TASK I,
+		  SYS_STAFF S
+		WHERE ADI.WORKFLOW_ID = AWI.WORKFLOW_ID 
+		  AND S.STAFF_ID = ADI.DEMAND_SUMIT_PID 
+		  AND ADI.DEMAND_ID = I.DEMAND_ID 
+		  AND I.TASK_STATUS = 1 
+		  AND ADI.IS_EVALUATE = 0 
+		  AND AWI.WORKFLOW_SINGLE_TYPE != '3' 
+		  AND ( I.IS_SINGATURE IS NULL  OR I.IS_SINGATURE = '2')
+		  	<isNotEmpty prepend="AND" property="staffId">
+			I.OPERATOR_ID = #staffId#   
+			</isNotEmpty>
+		  <isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+				I.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+				I.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="latn_id">
+			ADI.LATN_ID=#latn_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			ADI.DEMAND_STATUS = #demandStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="promoters">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #promoters#, '%')
+		</isNotEmpty>
+		UNION
+		 ALL 
+		 SELECT 
+		  ADI1.DEMAND_ID,
+		  ADI1.DEMAND_NAME,
+		  ADI1.DEMAND_STATUS,
+		  ADI1.DEMAND_CODE,
+		  ADI1.DEMAND_DESC,
+		  ADI1.WORKFLOW_ID,
+		  ADI1.OVER_TIME,
+		  ADI1.STAR_EVALUATE,
+		  ADI1.EVALUATE_INFO,
+		  ADI1.UNIFIED_AUTHENTICATION,
+		  DATE_FORMAT(ADI1.DCREATE_TIME, "%Y-%m-%d %T") DCREATE_TIME,
+		  AWI1.WORKFLOW_NAME,
+		  AWI1.TEMPLATE_ID,
+		  AWI1.WCREATOR_ID,
+		  I1.TASK_ID,
+		  I1.OPERATOR_ID,
+		  I1.OPERATOR_NAME,
+		  I1.OPERATOR_DEPT,
+		  I1.OPERATOR_DEPT_ID,
+		  I1.URGE_COUNT,
+		  DATE_FORMAT(I1.END_TIME, "%Y-%m-%d %T") END_TIME,
+		  ADI1.LATN_ID,
+		  ADI1.DEMAND_SUMIT_PID,
+		  ADI1.DEMAND_SUMIT_PNAME,
+		  S1.DEPARTMENT,
+		  I1.IS_SINGATURE,
+		  WA.AUTHORITY_START_TIME,
+		  WA.AUTHORITY_END_TIME,
+		  I1.ERA_OPERATOR_ID,
+		  I1.ERA_OPERATOR_NAME,
+		  I1.ERA_OPERATOR_DEPT_ID,
+		  I1.ERA_OPERATOR_DEPT,
+		  DATE_FORMAT(I1.URGE_TIME, "%Y-%m-%d %T") URGE_TIME 
+		FROM
+		  ACT_DEMAND_INFO ADI1,
+		  ACT_WORKFLOW_INFO AWI1,
+		  ACT_DEMAND_TASK I1,
+		  SYS_STAFF S1,
+		  ACT_WORKFLOW_AUTHORITY WA 
+		WHERE
+		ADI1.WORKFLOW_ID = AWI1.WORKFLOW_ID 
+		AND S1.STAFF_ID = ADI1.DEMAND_SUMIT_PID 
+		AND ADI1.DEMAND_ID = I1.DEMAND_ID
+		AND WA.WORKFLOW_ID = ADI1.WORKFLOW_ID 
+		AND I1.TASK_STATUS = 1 
+		AND ADI1.IS_EVALUATE = 0 
+		AND AWI1.WORKFLOW_SINGLE_TYPE != '3' 
+		AND (I1.IS_SINGATURE IS NULL or I1.IS_SINGATURE='2')
+		<isNotEmpty prepend="AND" property="staffId">
+			(I1.ERA_OPERATOR_ID = #staffId#   
+			AND WA.AUTHORITY_START_TIME  <![CDATA[<]]> NOW()  AND WA.AUTHORITY_END_TIME  <![CDATA[>]]> NOW())
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+
+				I1.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+
+				I1.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+
+			</isEqual>
+		</isNotEmpty>
+
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI1.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="latn_id">
+			ADI1.LATN_ID=#latn_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI1.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			ADI1.DEMAND_STATUS = #demandStatus#
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="overTime" > -->
+		<!-- ADI.OVER_TIME = #overTime# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="promoters">
+			AWI1.WORKFLOW_NAME LIKE CONCAT('%', #promoters#, '%')
+		</isNotEmpty>) D
+	</select>
+	<!-- 短流程需求查询总数量 :end -->
+
+	<!-- 短流程需求查询总记录:begin -->
+	<select id="getDemandListPage" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT ADI.DEMAND_ID,
+		ADI.DEMAND_NAME,
+		ADI.DEMAND_STATUS,
+		ADI.DEMAND_CODE,
+		ADI.DEMAND_DESC,
+		ADI.WORKFLOW_ID,
+		ADI.OVER_TIME,
+		ADI.STAR_EVALUATE,
+		ADI.EVALUATE_INFO,
+		ADI.SUBOFFICE_NAME,
+		ADI.CENTER_REPOSITORY_NAME,
+		DATE_FORMAT(ADI.DCREATE_TIME, "%Y-%m-%d %T") DCREATE_TIME,
+		AWI.WORKFLOW_NAME,
+		I.TASK_ID,
+		I.OPERATOR_ID,
+		I.OPERATOR_NAME,
+		I.OPERATOR_DEPT,
+		I.OPERATOR_DEPT_ID,
+		I.URGE_COUNT,
+		DATE_FORMAT(I.END_TIME, "%Y-%m-%d %T") END_TIME,
+		ADI.DEMAND_SUMIT_PID,
+		ADI.DEMAND_SUMIT_PNAME,
+		ADI.LATN_ID,
+		ADI.IS_EVALUATE,
+		AWI.WORKFLOW_SINGLE_TYPE,
+		S.DEPARTMENT,
+		S.MOB_TEL,
+		DATE_FORMAT( I.URGE_TIME, "%Y-%m-%d %T")
+		URGE_TIME
+		FROM
+		ACT_DEMAND_INFO ADI, ACT_WORKFLOW_INFO AWI, ACT_DEMAND_TASK
+		I,sys_staff s
+		WHERE ADI.WORKFLOW_ID = AWI.WORKFLOW_ID
+		AND ADI.DEMAND_ID
+		= I.DEMAND_ID
+		AND S.STAFF_ID=ADI.DEMAND_SUMIT_PID
+		AND I.TASK_ID IN
+		(SELECT MAX(T.TASK_ID)
+		FROM ACT_DEMAND_TASK T
+		,ACT_DEMAND_INFO Z
+		WHERE
+		T.DEMAND_ID = Z.DEMAND_ID AND ADI.DEMAND_ID=Z.DEMAND_ID )
+		AND
+		ADI.IS_EVALUATE=0
+		<isNotEmpty prepend="AND" property="staffId">
+			(ADI.DEMAND_SUMIT_PID=#staffId# or I.OPERATOR_ID=#staffId#)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+
+				I.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+
+				I.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="is_evaluate">
+			ADI.IS_EVALUATE=#is_evaluate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+
+		<isNotEmpty prepend="AND" property="latn_id">
+			ADI.LATN_ID=#latn_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			ADI.DEMAND_STATUS =
+			#demandStatus#
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="overTime" > -->
+		<!-- ADI.OVER_TIME = #overTime# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="promoters">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #promoters#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="pagesize">
+			limit $pagenum$,$pagesize$
+		</isNotEmpty>
+	</select>
+	<select id="getDemandListPage_fun" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+	SELECT D.* from (
+		SELECT ADI.DEMAND_ID,
+		ADI.DEMAND_NAME,
+		ADI.DEMAND_STATUS,
+		ADI.DEMAND_CODE,
+		ADI.DEMAND_DESC,
+		ADI.WORKFLOW_ID,
+		ADI.OVER_TIME,
+		ADI.STAR_EVALUATE,
+		ADI.EVALUATE_INFO,
+		ADI.UNIFIED_AUTHENTICATION,
+		DATE_FORMAT(ADI.DCREATE_TIME, "%Y-%m-%d %T") DCREATE_TIME,
+		AWI.WORKFLOW_NAME,
+		AWI.TEMPLATE_ID,
+		AWI.WCREATOR_ID,
+		I.TASK_ID,
+		I.OPERATOR_ID,
+		I.OPERATOR_NAME,
+		I.OPERATOR_DEPT,
+		I.OPERATOR_DEPT_ID,
+		I.URGE_COUNT,
+		DATE_FORMAT(I.END_TIME, "%Y-%m-%d %T") END_TIME,
+		ADI.LATN_ID,
+		ADI.DEMAND_SUMIT_PID,
+		ADI.DEMAND_SUMIT_PNAME,
+		S.DEPARTMENT,
+		I.IS_SINGATURE,
+		'' AUTHORITY_START_TIME,
+		'' AUTHORITY_END_TIME,
+		I.ERA_OPERATOR_ID,
+		I.ERA_OPERATOR_NAME,
+		I.ERA_OPERATOR_DEPT_ID,
+		I.ERA_OPERATOR_DEPT,
+		I.REPULSE_TYPE,
+		'' AUTHOR_STATUS,
+		DATE_FORMAT( I.URGE_TIME, "%Y-%m-%d %T") URGE_TIME,
+		(select ACT_WORKFLOW_TYPE_NAME FROM ACT_WORKFLOW_TYPE AWT WHERE AWT.ACT_WORKFLOW_TYPE_ID=AWI.WORKFLOW_TYPE) WORKFLOW_TYPE_NAME,
+		AWI.noticeInfo noticeInfo
+		FROM
+		  ACT_DEMAND_INFO ADI,
+		  ACT_WORKFLOW_INFO AWI,
+		  ACT_DEMAND_TASK I,
+		  SYS_STAFF S
+		WHERE ADI.WORKFLOW_ID = AWI.WORKFLOW_ID 
+		  AND S.STAFF_ID = ADI.DEMAND_SUMIT_PID 
+		  AND ADI.DEMAND_ID = I.DEMAND_ID 
+		  AND I.TASK_STATUS = 1 
+		  AND ADI.IS_EVALUATE = 0 
+		  AND AWI.WORKFLOW_SINGLE_TYPE != '3' 
+		  AND ( I.IS_SINGATURE IS NULL  OR I.IS_SINGATURE = '2')
+		  <isNotEmpty prepend="AND" property="staffId">
+			I.OPERATOR_ID = #staffId#   
+		</isNotEmpty>
+		  <isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+				I.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+				I.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="latn_id">
+			ADI.LATN_ID=#latn_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			ADI.DEMAND_STATUS = #demandStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="promoters">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #promoters#, '%')
+		</isNotEmpty>
+		UNION
+		 ALL 
+		 SELECT 
+		  ADI1.DEMAND_ID,
+		  ADI1.DEMAND_NAME,
+		  ADI1.DEMAND_STATUS,
+		  ADI1.DEMAND_CODE,
+		  ADI1.DEMAND_DESC,
+		  ADI1.WORKFLOW_ID,
+		  ADI1.OVER_TIME,
+		  ADI1.STAR_EVALUATE,
+		  ADI1.EVALUATE_INFO,
+		  ADI1.UNIFIED_AUTHENTICATION,
+		  DATE_FORMAT(ADI1.DCREATE_TIME, "%Y-%m-%d %T") DCREATE_TIME,
+		  AWI1.WORKFLOW_NAME,
+		  AWI1.TEMPLATE_ID,
+		  AWI1.WCREATOR_ID,
+		  I1.TASK_ID,
+		  I1.OPERATOR_ID,
+		  I1.OPERATOR_NAME,
+		  I1.OPERATOR_DEPT,
+		  I1.OPERATOR_DEPT_ID,
+		  I1.URGE_COUNT,
+		  DATE_FORMAT(I1.END_TIME, "%Y-%m-%d %T") END_TIME,
+		  ADI1.LATN_ID,
+		  ADI1.DEMAND_SUMIT_PID,
+		  ADI1.DEMAND_SUMIT_PNAME,
+		  S1.DEPARTMENT,
+		  I1.IS_SINGATURE,
+		  WA.AUTHORITY_START_TIME,
+		  WA.AUTHORITY_END_TIME,
+		  I1.ERA_OPERATOR_ID,
+		  I1.ERA_OPERATOR_NAME,
+		  I1.ERA_OPERATOR_DEPT_ID,
+		  I1.ERA_OPERATOR_DEPT,
+		  I1.REPULSE_TYPE,
+		  WA.AUTHOR_STATUS,
+		  DATE_FORMAT(I1.URGE_TIME, "%Y-%m-%d %T") URGE_TIME,
+		  (select ACT_WORKFLOW_TYPE_NAME FROM ACT_WORKFLOW_TYPE AWT WHERE AWT.ACT_WORKFLOW_TYPE_ID=AWI1.WORKFLOW_TYPE) WORKFLOW_TYPE_NAME,
+		  AWI1.noticeInfo noticeInfo
+		FROM
+		  ACT_DEMAND_INFO ADI1,
+		  ACT_WORKFLOW_INFO AWI1,
+		  ACT_DEMAND_TASK I1,
+		  SYS_STAFF S1,
+		  ACT_WORKFLOW_AUTHORITY WA 
+		WHERE
+		ADI1.WORKFLOW_ID = AWI1.WORKFLOW_ID 
+		AND S1.STAFF_ID = ADI1.DEMAND_SUMIT_PID 
+		AND ADI1.DEMAND_ID = I1.DEMAND_ID
+		AND WA.WORKFLOW_ID = ADI1.WORKFLOW_ID 
+		AND I1.TASK_STATUS = 1 
+		AND ADI1.IS_EVALUATE = 0 
+		AND AWI1.WORKFLOW_SINGLE_TYPE != '3' 
+		AND (I1.IS_SINGATURE IS NULL or I1.IS_SINGATURE='2')
+		<isNotEmpty prepend="AND" property="staffId">
+			(I1.ERA_OPERATOR_ID = #staffId#   
+			AND WA.AUTHORITY_START_TIME  <![CDATA[<]]> NOW()  AND WA.AUTHORITY_END_TIME  <![CDATA[>]]> NOW())
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+
+				I1.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+
+				I1.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+
+			</isEqual>
+		</isNotEmpty>
+
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI1.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="latn_id">
+			ADI1.LATN_ID=#latn_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI1.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			ADI1.DEMAND_STATUS = #demandStatus#
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="overTime" > -->
+		<!-- ADI.OVER_TIME = #overTime# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="promoters">
+			AWI1.WORKFLOW_NAME LIKE CONCAT('%', #promoters#, '%')
+		</isNotEmpty>) D
+		ORDER BY D.DEMAND_ID DESC
+		<isNotEmpty prepend="" property="pagesize">
+			limit $pagenum$,$pagesize$
+		</isNotEmpty>
+	</select>
+	<!-- 短流程需求查询总记录:end -->
+
+	<!-- 历史短流程需求查询总数量 :begin -->
+	<select id="getDemandHistoryListSum" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT count(*)
+		FROM ACT_DEMAND_INFO ADI, ACT_WORKFLOW_INFO
+		AWI,SYS_STAFF S
+		WHERE ADI.WORKFLOW_ID = AWI.WORKFLOW_ID
+		AND
+		ADI.DEMAND_STATUS = 1001
+		AND ADI.DEMAND_SUMIT_PID=S.STAFF_ID
+		AND
+		ADI.IS_EVALUATE=1
+		<isNotEmpty prepend="AND" property="latn_id">
+			ADI.LATN_ID=#latn_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+
+				ADI.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+
+				ADI.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+			</isEqual>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="staffId">
+			ADI.DEMAND_SUMIT_PID=#staffId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			ADI.DEMAND_STATUS =
+			#demandStatus#
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="overTime" > -->
+		<!-- ADI.OVER_TIME = #overTime# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="promoters">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #promoters#, '%')
+		</isNotEmpty>
+	</select>
+	<!-- 历史短流程需求查询总数量 :end -->
+
+	<!-- 历史短流程需求查询总记录:begin -->
+	<select id="getDemandHistoryListPage" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT ADI.DEMAND_ID,
+		ADI.DEMAND_NAME,
+		ADI.DEMAND_STATUS,
+		ADI.DEMAND_CODE,
+		ADI.DEMAND_DESC,
+		ADI.WORKFLOW_ID,
+		ADI.OVER_TIME,
+		ADI.STAR_EVALUATE,
+		ADI.EVALUATE_INFO,
+		DATE_FORMAT(ADI.DCREATE_TIME,"%Y-%m-%d %T") DCREATE_TIME,
+		AWI.WORKFLOW_NAME,
+		ADI.DEMAND_SUMIT_PID,
+		ADI.DEMAND_SUMIT_PNAME,
+		AWI.WORKFLOW_SINGLE_TYPE,
+		S.DEPARTMENT
+		FROM ACT_DEMAND_INFO
+		ADI, ACT_WORKFLOW_INFO AWI,SYS_STAFF S
+		WHERE ADI.WORKFLOW_ID =AWI.WORKFLOW_ID
+		AND ADI.DEMAND_STATUS = 1001
+		AND ADI.DEMAND_SUMIT_PID=S.STAFF_ID
+		<isEmpty prepend="AND" property="demandStatusflags">
+			ADI.IS_EVALUATE=1
+		</isEmpty>
+		<isNotEmpty prepend="AND" property="staffId">
+			ADI.DEMAND_SUMIT_PID=#staffId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="latn_id">
+			ADI.LATN_ID=#latn_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			ADI.DEMAND_STATUS =
+			#demandStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+
+				ADI.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+
+				ADI.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+			</isEqual>
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="overTime" > -->
+		<!-- ADI.OVER_TIME = #overTime# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="promoters">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #promoters#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="pagesize">
+			limit $pagenum$,$pagesize$
+		</isNotEmpty>
+	</select>
+	<!-- 历史短流程需求查询记录:end -->
+
+	<!-- 短流程需求详细查询记录:begin -->
+	<select id="getNodes" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT APNE.NODE_ID,
+		APNE.WORKFLOW_ID,
+		APNE.NODE_NAME,
+		APNE.NODE_TYPE,
+		APNE.NODE_IN_TYPE,
+		APNE.NODE_EXECUTOR,
+		APNE.NODE_EXECUTE_DEPART,
+		APNE.NODE_EXECUTORTEL,
+		APNE.TIME_LIMIT,
+		APNE.IS_SUPPORT,
+		APNE.NCREATE_TIME,
+		APNE.TO_LEFT,
+		APNE.TO_TOP,
+		APNE.NODE_WIDTH,
+		APNE.OPERAT_AGREE,
+		APNE.TO_BEGIN_NODE,
+		APNE.TO_PREV_NODE,
+		APNE.NODE_HEIGHT,
+		APNE.IS_SIGNATURE,
+		APNE.POST_ID,
+		APNE.DEPT_TYPE_ID,
+		APNE.DEPT_LEVEL,
+		(SELECT DISTINCT dept_type_name FROM act_workflow_dept_type_clock AWD 
+        WHERE AWD.dept_type_id=APNE.DEPT_TYPE_ID) DEPT_TYPE_NAME, <!--动态节点部门类型  -->
+        (select post_name from act_workflow_post_info AWPI where AWPI.post_id=APNE.POST_ID) POST_NAME <!--岗位表  -->
+		FROM
+		ACT_PROCESS_NODE_EXAMPLE APNE
+		WHERE 1=1
+		<isNotEmpty prepend="AND" property="workflowId">
+			APNE.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+	</select>
+	<!-- 短流程需求详细查询记录:end -->
+
+	<select id="qryWorkFlowListPage" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT A.*,SR.REGION_NAME,
+		AWS.ACT_WORKFLOW_SORT_ID,
+		AWS.ACT_WORKFLOW_SORT_NAME,
+		AWT.ACT_WORKFLOW_TYPE_ID,
+		AWT.ACT_WORKFLOW_TYPE_NAME
+		FROM ACT_WORKFLOW_INFO A
+		LEFT JOIN SYS_REGION
+		SR
+		ON A.WLATN_ID = SR.REGION_ID
+		LEFT JOIN ACT_WORKFLOW_SORT AWS
+		ON
+		A.WORKFLOW_SORT = AWS.ACT_WORKFLOW_SORT_ID
+		LEFT JOIN ACT_WORKFLOW_TYPE
+		AWT
+		ON A.WORKFLOW_TYPE = AWT.ACT_WORKFLOW_TYPE_ID
+		where 1=1 and
+		A.WORKFLOW_SINGLE_TYPE!='3'
+		<isNotEmpty property="regionId" prepend="and">
+			A.WLATN_ID = #regionId#
+		</isNotEmpty>
+		<isNotEmpty property="workflowNbr" prepend="and">
+			A.WORKFLOW_CODE LIKE CONCAT('%', #workflowNbr#, '%') 
+		</isNotEmpty>
+		<isNotEmpty property="workflowState">
+			<isEqual property="workflowState" compareValue="1000"
+				prepend="and">
+				A.WORKFLOW_PUBLISH_STATUS = '1'
+				AND A.WORKFLOW_STATUS!='1002'
+			</isEqual>
+			<isNotEqual property="workflowState" compareValue="1000"
+				prepend="and">
+				A.WORKFLOW_STATUS = #workflowState#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty property="selectWorkflowType" prepend="and">
+			AWT.ACT_WORKFLOW_TYPE_ID = #selectWorkflowType#
+		</isNotEmpty>
+		<isNotEmpty property="selectWorkflowSort" prepend="and">
+			AWS.ACT_WORKFLOW_SORT_ID = #selectWorkflowSort#
+		</isNotEmpty>
+		<isNotEmpty property="workflowName" prepend="and">
+			A.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+		</isNotEmpty>
+		<isNotEqual property="regionId" compareValue="888">
+			AND
+			A.WORKFLOW_STATUS != '1010'
+			AND A.WLATN_ID = #regionId#
+		</isNotEqual>
+		<isNotEmpty property="workflowId" prepend="and">
+			A.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+		ORDER BY A.WCREATE_TIME,A.WORKFLOW_ID DESC
+		<isNotEmpty prepend="" property="minSize">
+			limit $minSize$,$maxSize$
+		</isNotEmpty>
+	</select>
+	<select id="qryWorkFlowListSum" resultClass="java.lang.String"
+		parameterClass="java.util.HashMap">
+		select count(*) from (
+		select A.* from act_workflow_info A
+		LEFT JOIN
+		SYS_REGION SR
+		ON A.WLATN_ID = SR.REGION_ID
+		LEFT JOIN ACT_WORKFLOW_SORT
+		AWS
+		ON A.WORKFLOW_SORT = AWS.ACT_WORKFLOW_SORT_ID
+
+		LEFT JOIN
+		ACT_WORKFLOW_TYPE AWT
+		ON A.WORKFLOW_TYPE = AWT.ACT_WORKFLOW_TYPE_ID
+		where 1=1 and
+		A.WORKFLOW_SINGLE_TYPE!='3'
+
+		<isNotEmpty property="regionId" prepend="and">
+			A.WLATN_ID = #regionId#
+		</isNotEmpty>
+		<isNotEmpty property="workflowNbr" prepend="and">
+			A.WORKFLOW_CODE LIKE CONCAT('%', #workflowNbr#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="workflowState">
+			<isEqual property="workflowState" compareValue="1000"
+				prepend="and">
+				A.WORKFLOW_PUBLISH_STATUS = '1'
+				AND A.WORKFLOW_STATUS!='1002'
+			</isEqual>
+			<isNotEqual property="workflowState" compareValue="1000"
+				prepend="and">
+				A.WORKFLOW_STATUS = #workflowState#
+			</isNotEqual>
+		</isNotEmpty>
+		<isNotEmpty property="selectWorkflowType" prepend="and">
+			AWT.ACT_WORKFLOW_TYPE_ID = #selectWorkflowType#
+		</isNotEmpty>
+		<isNotEmpty property="selectWorkflowSort" prepend="and">
+			AWS.ACT_WORKFLOW_SORT_ID = #selectWorkflowSort#
+		</isNotEmpty>
+		<isNotEmpty property="workflowName" prepend="and">
+			A.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+		</isNotEmpty>
+		<isNotEqual property="regionId" compareValue="888">
+			AND
+			A.WORKFLOW_STATUS != '1010'
+			AND A.WLATN_ID = #regionId#
+		</isNotEqual>
+		<isNotEmpty property="workflowId" prepend="and">
+			A.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+		order by A.WCREATE_TIME desc)D
+	</select>
+	<!-- 短流程需求详细查询记录:begin -->
+	<select id="getLines" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT AWL.LINE_ID,
+		AWL.FROM_NODE_ID,
+		AWL.TO_NODE_ID,
+		AWL.LINE_TYPE,
+		AWL.CREATE_DATE,
+		AWL.WORKFLOW_ID,
+		AWL.M,
+		AWL.LINE_NAME
+		FROM
+		ACT_WORKFLOW_LINE AWL
+		WHERE 1=1
+		<isNotEmpty prepend="AND" property="workflowId">
+			AWL.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+	</select>
+	<!-- 短流程开始节点数据 -->
+	<select id="getStarNode" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select
+		f.*,E.SELECTNODE_ID,E.NODE_EXECUTOR,E.NODE_EXECUTOR_ID,E.NODE_EXECUTE_DEPART,E.NODE_EXECUTE_DEPART_ID,
+		E.POST_ID,
+		E.DEPT_TYPE_ID,
+		E.DEPT_LEVEL
+		from ACT_PROCESS_NODE_EXAMPLE e,
+		(select *
+		from ACT_WORKFLOW_CONFIG a
+		where a.wf_id in
+		(select min(b.wf_id) from ACT_WORKFLOW_CONFIG b where
+		b.workflow_id =
+		#workflowId#)) f
+		where f.NEXT_NODE_ID =e.node_id
+	</select>
+	<!-- 短流程开始节点数据 -->
+	<select id="getTemplatePro" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT A.*,B.ACT_WORKFLOW_TYPE_NAME,B.ACT_WORKFLOW_TYPE_CODE
+		FROM
+		ACT_WORKFLOW_INFO A,
+		ACT_WORKFLOW_TYPE B
+		WHERE A.WORKFLOW_ID =#workflowId#
+		AND A.WORKFLOW_TYPE=B.ACT_WORKFLOW_TYPE_ID
+	</select>
+	<!-- 短流程需求详细查询记录:end -->
+
+	<!-- 短流程需求节点查询记录:begin -->
+	<select id="queryWorkflowNodeInfo" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT APNE.NODE_NAME, 					<!-- 节点名称 -->
+		APNE.NODE_EXECUTOR, 				<!--处理人 -->
+		APNE.NODE_EXECUTE_DEPART,		<!--处理部门 -->
+		APNE.DISPOSE_ACTION,				<!--处理动作 -->
+		APNE.TIME_LIMIT, 				<!--处理时限 -->
+		APNE.IS_SUPPORT, 				<!--是否支撑 -->
+		APNE.OPERAT_AGREE,
+		APNE.TO_PREV_NODE, 				<!--是否允许打回上一步 -->
+		APNE.TO_BEGIN_NODE, 				<!--是否允许打回开始节点 -->
+		APNE.NODE_EXECUTOR_ID,
+		APNE.NODE_EXECUTE_DEPART_ID ,
+		APNE.IS_SIGNATURE,				<!--是否会签 -->
+        APNE.SELECTNODE_ID,             <!--所选节点 -->
+        APNE.POST_ID,                   <!--岗位Id -->
+        APNE.DEPT_TYPE_ID,              <!--部门类型Id -->
+        APNE.DEPT_LEVEL,                <!--部门层级 -->
+        (SELECT DISTINCT dept_type_name FROM act_workflow_dept_type_clock AWD 
+        WHERE AWD.dept_type_id=APNE.DEPT_TYPE_ID) DEPT_TYPE_NAME, <!--动态节点部门类型  -->
+        (select post_name from act_workflow_post_info AWPI where AWPI.post_id=APNE.POST_ID) POST_NAME <!--岗位表  -->
+		<!-- ADTL.TLOVER_TIME, 是否超时 -->
+		<!-- ADTL.OPERATION 审批结果 -->
+		FROM ACT_PROCESS_NODE_EXAMPLE APNE
+		<!-- LEFT JOIN ACT_DEMAND_TASK ADT -->
+		<!-- ON APNE.NODE_ID = ADT.NODE_ID -->
+		<!-- LEFT JOIN ACT_DEMAND_TASK_LOG ADTL -->
+		<!-- ON ADT.TASK_ID = ADTL.TASK_ID -->
+		WHERE 1=1
+		<isNotEmpty prepend="AND" property="nodeId">
+			APNE.NODE_ID = #nodeId#
+		</isNotEmpty>
+	</select>
+	<!-- 短流程需求节点查询记录:end -->
+
+	<!-- 保存流程信息 -->
+	<insert id="addWorkflow" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_WORKFLOW_INFO
+		(WORKFLOW_ID,
+		WORKFLOW_NAME,
+		UP_WORKFLOW_ID,
+		WLATN_ID,
+		WORKFLOW_STATUS,
+		WIS_UPDATE,
+		WCREATOR_ID,
+		WLIMIT_TIME,
+		WORKFLOW_SORT,
+		WORKFLOW_TYPE,
+		WCREATE_TIME,
+		WORKFLOW_CODE,
+		WORKFLOW_LEVEL,
+		WORKFLOW_PUBLISH_STATUS,
+		noticeInfo,
+		<isNotEmpty property="workflowTemplateId">
+		WORKFLOW_SINGLE_TYPE,
+			TEMPLATE_ID
+		</isNotEmpty>
+		<isEmpty property="workflowTemplateId">
+			WORKFLOW_SINGLE_TYPE
+		</isEmpty>
+		)
+		VALUES
+		(#workflowId#,
+		#workflowName#,
+		#workflowParentId#,
+		#localNet#,
+		#workflowStatus#,
+		'',
+		#wcreatorId#,
+		0,
+		#workflowClass#,
+		#workflowType#,
+		NOW(),
+		#workflowCode#,
+		#workflowLevel#,
+		0,
+		#noticeInfo#,
+		
+		<isNotEmpty property="workflowTemplateId">
+			#workflowSingleType#,
+			#workflowTemplateId#
+		</isNotEmpty>
+		<isEmpty property="workflowTemplateId">
+			#workflowSingleType#
+		</isEmpty>
+		)
+	</insert>
+
+	<!-- 保存流程节点实例信息 -->
+	<insert id="addNodeExample" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_PROCESS_NODE_EXAMPLE
+		(NODE_ID,
+		WORKFLOW_ID,
+		NODE_NAME,
+		NODE_TYPE,
+		NODE_IN_TYPE,
+		NODE_EXECUTOR,
+		NODE_EXECUTE_DEPART,
+		TIME_LIMIT,
+		IS_SUPPORT,
+		NCREATE_TIME,
+		TO_LEFT,
+		TO_TOP,
+		NODE_WIDTH,
+		NODE_HEIGHT,
+		TO_NEXTNODE_CONDITION,
+		DISPOSE_ACTION,
+		TO_PREV_NODE
+		)
+		VALUES
+		(#nodeId#,
+		#workflowId#,
+		#nodeName#,
+		#nodeType#,
+		#nodeInType#,
+		'',
+		'',
+		#timeLimit#,
+		'',
+		NOW(),
+		#nodeLeft#,
+		#nodeTop#,
+		#nodeWidth#,
+		#nodeHeight#,
+		'',
+		'',
+		#toPrevNode#)
+	</insert>
+
+	<!-- 保存 节点别名与节点ID关系表 信息 -->
+	<insert id="addNodeRealition" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_NODEALIAS_NODEID_REALITION
+		(WORKFLOW_NODE_ALIAS, WORKFLOW_ID,
+		NODE_NAME, NODE_ID, CREATE_TIME)
+		VALUES
+		(#workflowAlias#,
+		#workflowId#,
+		#nodeName#,
+		#nodeId#,
+		NOW())
+	</insert>
+
+	<!-- 保存流程线 信息 -->
+	<insert id="addWorkflowLine" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_WORKFLOW_LINE
+		(
+		FROM_NODE_ID,
+		TO_NODE_ID,
+		LINE_TYPE,
+		CREATE_DATE,
+		WORKFLOW_ID,
+		M,
+		LINE_NAME)
+		VALUES
+		(
+		#lineFromId#,
+		#lineToId#,
+		#lineType#,
+		NOW(),
+		#workflowId#,
+		#lineM#,
+		#lineName#)
+	</insert>
+
+	<!-- 保存 流程配置 信息 -->
+	<insert id="addWorkflowConfig" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_WORKFLOW_CONFIG
+		(
+		WORKFLOW_ID,
+		WORKFLOW_CODE,
+		NOW_NODE_ID,
+		PREV_NODE_ID,
+		NEXT_NODE_ID,
+		OPERATION,
+		OPERATION_INFO)
+		VALUES
+		(
+		#workflowId#,
+		#workflowCode#,
+		#nodeId#,
+		#prevNodeId#,
+		#nextNodeId#,
+		#operation#,
+		'')
+	</insert>
+
+	<!-- 获取节点id:begin -->
+	<select id="getNodeId" resultClass="String">
+		SELECT
+		nextval('SEQ_ACT_PROCESS_NODE_EXAM_NID') FROM dual_test
+	</select>
+	<!-- 获取节点id:end -->
+
+	<!-- 根据别名和流程id获取节点id:begin -->
+	<select id="getNodeIdByPara" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT ANNR.NODE_ID FROM ACT_NODEALIAS_NODEID_REALITION ANNR
+		WHERE 1=1
+		<isNotEmpty prepend="AND" property="workflowId">
+			ANNR.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="nodeAlais">
+			ANNR.WORKFLOW_NODE_ALIAS = #nodeAlais#
+		</isNotEmpty>
+	</select>
+	<!-- 根据别名和流程id获取节点id:end -->
+
+	<!-- 根据别名获取节点类型:begin -->
+	<select id="getNodeTypeByPara" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT APNE.NODE_TYPE
+		FROM ACT_PROCESS_NODE_EXAMPLE APNE
+		LEFT JOIN
+		ACT_NODEALIAS_NODEID_REALITION ANNR
+		ON (APNE.WORKFLOW_ID =
+		ANNR.WORKFLOW_ID AND
+		APNE.NODE_ID = ANNR.NODE_ID)
+		WHERE 1 = 1
+		<isNotEmpty prepend="AND" property="workflowId">
+			ANNR.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="nodeAlais">
+			ANNR.WORKFLOW_NODE_ALIAS = #nodeAlais#
+		</isNotEmpty>
+	</select>
+	<!-- 根据别名获取节点类型:end -->
+
+	<!-- 获取流程id:begin -->
+	<select id="getWorkflowId" resultClass="java.util.HashMap">
+		SELECT nextval('SEQ_ACT_WORKFLOW_INFO_WFID') as workflowId FROM dual_test
+	</select>
+	<!-- 获取流程id:end -->
+
+	<!-- 获取流程编号:begin -->
+	<select id="getWorkflowCode" resultClass="String">
+		SELECT CONCAT('DLC',DATE_FORMAT(NOW(),
+		'%Y%m%d'),nextval('SEQ_ACT_WORKFLOW_INFO_WFCODE')) FROM dual_test;
+	</select>
+	<!-- 获取流程编号:end -->
+
+
+	<!-- 从别名与流程id表中获取节点id:begin -->
+	<select id="getNodeIdByRealition" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT ANNR.NODE_ID FROM ACT_NODEALIAS_NODEID_REALITION ANNR
+		WHERE 1=1
+		<isNotEmpty prepend="AND" property="workflowId">
+			ANNR.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="name">
+			ANNR.NODE_NAME = #name#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="alias">
+			ANNR.WORKFLOW_NODE_ALIAS = #alias#
+		</isNotEmpty>
+
+	</select>
+	<!-- 从别名与流程id表中获取节点id:end -->
+
+	<!-- 获取下一节点:begin -->
+	<select id="getNextNodeList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT  AWC.NEXT_NODE_ID FROM ACT_WORKFLOW_CONFIG AWC
+		WHERE 1=1
+		<isNotEmpty prepend="AND" property="workflowId">
+			AWC.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="nodeId">
+			AWC.NOW_NODE_ID =
+			#nodeId#
+		</isNotEmpty>
+	</select>
+	<!-- 获取下一节点:end -->
+
+	<!-- 查询父流程:begin -->
+	<select id="queryWorkflowPublishParentList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT WORKFLOW_ID,
+		WORKFLOW_NAME,
+		UP_WORKFLOW_ID,
+		WLATN_ID,
+		SR.REGION_NAME,
+		WORKFLOW_STATUS,
+		WIS_UPDATE,
+		WCREATOR_ID,
+		WLIMIT_TIME,
+		WORKFLOW_SORT,
+		WORKFLOW_TYPE,
+		WCREATE_TIME,
+		WORKFLOW_CODE,
+		WORKFLOW_LEVEL,
+		NOTICEINFO
+		FROM ACT_WORKFLOW_INFO AWI
+		LEFT JOIN SYS_REGION SR ON
+		AWI.WLATN_ID=SR.REGION_ID
+		WHERE 1=1
+		<isNotEmpty prepend="AND" property="workflowId">
+			AWI.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+	</select>
+	<!-- 查询父流程:end -->
+
+	<!-- 查询子流程:begin -->
+	<select id="queryWorkflowPublishSonList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT WORKFLOW_ID,
+		WORKFLOW_NAME,
+		UP_WORKFLOW_ID,
+		WLATN_ID,
+		SR.REGION_NAME,
+		WORKFLOW_STATUS,
+		WIS_UPDATE,
+		WCREATOR_ID,
+		WLIMIT_TIME,
+		WORKFLOW_SORT,
+		WORKFLOW_TYPE,
+		WCREATE_TIME,
+		WORKFLOW_CODE,
+		WORKFLOW_LEVEL,
+		NOTICEINFO,
+		AWT.ACT_WORKFLOW_TYPE_NAME,
+		AWS.ACT_WORKFLOW_SORT_NAME
+		FROM ACT_WORKFLOW_INFO AWI
+		LEFT JOIN SYS_REGION SR ON
+		AWI.WLATN_ID=SR.REGION_ID
+		LEFT JOIN ACT_WORKFLOW_TYPE AWT
+		ON
+		AWI.WORKFLOW_TYPE = AWT.ACT_WORKFLOW_TYPE_ID
+		LEFT JOIN
+		ACT_WORKFLOW_SORT AWS
+		ON AWI.WORKFLOW_SORT = AWS.ACT_WORKFLOW_SORT_ID
+		WHERE 1=1
+		<isNotEmpty prepend="AND" property="workflowId">
+			AWI.UP_WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+	</select>
+	<!-- 查询子流程:end -->
+
+
+	<!-- 保存草稿:begin -->
+	<update id="updateParentWorkflow" parameterClass="java.util.HashMap">
+		UPDATE ACT_WORKFLOW_INFO AWI SET
+		<isNotEmpty property="authority">
+			AWI.WIS_UPDATE = #authority#
+		</isNotEmpty>
+		WHERE AWI.WORKFLOW_ID = #workflowId#
+	</update>
+	<update id="updateSonWorkflow" parameterClass="java.util.HashMap">
+		UPDATE ACT_WORKFLOW_INFO AWI SET
+		<isNotEmpty property="authority">
+			AWI.WIS_UPDATE = #authority#
+		</isNotEmpty>
+		WHERE AWI.UP_WORKFLOW_ID = #workflowId#
+	</update>
+	<!-- 保存草稿:end -->
+
+	<!-- 省级发布:begin -->
+	<update id="publishParent" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_WORKFLOW_INFO AWI SET
+		AWI.WORKFLOW_PUBLISH_STATUS='1'
+		WHERE
+		AWI.WORKFLOW_ID = #workflowId#
+	</update>
+	<update id="publishSon" parameterClass="java.util.HashMap">
+		UPDATE ACT_WORKFLOW_INFO
+		AWI SET
+		AWI.WORKFLOW_STATUS = '1000',
+		AWI.WORKFLOW_PUBLISH_STATUS='1'
+		WHERE AWI.UP_WORKFLOW_ID = #workflowId#
+		AND AWI.WORKFLOW_STATUS!='1003'
+	</update>
+	<!-- 省级发布:end -->
+
+	<!-- 本地网发布:begin -->
+	<update id="publishLocalNet" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_WORKFLOW_INFO AWI SET
+		AWI.WORKFLOW_STATUS = '1000',
+		AWI.WORKFLOW_PUBLISH_STATUS='1'
+		WHERE AWI.WORKFLOW_ID = #workflowId#
+	</update>
+	<update id="updateWorkFlowShiLi" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_PROCESS_NODE_EXAMPLE a
+		SET
+		NODE_EXECUTOR_ID=#chulirenid2#,
+		NODE_EXECUTOR=#chulirenname2#,
+		NODE_EXECUTE_DEPART_ID=#chulideptid2#,
+		NODE_EXECUTE_DEPART=#chulideptname2#
+		WHERE a.workflow_id = #workflowId#
+		and a.node_id=#node2#
+	</update>
+	<!-- 更新子流程状态为发布:end -->
+
+	<!-- 查询本地网:begin -->
+	<select id="querySysRegion" resultClass="java.util.HashMap">
+		SELECT REGION_ID,
+		REGION_CODE,
+		REGION_PID,
+		REGION_NAME,
+		REGION_TYPE,
+		STATE,
+		STATE_DATE,
+		CONTROL_NUMBER
+		FROM SYS_REGION SR 
+		<!--WHERE SR.REGION_ID!='888'  -->
+	</select>
+	<!-- 查询需求ID -->
+	<select id="queryWorkFlowNeedId" resultClass="java.util.HashMap">
+		SELECT
+		CONCAT('DLCXQ',DATE_FORMAT(NOW(),
+		'%Y%m%d'),nextval('SEQ_ACT_DEMAND_INFO_DEMANDCODE')) WORKFLOWNEEDCODE,
+		nextval('SEQ_ACT_DEMAND_INFO_DEMANDID') WORKFLOWNEEDID,
+		nextval('SEQ_ACT_DEMAND_TASK_TASK_ID') QUESTID,
+		nextval('SEQ_ACT_DEMAND_TEMPLATE_DID')TEMPLATEID
+		FROM dual_test
+	</select>
+	<!-- 查询本地网:end -->
+
+	<!-- 待处理、已处理短流程需求列表 -->
+	<select id="getSolveProcessList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT
+		T.*
+		FROM
+		(SELECT DISTINCT
+		A.DEMAND_ID,
+		A.DEMAND_NAME,
+		A.DEMAND_STATUS,
+		A.DEMAND_CODE,
+		A.DEMAND_DESC,
+		A.WORKFLOW_ID,
+		A.OVER_TIME,
+		A.STAR_EVALUATE,
+		A.EVALUATE_INFO,
+		DATE_FORMAT(A.DCREATE_TIME,"%Y-%m-%d %T") DCREATE_TIME,
+		A.DEMAND_SUMIT_PID,
+		A.DEMAND_SUMIT_PNAME,
+		C.WORKFLOW_NAME,
+		A.IS_EVALUATE,
+		DT.SUBMIT_NAME,
+		S.DEPARTMENT,
+		(SELECT AWS.ACT_WORKFLOW_SORT_NAME FROM ACT_WORKFLOW_SORT AWS WHERE C.WORKFLOW_SORT = AWS.ACT_WORKFLOW_SORT_ID) AS ACT_WORKFLOW_SORT_NAME,
+		(SELECT AWT.ACT_WORKFLOW_TYPE_NAME FROM ACT_WORKFLOW_TYPE AWT WHERE C.WORKFLOW_TYPE = AWT.ACT_WORKFLOW_TYPE_ID) AS ACT_WORKFLOW_TYPE_NAME,
+		S.MOB_TEL
+		FROM
+		ACT_DEMAND_INFO A,
+		ACT_WORKFLOW_INFO C,
+		SYS_STAFF S,
+		ACT_DEMAND_TASK_LOG DT
+		WHERE A.DEMAND_ID IN (DT.DEMAND_ID)
+		AND C.WORKFLOW_ID = A.WORKFLOW_ID
+		AND A.DEMAND_SUMIT_PID = S.STAFF_ID
+    	AND (DT.SUBMIT_ID = #staff_id# OR DT.ERA_OPERATOR_ID = #staff_id#)
+		<isNotEmpty prepend="AND" property="demandCode">
+			a.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			a.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			a.DEMAND_STATUS =#demandStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflowType">
+			C.WORKFLOW_TYPE=#workflowType#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+
+				a.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+
+				a.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+			</isEqual>
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="overTime" > -->
+		<!-- a.OVER_TIME = #overTime# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="workflowName">  
+             	<![CDATA[ 
+             		c.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+             	]]>
+		</isNotEmpty>
+		ORDER BY A.DCREATE_TIME DESC
+		 )t where 1=1
+		<isNotEmpty prepend="" property="pageSize">
+			limit $limit$,$pageSize$
+		</isNotEmpty>
+	</select>
+	<!-- 待处理、已处理短流程需求列表总数量 -->
+	<select id="getSolveProcessListCount" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT
+		 COUNT(*)
+		FROM
+		(SELECT DISTINCT
+		A.DEMAND_ID,
+		A.DEMAND_NAME,
+		A.DEMAND_STATUS,
+		A.DEMAND_CODE,
+		A.DEMAND_DESC,
+		A.WORKFLOW_ID,
+		A.OVER_TIME,
+		A.STAR_EVALUATE,
+		A.EVALUATE_INFO,
+		DATE_FORMAT(A.DCREATE_TIME,"%Y-%m-%d %T") DCREATE_TIME,
+		A.DEMAND_SUMIT_PID,
+		A.DEMAND_SUMIT_PNAME,
+		C.WORKFLOW_NAME,
+		A.IS_EVALUATE,
+		DT.OPERATOR_NAME,
+		S.DEPARTMENT,
+		(SELECT AWS.ACT_WORKFLOW_SORT_NAME FROM ACT_WORKFLOW_SORT AWS WHERE C.WORKFLOW_SORT = AWS.ACT_WORKFLOW_SORT_ID) AS ACT_WORKFLOW_SORT_NAME,
+		(SELECT AWT.ACT_WORKFLOW_TYPE_NAME FROM ACT_WORKFLOW_TYPE AWT WHERE C.WORKFLOW_TYPE = AWT.ACT_WORKFLOW_TYPE_ID) AS ACT_WORKFLOW_TYPE_NAME,
+		S.MOB_TEL
+		FROM
+		ACT_DEMAND_INFO A,
+		ACT_WORKFLOW_INFO C,
+		SYS_STAFF S,
+		ACT_DEMAND_TASK DT
+		WHERE A.DEMAND_ID IN (DT.DEMAND_ID)
+		AND C.WORKFLOW_ID = A.WORKFLOW_ID
+		AND A.DEMAND_SUMIT_PID = S.STAFF_ID
+		AND DT.TASK_STATUS = '0'
+    	AND (DT.OPERATOR_ID = #staff_id# OR DT.ERA_OPERATOR_ID = #staff_id#)
+		<isNotEmpty prepend="AND" property="demandCode">
+			a.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandName">
+			a.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			a.DEMAND_STATUS =
+			#demandStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflowType">
+			C.WORKFLOW_TYPE=#workflowType#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overTime">
+			<isEqual property="overTime" compareValue="1">
+
+				a.END_TIME
+	    	   <![CDATA[<]]>
+				NOW()
+			</isEqual>
+			<isEqual property="overTime" compareValue="0">
+
+				a.END_TIME
+	    	   <![CDATA[>=]]>
+				NOW()
+			</isEqual>
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="overTime" > -->
+		<!-- a.OVER_TIME = #overTime# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="workflowName">  
+             	<![CDATA[ 
+             		c.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+             	]]>
+		</isNotEmpty>
+		 )t
+	</select>
+	<!--查询本地网 -->
+	<select id="searchland" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT S.REGION_ID, S.REGION_NAME FROM SYS_REGION S where 1=1
+		<isNotEmpty prepend="AND" property="region_id">
+			s.REGION_ID in
+			($region_id$)
+		</isNotEmpty>
+		ORDER BY S.REGION_ID
+
+
+	</select>
+	<!-->查询部门 -->
+	<select id="searchdeppt" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT
+		o.dept_id ORG_ID,
+		o.dept_id ORG_CODE,
+		o.dept_name ORG_NAME,
+		o.latn_id REGION_ID
+		FROM
+		act_workflow_dept_info o
+		WHERE
+		1=1
+		<isNotEmpty prepend="AND" property="region_id">
+			o.latn_id=#region_id#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="org_Name">
+			o.dept_name LIKE CONCAT('%', #org_Name#, '%') 
+		</isNotEmpty>
+		ORDER BY O.dept_id
+	</select>
+	<!-- 查询处理人 -->
+	<select id="qryStaffPage" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT * FROM ( SELECT
+		S.STAFF_ID,
+		S.STAFF_NAME,
+		S.MOB_TEL,
+		O.dept_id AS
+		DEPARTMENT_ID,
+		S.dept_id as DEPARTMENT_CODE,
+		S.REGION_ID,
+		O.dept_name as ORG_NAME
+		FROM SYS_STAFF
+		S, act_workflow_dept_info O
+		WHERE O.dept_id = S.dept_id
+		AND S.dept_id
+		=#department_code#
+		) A WHERE 1=1
+		<isNotEmpty prepend="" property="pageSize">
+			limit $limit$,$pageSize$
+		</isNotEmpty>
+	</select>
+	<!-- 查询处理人总数 -->
+	<select id="qryStaffPageCount" resultClass="java.lang.String"
+		parameterClass="java.util.HashMap">
+		select count(1) from (
+		SELECT s.staff_id,
+		s.staff_name,
+		s.mob_tel,
+		s.dept_id,
+		s.region_id,
+		o.dept_name
+		from sys_staff s,
+		act_workflow_dept_info o
+		WHERE o.dept_id = s.dept_id
+		AND s.dept_id
+		=#department_code#
+		)b
+	</select>
+	<select id="qryTemplateAttr" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select a.attr_str from ACT_DEMAND_TEMPLATE_DATA a where
+		a.demand_id=#demandId#
+	</select>
+
+	<!-- 保存需求信息 -->
+	<insert id="addWorkflowneed1" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_DEMAND_INFO
+		(DEMAND_ID,
+		DEMAND_NAME,
+		DEMAND_STATUS,
+		DEMAND_CODE,
+		DEMAND_DESC,
+		WORKFLOW_ID,
+		OVER_TIME,
+		DCREATE_TIME,
+		BEGIN_TIME,
+		DEMAND_SUMIT_PID,
+		DEMAND_SUMIT_PNAME,
+		IS_EVALUATE,
+		URGE_COUNT,
+		LATN_ID,
+		LATN_NAME,
+		DEMAND_SUMIT_PNO,
+		UNIFIED_AUTHENTICATION
+		)
+		VALUES
+		(#demandId#,
+		#demandName#,
+		#demandState#,
+		#demandCode#,
+		#demandDesc#,
+		#workflowId#,
+		#isNotTime#,
+		NOW(),
+		NOW(),
+		#StaffId#,
+		#StaffName#,
+		#isNotPingJia#,
+		'0',
+		#latnId#,
+		#latnName#,
+		#phone#,
+		#isCertification#)
+	</insert>
+	<insert id="addWorkflowneed2" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_DEMAND_TASK
+		(TASK_ID,
+		DEMAND_ID,
+		WORKFLOW_ID,
+		NODE_ID,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		OPERATOR_DEPT_ID,
+		OPERATOR_DEPT,
+		CREATE_TIME,
+		START_TIME,
+		TASK_TYPE,
+		URGE_COUNT,
+		TASK_STATUS
+		)
+		VALUES
+		(#questId#,
+		#demandId#,
+		#workflowId#,
+		#node1#,
+		#chulirenid1#,
+		#chulirenname1#,
+		(SELECT DEPT_ID FROM SYS_STAFF WHERE STAFF_ID=#chulirenid1#),
+		(SELECT DEPT_NAME FROM SYS_STAFF WHERE STAFF_ID=#chulirenid1#),
+		NOW(),
+		NOW(),
+		#questtype#,
+		'0',
+		'0')
+	</insert>
+	<insert id="addWorkflowneed21" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_DEMAND_TASK
+		(
+		DEMAND_ID,
+		WORKFLOW_ID,
+		NODE_ID,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		OPERATOR_DEPT_ID,
+		OPERATOR_DEPT,
+		ERA_OPERATOR_ID,
+		ERA_OPERATOR_NAME,
+		ERA_OPERATOR_DEPT_ID,
+		ERA_OPERATOR_DEPT,
+		CREATE_TIME,
+		START_TIME,
+		END_TIME,
+		TASK_TYPE,
+		URGE_COUNT,
+		TASK_STATUS
+		)
+		VALUES
+		(
+		#demandId#,
+		#workflowId#,
+		#node2#,
+		#chulirenid2#,
+		#chulirenname2#,
+		#chulideptid2#,
+		#chulideptname2#,
+		#ear_chulirenid2#,
+		#ear_chulirenname2#,
+		#ear_chulideptid2#,
+		#ear_chulideptname2#,
+		NOW(),
+		NOW(),
+		DATE_FORMAT(#endtime2#, "%Y-%m-%d %T"),
+		#questtype#,
+		'0',
+		'1')
+	</insert>
+	<update id="updateWorkflowneed" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_DEMAND_TASK SET TASK_STATUS='0'
+		WHERE DEMAND_ID= #demandId# and
+		NODE_ID=#now_node_id#
+	</update>
+	<update id="updateWorkflowDemandInfo" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_DEMAND_INFO SET demand_status='1001'
+		WHERE DEMAND_ID= #demandId#
+	</update>
+	<!-- 保存模板实例化信息 -->
+	<insert id="addWorkflowneed3" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_DEMAND_TEMPLATE_DATA
+		(TEMPLATE_DID,
+		ATTR_STR,
+		CREATE_DATE,
+		DEMAND_ID
+		)
+		VALUES
+		(#templateid#,
+		#templatepro#,
+		NOW(),
+		#demandId#)
+	</insert>
+	<insert id="addWorkflowneedStartLog" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_DEMAND_TASK_LOG
+		(
+		TASK_LOG_ID,
+		TASK_ID,
+		WORKFLOW_ID,
+		DEMAND_ID,
+		SUBMIT_ID,
+		SUBMIT_NAME,
+		NODE_ID,
+		NOTE_NAME,
+		NODE_EXECUTE_DEPART,
+		CREATE_TIME,
+		URGE_COUNT
+		)
+		VALUES
+		(
+		#taskLogId#,
+		#questId#,
+		#workflowId#,
+		#demandId#,
+		#StaffId#,
+		#StaffName#,
+		#node1#,
+		'开始',
+		(SELECT DEPT_NAME FROM SYS_STAFF WHERE STAFF_ID=#chulirenid1#),
+		NOW(),
+		'0'
+		)
+	</insert>
+	<insert id="addWorkflowTemplateDate" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_DEMAND_TEMPLATE_DATA
+		(
+		CREATE_DATE,
+		TEMPLATE_ID,
+		DEMAND_ID,
+		ATTR_ID,
+		ATTR_NAME,
+		ATTR_VALUE
+		)
+		VALUES
+		(
+		NOW(),
+		#templateId#,
+		#demandId#,
+		#attrId#,
+		#attrName#,
+		#attrValue#
+		)
+	</insert>
+	<insert id="addWorkflowneedProcessLog" parameterClass="java.util.HashMap">
+		INSERT
+		INTO ACT_DEMAND_TASK_LOG
+		(
+		TASK_LOG_ID,
+		TASK_ID,
+		WORKFLOW_ID,
+		DEMAND_ID,
+		APPROVAL_TIME,
+		OPERATION,
+		OPERATION_INFO,
+		SUBMIT_ID,
+		SUBMIT_NAME,
+		NODE_ID,
+		NODE_EXECUTE_DEPART,
+		TIME_LIMIT,
+		TLOVER_TIME,
+		CREATE_TIME,
+		URGE_COUNT,
+		ERA_OPERATOR_ID,
+		ERA_OPERATOR_NAME,
+		ERA_OPERATOR_DEPT,
+		URGE_TIME
+		)
+		VALUES
+		(
+		#taskLogId#,
+		#taskId#,
+		#workflowId#,
+		#demandId#,
+		NOW(),
+		#disposeRadio#,
+		#disposeDesc#,
+		#chulirenid1#,
+		#chulirenname1#,
+		#now_node_id#,
+		(SELECT DEPT_NAME FROM SYS_STAFF WHERE STAFF_ID=#chulirenid1#),
+		#timeLimit#,
+		#isEndTime#,
+		NOW(),
+		#urgeCount#,
+		#ear_chulirenid1#,
+		#ear_chulirenname1#,
+		(SELECT DEPT_NAME FROM SYS_STAFF WHERE STAFF_ID=#ear_chulirenid1#),
+		#urgeTime#
+		)
+	</insert>
+	<!--更新节点信息:begin -->
+	<update id="updateNodeData" parameterClass="java.util.HashMap">
+		UPDATE ACT_PROCESS_NODE_EXAMPLE APNE
+		SET APNE.NODE_EXECUTOR=#nodeExecutor# ,
+		APNE.NODE_EXECUTOR_ID =#nodeExecutorId# ,
+		APNE.NODE_EXECUTE_DEPART =#nodeExecuteDepart# ,
+		APNE.NODE_EXECUTE_DEPART_ID =#nodeExecuteDepartId# ,
+		APNE.NODE_EXECUTORTEL =#nodeExecutorTel# ,
+		<isNotEmpty property="nodesId"> 
+			APNE.SELECTNODE_ID =#nodesId#,
+		</isNotEmpty>  
+		<isNotEmpty property="disposeJobId">  
+			APNE.POST_ID =#disposeJobId#,
+		</isNotEmpty>
+		<isNotEmpty property="disposeDeptId"> 
+			APNE.DEPT_TYPE_ID =#disposeDeptId#,
+		</isNotEmpty>
+		<isNotEmpty property="disposeDeptLevel">  
+			APNE.DEPT_LEVEL =#disposeDeptLevel#,
+	    </isNotEmpty>
+		<isNotEmpty property="opertionAgree">
+			APNE.OPERAT_AGREE = '1',
+		</isNotEmpty>
+		<isNotEmpty property="toPrevNode">
+			APNE.TO_PREV_NODE = '2',
+		</isNotEmpty>
+		<isEmpty property="toPrevNode">
+			APNE.TO_PREV_NODE = '',
+		</isEmpty>
+		<isNotEmpty property="toBeginNode">
+			APNE.TO_BEGIN_NODE = '3',
+		</isNotEmpty>
+		<isEmpty property="toBeginNode">
+			APNE.TO_BEGIN_NODE = '',
+		</isEmpty>
+		<isNotEmpty property="isSignature">
+			APNE.IS_SIGNATURE = #isSignature#,
+		</isNotEmpty>
+		<isNotEmpty property="workflowRadioInfo">
+			APNE.RADIO_ID = #workflowRadioInfo#,
+		</isNotEmpty>
+		APNE.TIME_LIMIT =#timeLimit#
+		WHERE APNE.NODE_ID =#nodeId#
+	</update>
+	<!--更新节点信息:end -->
+	<!--更新流程状态为暂停:begin -->
+	<update id="updateWFStatusToStop" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_WORKFLOW_INFO AWI
+		SET AWI.WORKFLOW_STATUS = (case
+		when
+		WORKFLOW_STATUS = '1002' then
+		'1000'
+		when WORKFLOW_STATUS = '1000' then
+		'1002'
+		end)
+		WHERE AWI.WORKFLOW_ID = #workflowId#
+	</update>
+	<!--更新流程状态为暂停:end -->
+
+	<!--更新流程时限:begin -->
+	<update id="updateWorkflowTimeLimit" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_WORKFLOW_INFO AWI
+		SET AWI.WLIMIT_TIME = $workflowLimitTime$
+		WHERE
+		AWI.WORKFLOW_ID = #workflowId#
+	</update>
+	<!--更新流程时限:end -->
+
+	<!--查询所有节点时限:begin -->
+	<select id="queryAllNodeTimeLimit" parameterClass="java.util.HashMap"
+		resultClass="String">
+		SELECT SUM(APNE.TIME_LIMIT)
+		FROM ACT_PROCESS_NODE_EXAMPLE
+		APNE
+		WHERE APNE.WORKFLOW_ID =#workflowId#
+		AND APNE.NODE_TYPE != '0'
+		AND
+		APNE.NODE_TYPE != '2'
+	</select>
+	<!--查询所有节点时限:end -->
+
+	<!--修改需求单，催单 -->
+	<update id="update_demand_urge_count" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_DEMAND_INFO I
+		SET I.URGE_COUNT =I.URGE_COUNT+1, I.URGE_TIME = NOW()
+		WHERE I.DEMAND_ID =#demand_id#
+
+	</update>
+	<!--修改任务表，催单 -->
+	<update id="update_record_urge_count" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_DEMAND_TASK I
+		SET I.URGE_COUNT =I.URGE_COUNT+1, I.URGE_TIME = NOW()
+		WHERE I.DEMAND_ID =#demand_id#
+		AND I.TASK_ID = (SELECT MAX(T.TASK_ID)
+		FROM ACT_DEMAND_TASK T
+		LEFT JOIN ACT_DEMAND_INFO I
+		ON T.DEMAND_ID =
+		I.DEMAND_ID
+		WHERE T.DEMAND_ID =#demand_id#)
+
+	</update>
+
+	<!-- 查询要标红的需求审批中的节点信息:begin -->
+	<select id="queryCurrentRedNode" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT ADT.NODE_ID
+		FROM ACT_DEMAND_TASK ADT
+		INNER JOIN ACT_DEMAND_INFO
+		ADI
+		ON (ADT.DEMAND_ID = ADI.DEMAND_ID AND ADT.WORKFLOW_ID =
+		ADI.WORKFLOW_ID)
+		WHERE ADT.WORKFLOW_ID = #workflowId#
+		AND ADT.DEMAND_ID
+		= #demandId#
+		AND ADT.TASK_STATUS = 1
+		<isNotEmpty property="taskId" prepend="and">
+			ADT.task_id <![CDATA[=]]>#taskId#
+		</isNotEmpty>
+	</select>
+	<!-- 查询要标红的需求审批中的节点信息:end -->
+
+	<!-- 查询要标红的需求审批中完结的节点信息:begin -->
+	<select id="queryConfirmRedNode" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT T.NODE_ID, T.NODE_TYPE
+		FROM ACT_PROCESS_NODE_EXAMPLE T
+		WHERE
+		T.NODE_ID IN (
+
+		SELECT ADT.NODE_ID
+		FROM ACT_DEMAND_TASK ADT
+		INNER JOIN
+		ACT_DEMAND_INFO ADI
+		ON (ADT.DEMAND_ID = ADI.DEMAND_ID AND
+		ADT.WORKFLOW_ID = ADI.WORKFLOW_ID)
+		WHERE ADT.WORKFLOW_ID = #workflowId#
+		AND ADT.DEMAND_ID = #demandId#
+		AND ADT.TASK_STATUS = '0'
+		<isNotEmpty property="taskId" prepend="and">
+			ADT.task_id <![CDATA[<]]>#taskId#
+		</isNotEmpty>
+		)
+	</select>
+	<!-- 查询要标红的需求审批中完结的节点信息:end -->
+
+	<!-- 查询审批结果:begin -->
+	<select id="getOperation" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT AWL.LINE_NAME
+		FROM ACT_WORKFLOW_LINE AWL
+		WHERE AWL.FROM_NODE_ID =
+		#fromId#
+		AND AWL.TO_NODE_ID = #toId#
+	</select>
+	<!-- 查询审批结果:end -->
+
+	<select id="qryTaskId" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT A.*
+		FROM ACT_DEMAND_TASK a
+		WHERE A.DEMAND_ID =#demandId#
+		<isNotEmpty property="ear_operatop_id" prepend="and">
+			A.ERA_OPERATOR_ID =#ear_operatop_id#
+		</isNotEmpty>
+		<isEmpty property="ear_operatop_id" prepend="and">
+			A.OPERATOR_ID = #staff_id#
+		</isEmpty>
+		
+		AND A.TASK_STATUS = 1
+		AND
+		A.WORKFLOW_ID= #workflowId#
+	</select>
+	<select id="qryTime" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT * FROM ACT_PROCESS_NODE_EXAMPLE A WHERE
+		A.NODE_ID= #node2# AND A.WORKFLOW_ID= #workflowId#
+	</select>
+	<select id="qryCaozuoType" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT * FROM ACT_PROCESS_NODE_EXAMPLE A WHERE
+		A.WORKFLOW_ID=#workflowId# AND A.NODE_ID=#nodeId#
+	</select>
+	<select id="qryNodeCount" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT COUNT(DISTINCT A.NOW_NODE_ID) NODECOUNT
+		FROM
+		ACT_WORKFLOW_CONFIG A
+		WHERE A.WORKFLOW_ID=#workflowId#
+		AND
+		A.PREV_NODE_ID=#nodeId#
+
+	</select>
+	<select id="qryGuoShiTime" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select DATE_FORMAT(a.end_time, "%Y-%m-%d %T") ENDTIME,
+		b.TIME_LIMIT
+		from ACT_DEMAND_TASK a,
+		ACT_PROCESS_NODE_EXAMPLE b
+		WHERE
+		A.NODE_ID = #nodeId#
+		AND A.DEMAND_ID = #demandId#
+		AND
+		A.NODE_ID=B.NODE_ID
+		AND A.WORKFLOW_ID=#workflowId#
+	</select>
+	<!-- 修改评价信息 -->
+	<update id="update_demand_eval_info" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_DEMAND_INFO
+		SET
+		IS_EVALUATE='1'
+		WHERE DEMAND_ID = #demandId#
+	</update>
+	<select id="qryOldNode" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+		<isEqual property="caozuo" compareValue="toStart">
+			select *
+			from ACT_DEMAND_TASK b
+			where b.demand_id = #demandId# and
+			b.workflow_id =#workflowId#
+			and b.node_id in(select min(c.node_id)
+			from ACT_PROCESS_NODE_EXAMPLE c where c.workflow_id = #workflowId#)
+			<!-- <isNotEmpty property="task_id" prepend="and"> b.task_id <![CDATA[>]]>#task_id# 
+				</isNotEmpty> -->
+		</isEqual>
+		<isEqual property="caozuo" compareValue="toPrev">
+			select * from
+			ACT_DEMAND_TASK a
+			where demand_id = #demandId#
+			and a.workflow_id =
+			#workflowId#
+			and a.node_id in( (select distinct (b.prev_node_id)
+			from
+			ACT_WORKFLOW_CONFIG b
+			where b.workflow_id = #workflowId#
+			and
+			b.now_node_id=#nodeId#))
+			ORDER by a.task_id
+		</isEqual>
+	</select>
+	<select id="qryDangQiaTaskId" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+
+		SELECT MAX(A.TASK_ID)
+		AS TASKID FROM ACT_DEMAND_TASK A WHERE A.NODE_ID IN(
+		SELECT
+		MIN(B.NOW_NODE_ID) FROM ACT_WORKFLOW_CONFIG B WHERE
+		B.WORKFLOW_ID=#workflowId#
+		) AND A.DEMAND_ID=#demandId#
+
+	</select>
+	<select id="qryPrevNode" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+		select a.*,
+		(select count(distinct b.now_node_id) nodecount
+		from
+		ACT_WORKFLOW_CONFIG b
+		where b.prev_node_id = a.prev_node_id
+		and
+		b.workflow_id = a.workflow_id) upNodecount,
+		(select distinct
+		dt.OPERATOR_ID
+		from ACT_DEMAND_TASK dt
+		where dt.workflow_id =
+		a.workflow_id
+		and dt.node_id = a.prev_node_id
+		and dt.task_status =0
+		and
+		dt.demand_id =#demandId#
+		<isNotEmpty property="task_id" prepend="and">
+			dt.task_id <![CDATA[>]]>#task_id#
+		</isNotEmpty>
+		) OPERATOR_ID,
+		(select distinct dt.OPERATOR_NAME
+		from ACT_DEMAND_TASK dt
+		where dt.workflow_id = a.workflow_id
+		and dt.node_id = a.prev_node_id
+		and dt.task_status =0
+		and dt.demand_id =#demandId#
+		<isNotEmpty property="task_id" prepend="and">
+			dt.task_id <![CDATA[>]]>#task_id#
+		</isNotEmpty>
+		) OPERATOR_NAME,
+		(select distinct dt.OPERATOR_DEPT_ID
+		from
+		ACT_DEMAND_TASK dt
+		where dt.workflow_id = a.workflow_id
+		and dt.node_id =
+		a.prev_node_id
+		and dt.task_status =0
+		and dt.demand_id =#demandId#
+		<isNotEmpty property="task_id" prepend="and">
+			dt.task_id <![CDATA[>]]>#task_id#
+		</isNotEmpty>
+		) OPERATOR_DEPT_ID,
+		(select distinct dt.OPERATOR_DEPT
+		from
+		ACT_DEMAND_TASK dt
+		where dt.workflow_id = a.workflow_id
+		and dt.node_id =
+		a.prev_node_id
+		and dt.task_status =0
+		and dt.demand_id =#demandId#
+		<isNotEmpty property="task_id" prepend="and">
+			dt.task_id <![CDATA[>]]>#task_id#
+		</isNotEmpty>
+		) OPERATOR_DEPT
+		from ACT_WORKFLOW_CONFIG a
+		where a.workflow_id =
+		#workflowId#
+		and a.now_node_id = #nodeId#
+	</select>
+	<select id="qryTaskNum" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+		SELECT COUNT(ADT.TASK_STATUS) TASK_SNUM
+		FROM ACT_DEMAND_TASK ADT
+		WHERE
+		ADT.WORKFLOW_ID = #workflowId#
+		AND ADT.DEMAND_ID=#demandId#
+		AND
+		ADT.NODE_ID IN (SELECT G.NEXT_NODE_ID
+		FROM ACT_WORKFLOW_CONFIG G
+		WHERE
+		G.WORKFLOW_ID =#workflowId#
+		AND G.NOW_NODE_ID =#upNodeId#)
+		AND
+		ADT.TASK_STATUS =0
+		<isNotEmpty property="task_id" prepend="and">
+			ADT.TASK_ID <![CDATA[>]]>#task_id#
+		</isNotEmpty>
+	</select>
+	<select id="qryEndNode" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+		SELECT E.*
+		FROM (SELECT
+		MAX(B.NODE_ID) ENDNODEID
+		FROM ACT_PROCESS_NODE_EXAMPLE B
+		WHERE
+		B.WORKFLOW_ID = #workflowId#) E,
+		(SELECT DISTINCT A.NEXT_NODE_ID
+		FROM
+		ACT_WORKFLOW_CONFIG A
+		WHERE A.WORKFLOW_ID = #workflowId#
+		AND
+		A.NOW_NODE_ID = #nodeId#) f
+		WHERE E.ENDNODEID = F.NEXT_NODE_ID
+
+	</select>
+	<!-- D短流程查询登录工号是不是小CEO -->
+	<select id="get_role_o_rel" resultClass="String" parameterClass="java.util.HashMap">
+		select count(1) from tb_cpc_sys_role_o_rel where o_rel_id=#staffId#
+		and role_id=10303
+
+	</select>
+	<!-- D短流程查询登录工号是不是短流程综支查看角色 -->
+	<select id="get_role_o" resultClass="String" parameterClass="java.util.HashMap">
+		select count(1) from tb_cpc_sys_role_o_rel where o_rel_id=#staffId#
+		and role_id=170000400
+
+	</select>
+
+	<select id="qryLiuChengInfo" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+		SELECT
+		A.*,B.TIME_LIMIT,B.TO_NEXTNODE_CONDITION,B.DISPOSE_ACTION,B.OPERAT_AGREE
+		FROM ACT_DEMAND_TASK A,
+		ACT_PROCESS_NODE_EXAMPLE B
+		WHERE
+		A.WORKFLOW_ID=B.WORKFLOW_ID
+		AND A.NODE_ID=B.NODE_ID
+		AND
+		A.DEMAND_ID=#demandId#
+		AND A.NODE_ID=#nodeId#
+
+	</select>
+	<select id="qryTongJiNode" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+		select count(1) as sums from ACT_DEMAND_TASK s where s.workflow_id =
+		#workflowId# and s.demand_id = #demandId# and s.node_id != #nodeId#
+		and s.node_id in(
+		select atws.next_node_id
+		from ACT_WORKFLOW_CONFIG atws
+		where atws.workflow_id = #workflowId#
+		and atws.now_node_id in
+		(select
+		atw.prev_node_id
+		from ACT_WORKFLOW_CONFIG atw
+		where atw.workflow_id =
+		#workflowId#
+		and atw.now_node_id = #nodeId#))
+		<isNotEmpty property="task_id" prepend="and">
+			s.task_id <![CDATA[>]]>#task_id#
+		</isNotEmpty>
+
+	</select>
+
+	<select id="qryTongJiNode1" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+		 SELECT A.NOW_NODE_ID
+		FROM ACT_WORKFLOW_CONFIG A WHERE
+		A.WORKFLOW_ID=#workflowId# and
+		A.PREV_NODE_ID IN ($node2$)
+
+	</select>
+	<delete id="delDemandTaskNode" parameterClass="java.util.HashMap">
+		DELETE FROM
+		ACT_DEMAND_TASK  WHERE DEMAND_ID=#demandId# and NODE_ID IN ($nodeIds$)
+	</delete>
+
+
+	<select id="querySonWorkflowNum" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT COUNT(*)
+		FROM ACT_PROCESS_NODE_EXAMPLE APNE
+		WHERE
+		APNE.WORKFLOW_ID = #workflowId#
+		AND APNE.NODE_TYPE != '0'
+		AND
+		APNE.NODE_TYPE != '2'
+	</select>
+	<update id="updateWorkflow" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_WORKFLOW_INFO ADI
+		<!--SET ADI.WORKFLOW_NAME =#workflowName# ,
+		ADI.WORKFLOW_SORT =
+		#workflowClass#, ADI.WORKFLOW_TYPE = #workflowType#  -->
+		set noticeInfo=#noticeInfo#
+		WHERE ADI.WORKFLOW_ID = #workflowId#
+	</update>
+	<update id="updateWorkflowToDiscard" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_WORKFLOW_INFO ADI
+		SET ADI.WORKFLOW_STATUS ='1003',
+		ADI.WORKFLOW_PUBLISH_STATUS='0'
+		WHERE ADI.WORKFLOW_ID = #workflowId#
+	</update>
+
+	<select id="queryEveryNodeTimeLimit" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT APNE.TIME_LIMIT
+		FROM ACT_PROCESS_NODE_EXAMPLE
+		APNE
+		WHERE APNE.WORKFLOW_ID = #workflowId# and apne.NODE_TYPE!='0' and
+		apne.NODE_TYPE!='2'
+	</select>
+	<select id="showNextNodeDeptInfo" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT * FROM ACT_PROCESS_NODE_EXAMPLE S WHERE
+		S.workflow_id =#workflowId#
+		AND S.NODE_ID IN (SELECT AWC.NEXT_NODE_ID
+		FROM ACT_WORKFLOW_CONFIG AWC
+		where AWC.workflow_id =#workflowId#
+		AND
+		AWC.NOW_NODE_ID = #nodeId#)
+	</select>
+	<select id="qryWorkflowType" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT * FROM ACT_WORKFLOW_INFO S WHERE
+		S.WORKFLOW_ID=#workflowId#
+	</select>
+	<select id="querydeft" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT DEPARTMENT FROM sys_staff WHERE
+		staff_id=#demand_sumit_pid#
+	</select>
+	<select id="queryDeptPno" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT S.DEMAND_SUMIT_PNAME, ST.dept_name,
+		S.DEMAND_SUMIT_PNO
+		FROM ACT_DEMAND_INFO S, SYS_STAFF ST
+		WHERE
+		S.DEMAND_SUMIT_PID = ST.STAFF_ID
+		AND S.DEMAND_ID = #demandId#
+		AND
+		S.WORKFLOW_ID = #workflowId#
+
+	</select>
+	<select id="queryWorkflowExampleStatus" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT ADI.DEMAND_STATUS FROM
+		ACT_DEMAND_INFO ADI WHERE
+		ADI.WORKFLOW_ID=#workflowId#
+	</select>
+
+	<select id="queryNodeType" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT APNE.NODE_TYPE FROM ACT_PROCESS_NODE_EXAMPLE APNE WHERE
+		APNE.NODE_ID=#nodeId#
+	</select>
+	<select id="queryshortp_sum" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		<!-- 		SELECT A.TASK_LOG_ID,
+		A.TASK_ID,
+		A.WORKFLOW_ID,
+		A.DEMAND_ID,
+		A.STEP,
+		A.EXECUTOR,
+		DATE_FORMAT(A.APPROVAL_TIME,"%Y-%m-%d %T") APPROVAL_TIME,
+
+		(SELECT DATE_FORMAT(B.URGE_TIME, '%Y-%m-%d')
+		URGE_TIME
+		FROM ACT_DEMAND_INFO B
+		WHERE B.DEMAND_ID = A.DEMAND_ID)
+		APPURGE_TIME,
+		CASE A.OPERATION
+		WHEN 'AGREE' THEN
+		'同意'
+		WHEN 'TOSTART' THEN
+		'打回根节点'
+		WHEN 'TOPREV' THEN
+		'打回上一步'
+		ELSE
+		''
+		END AS OPERATION,
+		A.OPERATION_INFO,
+		A.SUBMIT_ID AS OPERATOR_ID,
+		A.SUBMIT_NAME AS
+		OPERATOR_NAME,
+		A.NODE_ID,
+		A.NODE_EXECUTE_DEPART,
+		A.TIME_LIMIT,
+		CASE
+		A.TLOVER_TIME
+		WHEN '0' THEN
+		'未超时'
+		WHEN '1' THEN
+		'已超时'
+		ELSE
+		''
+		END AS
+		TLOVER_TIME,
+		DATE_FORMAT(A.CREATE_TIME, "%Y-%m-%d %T") APPCREATE_TIME,
+		A.NODE_SUPPORT,
+		A.URGE_COUNT,
+		DATE_FORMAT(A.URGE_TIME,"%Y-%m-%d %T")
+		URGE_TIME,
+		(SELECT T.OPERATOR_DEPT FROM ACT_DEMAND_TASK T WHERE
+		T.TASK_STATUS=1 AND
+		T.DEMAND_ID=A.DEMAND_ID ) OPERATOR_DEPTS,
+		(SELECT
+		T.OPERATOR_NAME FROM ACT_DEMAND_TASK T WHERE T.TASK_STATUS=1 AND
+		T.DEMAND_ID=A.DEMAND_ID ) OPERATOR_NAMES,
+		(SELECT T.OPERATOR_ID FROM
+		ACT_DEMAND_TASK T WHERE T.TASK_STATUS=1 AND
+		T.DEMAND_ID=A.DEMAND_ID )
+		OPERATOR_IDS,
+		(SELECT T.TASK_STATUS FROM ACT_DEMAND_TASK T WHERE
+		T.TASK_STATUS=1 AND
+		T.DEMAND_ID=A.DEMAND_ID ) TASK_STATUS,
+		(SELECT
+		B.NODE_NAME
+		FROM ACT_PROCESS_NODE_EXAMPLE B
+		WHERE B.NODE_ID = A.NODE_ID)
+		AS NODE_NAME
+		FROM ACT_DEMAND_TASK_LOG A
+		WHERE
+		A.DEMAND_ID=#demandId# AND
+		A.WORKFLOW_ID=#workflowId#
+		ORDER BY A.TASK_LOG_ID -->
+		
+		SELECT   *  FROM
+		 (SELECT 
+			    A.TASK_LOG_ID,
+			    A.TASK_ID,
+			    A.WORKFLOW_ID,
+			    A.DEMAND_ID,
+			    A.STEP,
+			    A.EXECUTOR,
+			    DATE_FORMAT(A.APPROVAL_TIME, '%Y-%m-%d %T') APPROVAL_TIME,
+			    (SELECT 
+			      DATE_FORMAT(B.URGE_TIME, '%Y-%m-%d') URGE_TIME 
+			    FROM
+			      ACT_DEMAND_INFO B 
+			    WHERE B.DEMAND_ID = A.DEMAND_ID) APPURGE_TIME,
+			    CASE
+			      A.OPERATION 
+			      WHEN 'AGREE' 
+			      THEN '同意' 
+			      WHEN 'TOSTART' 
+			      THEN '打回根节点' 
+			      WHEN 'TOPREV' 
+			      THEN '打回上一步'
+			      WHEN 'toCancle'
+			      THEN '作废' 
+			      ELSE '' 
+			    END AS OPERATION,
+			    A.OPERATION_INFO,
+			    A.SUBMIT_ID AS OPERATOR_ID,
+			    A.SUBMIT_NAME AS OPERATOR_NAME,
+			    A.NODE_ID,
+			    A.NOTE_NAME,
+			    A.NODE_EXECUTE_DEPART,
+			    A.TIME_LIMIT,
+			    CASE
+			      A.TLOVER_TIME 
+			      WHEN '0' 
+			      THEN '未超时' 
+			      WHEN '1' 
+			      THEN '已超时' 
+			      ELSE '' 
+			    END AS TLOVER_TIME,
+			    DATE_FORMAT(A.CREATE_TIME, '%Y-%m-%d %T') APPCREATE_TIME,
+			    A.NODE_SUPPORT,
+			    A.URGE_COUNT,
+			    DATE_FORMAT(A.URGE_TIME, '%Y-%m-%d %T') URGE_TIME,
+			    A.NODE_EXECUTE_DEPART OPERATOR_DEPTS,
+			    A.SUBMIT_NAME OPERATOR_NAMES,
+			    A.SUBMIT_ID OPERATOR_IDS,
+			    0 TASK_STATUS,
+			    A.ERA_OPERATOR_ID,
+			    A.ERA_OPERATOR_NAME,
+			    '' ERA_OPERATOR_DEPT_ID,
+			    A.ERA_OPERATOR_DEPT,
+			    (SELECT 
+			      B.NODE_NAME 
+			    FROM
+			      ACT_PROCESS_NODE_EXAMPLE B 
+			    WHERE B.NODE_ID = A.NODE_ID) AS NODE_NAME 
+			  FROM
+			    ACT_DEMAND_TASK_LOG A 
+			  WHERE A.DEMAND_ID = #demandId# 
+			    AND A.WORKFLOW_ID = #workflowId# 
+			  UNION
+			  ALL 
+			  SELECT 
+			    10000000 TASK_LOG_ID,
+			    A1.TASK_ID,
+			    A1.WORKFLOW_ID,
+			    A1.DEMAND_ID,
+			    A1.STEP,
+			    '' EXECUTOR,
+			    '' APPROVAL_TIME,
+			    (SELECT 
+			      DATE_FORMAT(B.URGE_TIME, '%Y-%m-%d') URGE_TIME 
+			    FROM
+			      ACT_DEMAND_INFO B 
+			    WHERE B.DEMAND_ID = A1.DEMAND_ID) APPURGE_TIME,
+			    '' OPERATION,
+			    '' OPERATION_INFO,
+			    A1.OPERATOR_ID AS OPERATOR_ID,
+			    A1.OPERATOR_NAME AS OPERATOR_NAME,
+			    3162 NODE_ID,
+			    '开始' NOTE_NAME,
+			    '部门' NODE_EXECUTE_DEPART,
+			    0 TIME_LIMIT,
+			    '' TLOVER_TIME,
+			    DATE_FORMAT(A1.CREATE_TIME, '%Y-%m-%d %T') APPCREATE_TIME,
+			    '' NODE_SUPPORT,
+			    A1.URGE_COUNT,
+			    DATE_FORMAT(A1.URGE_TIME, '%Y-%m-%d %T') URGE_TIME,
+			    A1.OPERATOR_DEPT OPERATOR_DEPTS,
+			    A1.OPERATOR_NAME OPERATOR_NAMES,
+			    A1.OPERATOR_ID OPERATOR_IDS,
+			    A1.TASK_STATUS TASK_STATUS,
+			    A1.ERA_OPERATOR_ID,
+			    A1.ERA_OPERATOR_NAME,
+			    A1.ERA_OPERATOR_DEPT_ID,
+			    A1.ERA_OPERATOR_DEPT,
+			    (SELECT 
+			      B.NODE_NAME 
+			    FROM
+			      ACT_PROCESS_NODE_EXAMPLE B 
+			    WHERE B.NODE_ID = A1.NODE_ID) AS NODE_NAME 
+			  FROM
+			    ACT_DEMAND_TASK A1 
+			  WHERE A1.DEMAND_ID = #demandId# 
+			    AND A1.WORKFLOW_ID = #workflowId# 
+			    AND A1.TASK_STATUS = 1) D 
+			ORDER BY D.TASK_LOG_ID,
+			  D.APPCREATE_TIME,
+			  D.TASK_STATUS 
+	</select>
+
+	<select id="queryWorkflwoSort" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT ACT_WORKFLOW_SORT_ID, ACT_WORKFLOW_SORT_CODE,
+		ACT_WORKFLOW_SORT_NAME
+		FROM ACT_WORKFLOW_SORT
+	</select>
+	<select id="queryWorkflwoType" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT 
+		  ACT_WORKFLOW_TYPE_ID,
+		  ACT_WORKFLOW_TYPE_CODE,
+		  ACT_WORKFLOW_TYPE_NAME
+		FROM
+		  ACT_WORKFLOW_TYPE
+		WHERE   1=1
+		<isNotEmpty prepend="AND" property="workflowClass">
+			ACT_WORKFLOW_TYPE_PID =#workflowClass#
+		</isNotEmpty> 
+		  
+	</select>
+	<select id="queryWisUpdate" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT T.WIS_UPDATE
+		FROM ACT_WORKFLOW_INFO T
+		WHERE T.UP_WORKFLOW_ID
+		=#workflowId#
+	</select>
+	<select id="queryChuLiName" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT
+		s.STAFF_ID,
+		s.STAFF_NAME,
+		s.DEPARTMENT_CODE,
+		o.ORG_NAME,
+		r.REGION_NAME
+		FROM
+		sys_staff s,
+		sys_org o,
+		sys_region r
+		WHERE
+		s.DEPARTMENT_CODE = o.ORG_ID
+		AND s.REGION_ID=r.REGION_ID
+		AND
+		s.STAFF_NAME like concat('%', #name#, '%')
+		<isNotEmpty prepend="AND" property="latnId">
+			s.REGION_ID = #latnId#
+		</isNotEmpty>
+
+	</select>
+	<select id="qryWorkFlowListPage_fun" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select t.* from (
+		SELECT A.*,SR.REGION_NAME,
+		AWS.ACT_WORKFLOW_SORT_ID,
+		AWS.ACT_WORKFLOW_SORT_NAME,
+		AWT.ACT_WORKFLOW_TYPE_ID,
+		AWT.ACT_WORKFLOW_TYPE_NAME
+		FROM ACT_WORKFLOW_INFO A
+		LEFT JOIN SYS_REGION SR ON A.WLATN_ID = SR.REGION_ID
+		LEFT JOIN ACT_WORKFLOW_SORT AWS ON  A.WORKFLOW_SORT = AWS.ACT_WORKFLOW_SORT_ID
+		LEFT JOIN ACT_WORKFLOW_TYPE AWT ON A.WORKFLOW_TYPE = AWT.ACT_WORKFLOW_TYPE_ID
+		where 1=1
+		and
+		A.WORKFLOW_PUBLISH_STATUS =1
+		AND A.WORKFLOW_STATUS!='1002'
+		<isNotEmpty property="latnId" prepend="and">
+			A.WLATN_ID = #latnId#
+		</isNotEmpty>
+		<isNotEmpty property="workflowNbr" prepend="and">
+			A.WORKFLOW_CODE LIKE CONCAT('%', #workflowNbr#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="workflowName" prepend="and">
+			A.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="workflow_type" prepend="and">
+			A.WORKFLOW_TYPE = #workflow_type#
+		</isNotEmpty>
+		<isNotEmpty property="workflow_type" prepend="and">
+			AWT.ACT_WORKFLOW_TYPE_ID = #workflow_type#
+		</isNotEmpty>
+		<isNotEmpty property="workflowId" prepend="and">
+			A.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+		order by A.WCREATE_TIME desc) t where 1=1
+		<isNotEmpty prepend="" property="pageSize">
+			limit $limit$,$pageSize$
+		</isNotEmpty>
+	</select>
+	<select id="qryWorkFlowListPage_funCount" resultClass="java.lang.String"
+		parameterClass="java.util.HashMap">
+		select count(*) from (
+		select A.* from act_workflow_info A
+		LEFT JOIN
+		SYS_REGION SR
+		ON A.WLATN_ID = SR.REGION_ID
+		LEFT JOIN ACT_WORKFLOW_SORT AWS ON A.WORKFLOW_SORT = AWS.ACT_WORKFLOW_SORT_ID
+		LEFT JOIN ACT_WORKFLOW_TYPE AWT ON A.WORKFLOW_TYPE = AWT.ACT_WORKFLOW_TYPE_ID
+		where 1=1
+		and
+		A.WORKFLOW_PUBLISH_STATUS =1
+		AND A.WORKFLOW_STATUS!='1002'
+		<isNotEmpty property="latnId" prepend="and">
+			A.WLATN_ID = #latnId#
+		</isNotEmpty>
+		<isNotEmpty property="workflowNbr" prepend="and">
+			A.WORKFLOW_CODE LIKE CONCAT('%', #workflowNbr#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="workflowName" prepend="and">
+			A.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="workflow_type" prepend="and">
+			A.WORKFLOW_TYPE = #workflow_type#
+		</isNotEmpty>
+		<isNotEmpty property="workflowId" prepend="and">
+			A.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+		order by A.WCREATE_TIME desc) D
+	</select>
+	<select id="queryIsOrNotPublish" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT AWI.WORKFLOW_STATUS
+		FROM ACT_WORKFLOW_INFO AWI
+		WHERE AWI.UP_WORKFLOW_ID = #workflowId#
+	</select>
+
+	<select id="queryDemandTemplateInfoSum" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT COUNT(*)
+		FROM ACT_DEMAND_TEMPLATE ADT
+		WHERE
+		ADT.TEMPLATE_STATUS='1'
+		<isNotEmpty prepend="AND" property="demandTemplateName">
+			ADT.TEMPLATE_NAME LIKE CONCAT('%', #demandTemplateName#, '%')
+		</isNotEmpty>
+	</select>
+
+	<select id="queryDemandTemplateInfo" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select t.* from (SELECT TEMPLATE_ID,
+		TEMPLATE_NAME,
+		TEMPLATE_STATUS,
+		DATE_FORMAT(TEMPLATE_CTIME,'%Y-%m-%d') as TEMPLATE_CTIME,
+		TEMPLATE_CODE,
+		DEMAND_SUMIT_DEPART_ID,
+		DEMAND_SUMIT_DEPART_NAME,
+		DEMAND_SUMIT_USER_ID,
+		DEMAND_SUMIT_USER_NAME,
+		APPLY_WORKFLOW_TYPE
+		FROM
+		ACT_DEMAND_TEMPLATE ADT
+		WHERE ADT.TEMPLATE_STATUS='1') t where 1=1
+		<isNotEmpty property="demandTemplateName" prepend="and">
+			t.TEMPLATE_NAME LIKE CONCAT('%', #demandTemplateName#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="sendUserName" prepend="and">
+			t.DEMAND_SUMIT_USER_NAME LIKE CONCAT('%', #sendUserName#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="applyWorkflowType" prepend="and">
+			t.APPLY_WORKFLOW_TYPE =#applyWorkflowType#
+		</isNotEmpty>
+		<isNotEmpty property="departName" prepend="and">
+			t.DEMAND_SUMIT_DEPART_ID =#departName#
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="pagesize">
+			limit $pagenum$,$pagesize$
+		</isNotEmpty>
+	</select>
+
+	<select id="queryDemandTemplateAttr" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT ADTA.ATTR_ID,
+		ADTA.TEMPLATE_ID,
+		ADTA.ATTR_NAME,
+		ADTA.ATTR_TYPE,
+		ADTA.ATTR_STATE,
+		ADTA.ATTR_STATE_DATE,
+		ADTA.ATTR_ONAME
+		FROM
+		ACT_DEMAND_TEMPLATE_ATTR ADTA
+		WHERE 1=1
+		<isNotEmpty property="templateId">
+		 AND ADTA.ATTR_STATE = '1'
+		 AND ADTA.TEMPLATE_ID = #templateId#
+		</isNotEmpty>
+	</select>
+
+	<insert id="addWorkflowDemandTemplateData"  parameterClass="java.util.HashMap">
+			INSERT INTO ACT_DEMAND_TEMPLATE_DATA (
+			  TEMPLATE_ID,
+			  DEMAND_ID,
+			  ATTR_ID,
+			  ATTR_NAME,
+			  ATTR_ONAME,
+			  ATTR_VALUE,
+			  CREATE_DATETIME
+			) 
+			VALUES
+			  (
+			  #templateId#,
+			  #demandId#,
+			  #attrId#,
+			  #attrName#,
+			  #attrOname#,
+			  #attrValue#,
+			  NOW()
+			  ) 
+	</insert>
+
+	<select id="queryDemandFinsh" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT ADI.DEMAND_STATUS FROM ACT_DEMAND_INFO ADI WHERE 1=1
+		<isNotEmpty property="demandId" prepend="and">
+			ADI.DEMAND_ID =
+			#demandId#
+		</isNotEmpty>
+	</select>
+
+	<select id="queryDemandPreOverTime" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT ADI.DEMAND_NAME AS "DEMANDNAME",
+		AWI.WORKFLOW_NAME AS "WORKFLOWNAME",
+		S.LOGIN_CODE AS "LOGINCODE",
+		S.MOB_TEL AS "MOBTEL",
+		T.DEMAND_ID AS "BUSIID"
+		FROM ACT_DEMAND_TASK T,
+		ACT_DEMAND_INFO ADI,
+		ACT_WORKFLOW_INFO AWI,
+		SYS_STAFF S
+		WHERE T.DEMAND_ID = ADI.DEMAND_ID
+		AND
+		T.WORKFLOW_ID = AWI.WORKFLOW_ID
+		AND T.OPERATOR_ID = S.STAFF_ID
+		AND
+		T.TASK_STATUS='1'
+		AND 
+		   		 <![CDATA[
+						DATE_FORMAT(t.end_time-1/24,'%Y-%M-%D %T') >= #startDate#
+				  ]]>
+		AND 	
+					<![CDATA[
+						DATE_FORMAT(t.end_time-1/24,'%Y-%M-%D %T') <= #endDate#
+				  ]]>
+
+	</select>
+
+	<select id="querySubofficeName" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT SUBOFFICE_ID,
+		SUBOFFICE_NAME,CENTER_REPOSITORY_NAME FROM
+		LOGIN_SUBOFFICE_REALITION
+		LSR
+		WHERE LSR.LOGIN_CODE = #loginCode#
+	</select>
+	
+	<!-- 查询流程步骤数 -->
+	<select id="queryStepNum" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT COUNT(1) AS STEP
+		FROM ACT_WORKFLOW_LINE T
+		WHERE 1=1
+		<isNotEmpty property="workflowId" prepend="and">
+			T.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+	</select>
+	 <!-- 查询并行步骤中其他子节点待办条数-->
+	<select id="qryParallelSum" resultClass="java.util.HashMap" parameterClass="java.util.HashMap" remapResults="true">
+	        select count(1) as sums from ACT_DEMAND_TASK s where s.workflow_id = #workflowId# and s.demand_id = #demandId# and s.node_id != #nodeId# and s.task_status=1 and s.node_id in(
+					select atws.next_node_id
+					  from ACT_WORKFLOW_CONFIG atws
+					 where atws.workflow_id = #workflowId#
+					   and atws.now_node_id in
+					       (select atw.prev_node_id
+					          from ACT_WORKFLOW_CONFIG atw
+					         where atw.workflow_id = #workflowId#
+					           and atw.now_node_id = #nodeId#))
+					 <isNotEmpty property="task_id" prepend="and">
+				       s.task_id <![CDATA[>]]>#task_id#
+				      </isNotEmpty>  
+      </select>      
+	<!-- 查询流程最后一个节点ID及最后节点的上一节点 -->
+	<select id="qryEndNodeIdAndPrveNodeId" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+		SELECT AWC.* FROM
+		ACT_WORKFLOW_CONFIG AWC
+		WHERE AWC.WORKFLOW_ID = #workflowId#
+		AND
+		AWC.NOW_NODE_ID =(
+		SELECT MAX(S.NEXT_NODE_ID) AS NEXTNODEID
+		FROM
+		ACT_WORKFLOW_CONFIG S
+		WHERE S.WORKFLOW_ID = #workflowId#
+		)
+	</select>
+
+	<!-- 导入并行一个节点结束流程其他节点均结束数据 -->
+	<insert id="addEndNodeWorkflowNeedProcessLog" parameterClass="java.util.HashMap">
+		INSERT INTO ACT_DEMAND_TASK_LOG (
+		TASK_LOG_ID,
+		TASK_ID,
+		WORKFLOW_ID,
+		DEMAND_ID,
+		APPROVAL_TIME,
+		OPERATION,
+		OPERATION_INFO,
+		SUBMIT_ID,
+		SUBMIT_NAME,
+		NODE_ID,
+		NODE_EXECUTE_DEPART,
+		TIME_LIMIT,
+		TLOVER_TIME,
+		CREATE_TIME,
+		URGE_COUNT,
+		URGE_TIME
+		)
+		(SELECT
+		#taskLogId#,
+		TASK_ID AS TASK_ID,
+		WORKFLOW_ID AS WORKFLOW_ID,
+		DEMAND_ID AS DEMAND_ID,
+		NOW()
+		APPROVAL_TIME,
+		#disposeRadio# AS OPERATION,
+		#disposeDesc# AS
+		OPERATION_INFO,
+		OPERATOR_ID AS SUBMIT_ID,
+		OPERATOR_NAME AS SUBMIT_NAME,
+		NODE_ID AS NODE_ID,
+		OPERATOR_DEPT AS NODE_EXECUTE_DEPART,
+		#timeLimit# AS
+		TIME_LIMIT,
+		#isEndTime# AS TLOVER_TIME,
+		NOW() CREATE_TIME,
+		#urgeCount# AS
+		URGE_COUNT,
+		#urgeTime# AS URGE_TIME
+		FROM
+		ACT_DEMAND_TASK
+		WHERE
+		<isNotEmpty property="now_node_id">
+			NODE_ID = #now_node_id#
+		</isNotEmpty>
+		DEMAND_ID =#demandId#
+		<isNotEmpty property="demandId" prepend="and">
+			DEMAND_ID
+			=#demandId#
+		</isNotEmpty>
+		<isNotEmpty property="taskId" prepend="and">
+			TASK_ID = #taskId#
+		</isNotEmpty>
+		)
+	</insert>
+	<!-- 查询拆分流程中的子节点待处理条数 -->
+	<select id="qryCTaskNum" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap" remapResults="true">
+		SELECT S.NODE_ID FROM
+		ACT_DEMAND_TASK S WHERE S.WORKFLOW_ID =#workflowId#
+		AND S.DEMAND_ID=#demandId# AND S.TASK_STATUS=1
+		<isNotEmpty property="nodeId" prepend="and">
+			S.NODE_ID = #nodeId#
+		</isNotEmpty>
+	</select>
+	<!--更新会签发起任务状态：暂停流转 -->
+	<update id="updateWorkflowSignStatus" parameterClass="java.util.HashMap">
+		UPDATE
+		ACT_DEMAND_TASK SET IS_SINGATURE =2 WHERE NODE_ID= #now_node_id# AND
+		DEMAND_ID=#demandId#
+	</update>
+	<!-- 会签发起代办 -->
+	<insert id="addWorkflowneedSign" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_DEMAND_TASK
+		(
+		DEMAND_ID,
+		WORKFLOW_ID,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		CREATE_TIME,
+		OPERATOR_DEPT_ID,
+		OPERATOR_DEPT,
+		TASK_STATUS,
+		IS_SINGATURE,
+		SINGATURE_SUBMIT_PID,
+		SINGATURE_SUBMIT_DEPARTMENTID)
+		VALUES
+		(
+		#demandId#,
+		#workflowId#,
+		#chulirenid2#,
+		#chulirenname2#,
+		NOW(),
+		#chulideptid2#,
+		#chulideptname2#,
+		'1',
+		#signStatus#,
+		#chulirenid1#,
+		#chulideptid1#)
+	</insert>
+	<!-- 查询节点是否是会签 -->
+	<select id="queryNodeIsSingature" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT COUNT(1) AS COUNT
+		FROM ACT_WORKFLOW_LINE T WHERE 1=1
+		<isNotEmpty property="nodeId" prepend="and">
+			T.FROM_NODE_ID =
+			#nodeId#
+		</isNotEmpty>
+	</select>
+
+	<!-- 查询当前节点的下一个节点id -->
+	<select id="queryNextIdsByCurrentId" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT T.NEXT_NODE_ID
+		FROM ACT_WORKFLOW_CONFIG T WHERE 1=1
+		<isNotEmpty property="nodeId" prepend="and">
+			T.NOW_NODE_ID =
+			#nodeId#
+		</isNotEmpty>
+		<isNotEmpty property="workflowId" prepend="and">
+			T.WORKFLOW_ID =
+			#workflowId#
+		</isNotEmpty>
+	</select>
+
+	<!-- 查询当前节点的下一个节点id -->
+	<select id="queryOutLineCount" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT COUNT(1) FROM ACT_WORKFLOW_LINE T WHERE 1=1
+		<isNotEmpty property="fromNodeId" prepend="and">
+			T.FROM_NODE_ID =
+			#fromNodeId#
+		</isNotEmpty>
+	</select>
+
+	<!-- 修改不走会签的线上的名称:begin -->
+	<update id="updateNotSingatureNodeLineName" parameterClass="java.util.HashMap">
+		UPDATE ACT_WORKFLOW_LINE AWL SET
+		AWL.LINE_NAME='3' WHERE 1=1
+		<isNotEmpty property="nodeId" prepend="and">
+			AWL.FROM_NODE_ID =
+			#nodeId#
+		</isNotEmpty>
+		<isNotEmpty property="notSingatureNode" prepend="and">
+			AWL.TO_NODE_ID = #notSingatureNode#
+		</isNotEmpty>
+	</update>
+
+	<!-- 修改走会签的线上的名称:begin -->
+	<update id="updateSingatureNodeLineName" parameterClass="java.util.HashMap">
+		UPDATE ACT_WORKFLOW_LINE AWL SET
+		AWL.LINE_NAME='3' WHERE 1=1
+		<isNotEmpty property="fromNodeId" prepend="and">
+			AWL.FROM_NODE_ID
+			= #fromNodeId#
+		</isNotEmpty>
+		<isNotEmpty property="toNodeId" prepend="and">
+			AWL.TO_NODE_ID =
+			#toNodeId#
+		</isNotEmpty>
+	</update>
+
+	<!-- 会签待处理列表查询:begin -->
+	<select id="queryNoSingatureDemandList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select t.* from (
+		SELECT ADI.DEMAND_ID,
+		ADI.DEMAND_NAME,
+		ADI.DEMAND_STATUS,
+		ADI.DEMAND_CODE,
+		ADI.DEMAND_DESC,
+		ADI.WORKFLOW_ID,
+		ADI.STAR_EVALUATE,
+		ADI.EVALUATE_INFO,
+		ADI.SUBOFFICE_NAME,
+		ADI.CENTER_REPOSITORY_NAME,
+		DATE_FORMAT(ADI.DCREATE_TIME, "%Y-%m-%d %T") DCREATE_TIME,
+		AWI.WORKFLOW_NAME,
+		AWI.TEMPLATE_ID,
+		I.TASK_ID,
+		I.NODE_ID,
+		I.OPERATOR_ID,
+		I.OPERATOR_NAME,
+		I.OPERATOR_DEPT,
+		I.OPERATOR_DEPT_ID,
+		I.URGE_COUNT,
+		DATE_FORMAT(I.END_TIME, "%Y-%m-%d %T") END_TIME,
+		ADI.DEMAND_SUMIT_PID,
+		ADI.DEMAND_SUMIT_PNAME,
+		ADI.LATN_ID,
+		AWI.WORKFLOW_SINGLE_TYPE,
+		S.DEPARTMENT,
+		S.MOB_TEL,
+		S.STAFF_NAME as
+		SINGATURE_USER,
+		S.DEPARTMENT AS SINGATURE_DEPART,
+		DATE_FORMAT(
+		I.URGE_TIME, "%Y-%m-%d %T") URGE_TIME,
+		AWT.ACT_WORKFLOW_TYPE_NAME
+		FROM ACT_DEMAND_INFO ADI, ACT_WORKFLOW_INFO AWI, 
+		ACT_DEMAND_TASK I,sys_staff s, 
+		ACT_WORKFLOW_TYPE AWT
+		WHERE ADI.WORKFLOW_ID = AWI.WORKFLOW_ID
+		AND ADI.DEMAND_ID = I.DEMAND_ID
+		AND AWI.WORKFLOW_TYPE=AWT.ACT_WORKFLOW_TYPE_ID
+		AND I.SINGATURE_SUBMIT_PID=S.STAFF_ID
+		AND I.TASK_STATUS = 1
+		AND I.IS_SINGATURE='1'
+		AND ADI.DEMAND_STATUS = '1000'
+		<isNotEmpty prepend="AND" property="staffId">
+			(I.OPERATOR_ID=#staffId#)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+
+		<!-- <isNotEmpty prepend="AND" property="latn_id" > -->
+		<!-- ADI.LATN_ID=#latn_id# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflowName">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+		</isNotEmpty>
+		)t where 1=1
+		<isNotEmpty prepend="" property="pagesize">
+			limit $minSize$,$maxSize$
+		</isNotEmpty>
+	</select>
+	<!-- 会签待处理列表总数量 :begin -->
+	<select id="queryNoSingatureDemandListSum" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT COUNT(*)
+		FROM ACT_DEMAND_INFO ADI, ACT_WORKFLOW_INFO AWI,
+		ACT_DEMAND_TASK
+		I,sys_staff s,ACT_WORKFLOW_TYPE AWT
+		WHERE
+		ADI.WORKFLOW_ID = AWI.WORKFLOW_ID
+		AND ADI.DEMAND_ID = I.DEMAND_ID
+		AND
+		AWI.WORKFLOW_TYPE=AWT.ACT_WORKFLOW_TYPE_ID
+		AND
+		I.SINGATURE_SUBMIT_PID=S.STAFF_ID
+		AND I.TASK_STATUS = 1
+		AND
+		I.IS_SINGATURE='1'
+		AND ADI.DEMAND_STATUS = '1000'
+		<isNotEmpty prepend="AND" property="staffId">
+			I.OPERATOR_ID=#staffId#
+		</isNotEmpty>
+				<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+
+		<!-- <isNotEmpty prepend="AND" property="latn_id" > -->
+		<!-- ADI.LATN_ID=#latn_id# -->
+		<!-- </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflowName">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+		</isNotEmpty>
+	</select>
+	<!-- 会签待处理列表总数量 :end -->
+
+	<!-- 会签已处理列表查询:begin -->
+	<select id="queryHasSingatureDemandList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select t.* from (
+		SELECT ADI.DEMAND_ID,
+		ADI.DEMAND_NAME,
+		ADI.DEMAND_STATUS,
+		ADI.DEMAND_CODE,
+		ADI.DEMAND_DESC,
+		ADI.WORKFLOW_ID,
+		ADI.STAR_EVALUATE,
+		ADI.EVALUATE_INFO,
+		ADI.SUBOFFICE_NAME,
+		ADI.CENTER_REPOSITORY_NAME,
+		DATE_FORMAT(ADI.DCREATE_TIME, "%Y-%m-%d %T") DCREATE_TIME,
+		AWI.WORKFLOW_NAME,
+		I.TASK_ID,
+		I.NODE_ID,
+		I.OPERATOR_ID,
+		I.OPERATOR_NAME,
+		I.OPERATOR_DEPT,
+		I.OPERATOR_DEPT_ID,
+		I.URGE_COUNT,
+		DATE_FORMAT(I.END_TIME, "%Y-%m-%d %T") END_TIME,
+		ADI.DEMAND_SUMIT_PID,
+		ADI.DEMAND_SUMIT_PNAME,
+		ADI.LATN_ID,
+		AWI.WORKFLOW_SINGLE_TYPE,
+		S.DEPARTMENT,
+		S.MOB_TEL,
+		DATE_FORMAT(
+		I.URGE_TIME, "%Y-%m-%d %T") URGE_TIME
+		FROM ACT_DEMAND_INFO ADI, ACT_WORKFLOW_INFO AWI,
+		ACT_DEMAND_TASK
+		I,sys_staff s
+		WHERE ADI.WORKFLOW_ID = AWI.WORKFLOW_ID
+		AND ADI.DEMAND_ID = I.DEMAND_ID
+		AND S.STAFF_ID=ADI.DEMAND_SUMIT_PID
+		AND I.TASK_STATUS = 0
+		AND I.IS_SINGATURE='1'
+		<isNotEmpty prepend="AND" property="staffId">
+			(I.OPERATOR_ID=#staffId#)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflowName">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandStatus">
+			AWI.DEMAND_STATUS =
+			#demandStatus#
+		</isNotEmpty>
+		)t where 1=1
+		<isNotEmpty prepend="" property="pagesize">
+			limit $minSize$,$maxSize$
+		</isNotEmpty>
+	</select>
+
+	<!-- 会签已处理列表总数量 :begin -->
+	<select id="queryHasSingatureDemandListSum" resultClass="String"
+		parameterClass="java.util.HashMap">
+		SELECT COUNT(*)
+		FROM ACT_DEMAND_INFO ADI, ACT_WORKFLOW_INFO AWI,
+		ACT_DEMAND_TASK
+		I,sys_staff s
+		WHERE ADI.WORKFLOW_ID = AWI.WORKFLOW_ID
+		AND ADI.DEMAND_ID = I.DEMAND_ID
+		AND S.STAFF_ID=ADI.DEMAND_SUMIT_PID
+		AND
+		I.TASK_STATUS = 0
+		AND I.IS_SINGATURE='1'
+		<isNotEmpty prepend="AND" property="staffId">
+			I.OPERATOR_ID=#staffId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandCode">
+			ADI.DEMAND_CODE LIKE CONCAT('%', #demandCode#, '%')
+		</isNotEmpty>
+
+		<isNotEmpty prepend="AND" property="demandName">
+			ADI.DEMAND_NAME LIKE CONCAT('%', #demandName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflowName">
+			AWI.WORKFLOW_NAME LIKE CONCAT('%', #workflowName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflowName">
+			AWI.WORKFLOW_NAME like
+			'%'||#workflowName#||'%'
+		</isNotEmpty>
+	</select>
+	<!-- 会签已处理列表总数量 :end -->
+
+	<!-- 修改会签需求任务状态:begin -->
+	<update id="updateSingatureDemandStatus" parameterClass="java.util.HashMap">
+		UPDATE ACT_DEMAND_TASK ADT
+		SET ADT.TASK_STATUS='0'
+		WHERE 1=1
+		<isNotEmpty property="taskId" prepend="and">
+			ADT.TASK_ID =
+			#taskId#
+		</isNotEmpty>
+	</update>
+
+	<!-- 查询已处理会签任务的单子:begin -->
+	<select id="queryDealSingatre" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT T.TASK_STATUS
+		FROM ACT_DEMAND_TASK T WHERE 1=1
+		<isNotEmpty prepend="AND" property="demandId">
+			T.DEMAND_ID=#demandId#
+		</isNotEmpty>
+		AND T.IS_SINGATURE = '1'
+	</select>
+	<!-- 查询已处理会签任务的单子:end -->
+
+	<!-- 修改发起会签需求的 单子的 IS_SINGATURE,使得能继续发起会签需求:begin -->
+	<update id="updateIsSingature" parameterClass="java.util.HashMap">
+		UPDATE ACT_DEMAND_TASK ADT
+		SET ADT.IS_SINGATURE =''
+		WHERE 1=1
+		<isNotEmpty property="demandId" prepend="and">
+			ADT.DEMAND_ID =
+			#demandId#
+		</isNotEmpty>
+		AND ADT.IS_SINGATURE = '2'
+	</update>
+	<!-- 查询文件路径 -->
+	<select id="qryDownloadPath" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT
+		ATTACHMENT_NAME,
+		ATTACHMENT_PATH,
+		ATTACHMENT_VALUE,
+		ATTACHMENT_TYPE,
+		OTHER_ATTACHMENT_NAME
+		FROM
+		TB_CPC_ATTACHMENT
+		WHERE ATTACHMENT_VALUE IN
+		(SELECT
+		ATTACHMENT_VALUE
+		FROM
+		TB_CPC_GOVER_ATTACHMENT
+		WHERE PRO_ID IN (#proId#))
+	</select>
+
+	<!-- 获取附件信息 -->
+	<select id="getGoverAttachInfo" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT * FROM tb_cpc_attachment T
+		WHERE t.attachment_type = #attachment_type#
+		<isNotEmpty prepend="AND" property="attachment_value">
+			t.attachment_value = #attachment_value#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflowId">
+			t.workflowId = #workflowId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="attachment_name">
+			t.attachment_name = #attachment_name#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="attachment_path">
+			t.attachment_path = #attachment_path#
+		</isNotEmpty>
+	</select>
+
+	<!-- 随机产生一个attachmentId -->
+	<select id="getAttachmentId" resultClass="java.lang.String"
+		parameterClass="java.util.HashMap">
+		SELECT gover_manager.nextval as attachmentId from dual
+	</select>
+
+	<!-- mysql附件信息保存 -->
+	<insert id="goverInsertAttach" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_cpc_attachment(attachment_name, attachment_path, attachment_type,
+		attachment_value, create_time,other_attachment_name,upload_person,upload_person_name,task_log_id,workflowId)
+		VALUES(#attachment_name#,#attachment_path#,#attachment_type#,#attachment_value#,
+		now(),#other_attachment_name#,#userId#,#userName#,#task_log_id#,#workflowId#)
+	</insert>
+	<!-- 关系表保存 -->
+	<insert id="goverInsertAttachInfo1" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_cpc_gover_attachment(attachment_value, pro_id, user_code,
+		create_time, state)
+		VALUES(#attachment_value#,#proId#,#userId#,now(),0)
+	</insert>
+	<!-- 文件删除 -->
+	<delete id="dealFileNameInfo" parameterClass="java.util.HashMap">
+		DELETE FROM tb_cpc_attachment WHERE attachment_value=#attachment_value# and
+		attachment_name = #attachment_name#
+	</delete>
+	<delete id="delMysqlFileName" parameterClass="java.util.HashMap">
+		DELETE FROM tb_cpc_attachment WHERE attachment_value=#attachment_value# and
+		attachment_name = #attachment_name#
+	</delete>
+	<!-- 流程规则查询总数量  -->
+	<select id="getFlowRuleListSum" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT  COUNT(*) FROM  ACT_WORKFLOW_FLOWRULE  FR  WHERE  FR.flowRuleStatus=1
+		<isNotEmpty prepend="AND" property="flowRuleName">
+			FR.FLOWRULENAME LIKE CONCAT('%', #flowRuleName#, '%')
+		</isNotEmpty>
+	</select>
+	<!-- 流程规则查询总数量 -->
+
+	<!-- 流程规则总记录 -->
+	<select id="getFlowRuleListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT FR.FLOWRULECODE,	
+			   FR.FLOWRULENAME,
+			   FR.FLOWRULECONTENT,
+			   FR.FLOWRULEDESCRIBE,
+			   FR.FLOWRULEMAX,
+			   FR.FLOWRULEMIN,
+			   FR.FLOWRULEVALUE,
+			   FR.FLOWRULETYPE,
+			   FR.FLOWRULESTATUS
+   		FROM ACT_WORKFLOW_FLOWRULE  FR  WHERE 1=1
+		<isNotEmpty prepend="AND" property="flowRuleName">
+			FR.FLOWRULENAME LIKE CONCAT('%', #flowRuleName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="" property="pagesize">
+			limit $pagenum$,$pagesize$
+		</isNotEmpty>
+	</select>
+	<!-- 流程规则查询记录 -->
+	<!-- 查询节点线的下一节点信息 -->
+	<select id="getNextLineInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  WL.LINE_ID,
+			  WL.FROM_NODE_ID,
+			  WL.TO_NODE_ID 
+			FROM
+			  ACT_WORKFLOW_LINE WL 
+			WHERE WL.LINE_ID = #currentNodeId#
+			AND WL.WORKFLOW_ID =#workflowId#
+	</select>
+	<!-- 查询节点线的下一节点信息-->
+	<!-- 保存流程规则与节点线关系-->
+	<insert id="addFlowRuleLine" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_FLOWRULE_LINE
+		(WORKFLOWID,
+		 TEMPLATEID,
+		 FLOWRULECODE,
+		 FLOWRULENAME,
+		 LINE_ID,
+		 CURRENTNODEID,
+		 NEXTNODEID,
+		 ATTR_ONAME,
+		 ATTR_ID,
+		 CREATETIME
+		)
+		VALUES
+		(#workflowId#,
+		 #templateId#,
+		 #flowRuleCode#,
+		 #flowRuleName#,
+		 #line_id#,
+		 #currentNodeId#,
+		 #nextNodeId#,
+		 #attr_value#,
+		 #attr_Id#,
+		 NOW()
+		)
+	</insert>
+	<!-- 规则获取并判断下一节点 -->
+	<select id="getFlowRuleToNextNodeInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+				  WF.FLOWRULEMIN,
+				  WF.FLOWRULEMAX,
+				  WF.FLOWRULECODE,
+				  FL.NEXTNODEID
+				FROM
+				  ACT_FLOWRULE_LINE FL,
+				  ACT_WORKFLOW_FLOWRULE WF 
+				  WHERE 
+				  FL.FLOWRULECODE = WF.FLOWRULECODE
+				  AND FL.WORKFLOWID = #workflowId#
+				  AND FL.CURRENTNODEID =#nodeId#
+	</select>
+	<!-- 评价（判断是否为发起人） -->
+	<select id="qryStartNodeIdInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT  * FROM   act_demand_task WHERE node_id = 
+		(SELECT  MIN(node_id)   FROM act_demand_task  WHERE demand_id = #demandId#)
+	</select>
+	<!-- 评价新增-->
+	<insert id="addWorkflowEvalInfo" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_EVAL_INFO
+		(
+		WORKFLOW_ID,
+		DEMAND_ID,
+		DEMAND_CODE,
+		STAR_EVALUATE,
+		EVALUATE_INFO,
+		EVAL_STAFF_ID,
+		EVAL_STAFF_NAME,
+		EVAL_TIME
+		)
+		VALUES
+		(
+		#workflowId#,
+		#demandId#,
+		#demand_Code#,
+		#starNum#,
+		#evalDesc#,
+		#staffId#,
+		#staffName#,
+		NOW())
+	</insert>
+		<!-- 查询短流程类型对应的流程信息-->
+	<select id="qryTypeGetWorkflowInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT  WORKFLOW_ID, WORKFLOW_CODE FROM ACT_WORKFLOW_INFO WHERE WORKFLOW_SORT = #workflow_sort#   AND WORKFLOW_TYPE = #workflow_type#   
+		<isNotEqual property="latnId" compareValue="888">
+		 AND WLATN_ID = #latnId#
+		</isNotEqual>
+	</select>
+	<!-- 授权新增 -->
+	<insert id="addWorkflowAuthorInfo" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_WORKFLOW_AUTHORITY
+		(
+		WORKFLOW_ID,
+		WORKFLOW_CODE,
+		ERA_OPERATOR_ID,
+		ERA_OPERATOR_NAME,
+		ERA_OPERATOR_DEPTID,
+		ERA_OPERATOR_DEPTNAME,
+		AUTHORITY_START_TIME,
+		AUTHORITY_END_TIME,
+		AUTHOR_STAFFID,
+		AUTHOR_STAFFNAME,
+		AUTHOR_STATUS
+		)
+		VALUES
+		(
+		#workflowId#,
+		#workflowCode#,
+		#authorityStaffId#,
+		#authorityStaff#,
+		#authorityStaffDeptId#,
+		#authorityStaffDeptName#,
+		#sendBeginDate#,
+		#sendEndDate#,
+		#thisStaffId#,
+		#thisStaffName#,
+		0)
+	</insert>
+	<!-- 流程授权总数量  -->
+	<select id="getWorkflowAuthorListSum" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT  COUNT(*) 
+		 FROM
+			  ACT_WORKFLOW_AUTHORITY WA ,
+			  ACT_WORKFLOW_INFO  WI,
+			  SYS_STAFF  S,
+			  ACT_WORKFLOW_SORT WS,
+			  ACT_WORKFLOW_TYPE WT
+			WHERE 1=1
+			  AND WA.WORKFLOW_CODE = WI.WORKFLOW_CODE
+			  AND WA.ERA_OPERATOR_ID = S.STAFF_ID
+			  AND WI.WORKFLOW_TYPE = WT.ACT_WORKFLOW_TYPE_ID
+			  AND WI.WORKFLOW_SORT = WS.ACT_WORKFLOW_SORT_ID
+			  AND WA.AUTHOR_STATUS = 0
+			<isNotEmpty prepend="AND" property="staffId">
+				WA.AUTHOR_STAFFID = #staffId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="sendEndDate">
+				WA.AUTHORITY_START_TIME = #sendEndDate#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="sendBeginDate">
+				WA.AUTHORITY_END_TIME =#sendBeginDate# 
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="workflow_type">
+				WA.WORKFLOW_TYPE =#workflow_type# 
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="workflow_sort">
+				WA.WORKFLOW_SORT = #workflow_sort#
+			</isNotEmpty>
+	</select>
+	<!-- 流程授权总记录 -->
+	<select id="getWorkflowAuthorListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  WA.WORKFLOW_ID,
+			  WA.WORKFLOW_CODE,
+			  WA.ERA_OPERATOR_ID,
+			  WA.ERA_OPERATOR_NAME,
+			  WA.ERA_OPERATOR_DEPTID,
+			  WA.ERA_OPERATOR_DEPTNAME,
+			  DATE_FORMAT( WA.AUTHORITY_START_TIME, "%Y-%m-%d") AUTHORITY_START_TIME,
+			  DATE_FORMAT( WA.AUTHORITY_END_TIME, "%Y-%m-%d") AUTHORITY_END_TIME,
+			  WS.ACT_WORKFLOW_SORT_NAME,
+			  WT.ACT_WORKFLOW_TYPE_NAME,
+			  WI.WORKFLOW_NAME,
+			  S.MOB_TEL,
+			  WA.AUTHOR_STATUS
+			FROM
+			  ACT_WORKFLOW_AUTHORITY WA ,
+			  ACT_WORKFLOW_INFO  WI,
+			  SYS_STAFF  S,
+			  ACT_WORKFLOW_SORT WS,
+			  ACT_WORKFLOW_TYPE WT
+			WHERE 1=1
+			  AND WA.WORKFLOW_CODE = WI.WORKFLOW_CODE
+			  AND WA.ERA_OPERATOR_ID = S.STAFF_ID
+			  AND WI.WORKFLOW_TYPE = WT.ACT_WORKFLOW_TYPE_ID
+			  AND WI.WORKFLOW_SORT = WS.ACT_WORKFLOW_SORT_ID
+			  AND WA.AUTHOR_STATUS = 0
+			<isNotEmpty prepend="AND" property="staffId">
+				WA.AUTHOR_STAFFID = #staffId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="workFlowId">
+				WA.WORKFLOW_ID = #workFlowId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="sendEndDate">
+				WA.AUTHORITY_START_TIME = #sendEndDate#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="sendBeginDate">
+				WA.AUTHORITY_END_TIME =#sendBeginDate# 
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="workflow_type">
+				WA.WORKFLOW_TYPE =#workflow_type# 
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="workflow_sort">
+				WA.WORKFLOW_SORT = #workflow_sort#
+			</isNotEmpty>
+			<isNotEmpty prepend="" property="pagesize">
+				limit $pagenum$,$pagesize$
+			</isNotEmpty>
+	</select>
+	<!--取消授权-->
+	<update id="updateWorkflowIsAuthor" parameterClass="java.util.HashMap">
+		UPDATE 
+  				ACT_WORKFLOW_AUTHORITY WA 
+			SET
+ 				WA.AUTHOR_STATUS = 2 
+			WHERE 1 = 1 
+  			AND WA.WORKFLOW_CODE =#workflowCode#
+	</update>
+	<!-- 查询流程被授权人信息 -->
+	<select id="getWorkflowAuthorStaffInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  WA.ERA_OPERATOR_ID,
+			  WA.ERA_OPERATOR_NAME,
+			  WA.ERA_OPERATOR_DEPTID,
+			  WA.ERA_OPERATOR_DEPTNAME
+			FROM
+			  ACT_WORKFLOW_AUTHORITY WA ,
+			  ACT_PROCESS_NODE_EXAMPLE PNE 
+			WHERE WA.WORKFLOW_ID = #workflowId#  
+			  AND PNE.WORKFLOW_ID  = WA.WORKFLOW_ID
+			  AND WA.AUTHOR_STAFFID = PNE.NODE_EXECUTOR_ID
+			  AND PNE.NODE_ID IN (#next_node_id#)
+			  AND WA.AUTHOR_STATUS = 0
+			  AND WA.AUTHORITY_START_TIME  <![CDATA[<]]>  NOW() 
+			  AND WA.AUTHORITY_END_TIME  <![CDATA[>]]> NOW()
+	</select>
+	<!-- 查询本节点原有处理人信息 -->
+	<select id="showNowNodeDeptInfo" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT * FROM ACT_PROCESS_NODE_EXAMPLE S WHERE
+		S.WORKFLOW_ID = #workflowId#
+		AND S.NODE_ID = #nodeId#
+	</select>
+	<!-- 查询短流程评价信息-->
+	<select id="qryshortProcessEvalInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+	    WORKFLOW_ID,
+		DEMAND_ID,
+		DEMAND_CODE,
+		STAR_EVALUATE,
+		EVALUATE_INFO,
+		EVAL_STAFF_ID,
+		EVAL_STAFF_NAME,
+		EVAL_TIME
+		from act_eval_info
+		where 1=1
+		<isNotEmpty prepend="AND" property="workflowId">
+		WORKFLOW_ID=#workflowId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandId">
+		DEMAND_ID=#demandId#
+		</isNotEmpty>
+	</select>
+	<!-- 查询当前节点是否存在同一级其他节点数-->
+	<select id="qryNowNodeIdOtherNodeInfoSum" resultClass="java.util.HashMap" parameterClass="java.util.HashMap" remapResults="true">
+		SELECT 
+		  COUNT(1)  AS otherSum
+		FROM
+		  ACT_WORKFLOW_CONFIG S,
+		  ACT_DEMAND_TASK  DT
+		WHERE S.NEXT_NODE_ID = 
+		  (SELECT 
+		    NEXT_NODE_ID 
+		  FROM
+		    ACT_WORKFLOW_CONFIG 
+		  WHERE NOW_NODE_ID = #nodeId#)
+		  AND S.WORKFLOW_ID = DT.WORKFLOW_ID
+		  AND S.NOW_NODE_ID = DT.NODE_ID
+		  AND DT.TASK_STATUS=1
+		  AND DT.DEMAND_ID=#demandId#
+	</select>
+	<!-- 查询需求发起人信息-->
+	<select id="qryShortEvalSmsInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap" remapResults="true">
+			SELECT 
+			  S.STAFF_NAME,
+			  S.MOB_TEL
+			FROM
+			  ACT_DEMAND_TASK DT,
+			  SYS_STAFF S 
+			WHERE DT.DEMAND_ID = #demandId# 
+			  AND DT.NODE_ID  = 
+			  (SELECT 
+			    MIN(NODE_ID) 
+			  FROM
+			    ACT_DEMAND_TASK 
+			  WHERE DEMAND_ID = #demandId#)
+			  AND DT.OPERATOR_ID = S.STAFF_ID
+	</select>
+	<!-- 流程对应模板属性总数量  -->
+	<select id="getFlowTemplateListCount" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT 
+			   COUNT(*)
+			FROM
+			  ACT_WORKFLOW_INFO WI,
+			  ACT_DEMAND_TEMPLATE_ATTR DTA
+			WHERE  1=1
+			AND WI.TEMPLATE_ID = DTA.TEMPLATE_ID
+			AND WI.WORKFLOW_ID = #workflowId#
+	</select>
+	<!-- 流程规则查询总数量 -->
+
+	<!-- 流程对应模板属性总记录 -->
+	<select id="getFlowTemplateList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			   WI.WORKFLOW_ID,
+			   WI.TEMPLATE_ID,
+			   DTA.ATTR_ID,
+			   DTA.ATTR_NAME,
+			   DTA.ATTR_ONAME,
+			   DTA.ATTR_TYPE
+			FROM
+			  ACT_WORKFLOW_INFO WI,
+			  ACT_DEMAND_TEMPLATE_ATTR DTA
+			WHERE  1=1
+			AND WI.TEMPLATE_ID = DTA.TEMPLATE_ID
+			AND WI.WORKFLOW_ID = #workflowId#
+		<isNotEmpty prepend="" property="pageSize">
+			limit $limit$,$pageSize$
+		</isNotEmpty>
+	</select>
+	<!-- 流程对应模板实例属性信息 -->
+	<select id="queryTemplataInfo" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		SELECT  
+			  DTD.ATTR_ID,
+			  DTA.ATTR_TYPE,
+			  DTD.TEMPLATE_ID,
+			  DTD.ATTR_NAME,
+			  DTD.ATTR_ONAME,
+			  DTD.DEMAND_ID,
+			  DTD.ATTR_VALUE 
+			FROM
+			  ACT_DEMAND_TEMPLATE_DATA DTD,
+			  ACT_DEMAND_TEMPLATE_ATTR DTA
+			WHERE 
+			  DTD.TEMPLATE_ID = DTA.TEMPLATE_ID
+			  AND DTD.ATTR_ID = DTA.ATTR_ID
+			  AND DTD.DEMAND_ID = #demandId#
+			  AND DTD.TEMPLATE_ID  = #templateId#
+	</select>
+		<!--规则与模板数据对比，判断下一节点 -->
+	<select id="queryFlowRuleNextNodeInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			   DTD.ATTR_VALUE,
+			   DTD.ATTR_ONAME,
+			   WF.FLOWRULEMIN,
+			   WF.FLOWRULEMAX,
+			   FL.NEXTNODEID,
+			   PNE.NODE_EXECUTOR_ID,
+			   PNE.NODE_EXECUTOR,
+			   PNE.NODE_EXECUTE_DEPART_ID,
+			   PNE.NODE_EXECUTE_DEPART 
+			FROM
+			  ACT_FLOWRULE_LINE FL,
+			  ACT_DEMAND_TEMPLATE_DATA DTD,
+			  ACT_WORKFLOW_FLOWRULE  WF,
+  			  ACT_PROCESS_NODE_EXAMPLE PNE
+			WHERE FL.TEMPLATEID = DTD.TEMPLATE_ID
+			  AND FL.ATTR_ID = DTD.ATTR_ID
+			  AND WF.FLOWRULECODE = FL.FLOWRULECODE 
+			  AND PNE.WORKFLOW_ID = FL.WORKFLOWID
+			  AND PNE.NODE_ID = FL.NEXTNODEID
+			  AND WF.FLOWRULECODE = FL.FLOWRULECODE
+			  AND FL.WORKFLOWID = #workflowId#
+			  AND FL.CURRENTNODEID = #now_node_id#
+			  GROUP BY FL.NEXTNODEID 
+	</select>
+		<!--显示当前节点线，规则 -->
+	<select id="queryFlowLineRuleInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+				  WF.FLOWRULECONTENT,
+				  PNE.NODE_NAME,
+				  DTA.ATTR_NAME,
+  				  S.LINE_ID	
+				FROM
+				  ACT_FLOWRULE_LINE S,
+				  ACT_WORKFLOW_FLOWRULE WF,
+				  ACT_DEMAND_TEMPLATE_ATTR DTA,
+				  ACT_PROCESS_NODE_EXAMPLE PNE,
+				  ACT_WORKFLOW_LINE WL
+				WHERE S.FLOWRULECODE = WF.FLOWRULECODE
+				  AND S.TEMPLATEID = DTA.TEMPLATE_ID
+				  AND S.ATTR_ID = DTA.ATTR_ID
+				  AND PNE.WORKFLOW_ID = S.WORKFLOWID
+				  AND WL.WORKFLOW_ID = S.WORKFLOWID
+				  AND WL.TO_NODE_ID = PNE.NODE_ID
+				  AND WL.LINE_ID = S.LINE_ID
+				  AND S.WORKFLOWID= #workflowId#
+				  AND S.LINE_ID = #LineId#
+	</select>
+	<!--修改当前节点线，规则 -->
+	<update id="updateFlowRuleLine" parameterClass="java.util.HashMap">
+			UPDATE 
+			  ACT_FLOWRULE_LINE FL 
+			SET
+			  FL.ATTR_ID=#attr_Id#,
+			  FL.ATTR_ONAME=#attr_value#,
+			  FL.FLOWRULECODE=#flowRuleCode#,
+			  FL.FLOWRULENAME=#flowRuleName#,
+			  FL.CREATETIME= NOW()
+			WHERE FL.WORKFLOWID = #workflowId# 
+			AND  FL.LINE_ID = #LineId#
+	</update>
+	<!--查询所属短流程类型的流程 -->
+	<select id="getWorkFlowByTypeInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT  * FROM  ACT_WORKFLOW_INFO S  WHERE 1=1
+		<isNotEmpty prepend="AND" property="workflow_sort">
+		S.WORKFLOW_SORT = #workflow_sort#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflow_type">
+		S.WORKFLOW_TYPE = #workflow_type#
+		</isNotEmpty> 
+		<isNotEmpty prepend="" property="pageSize">
+		limit $limit$,$pageSize$
+		</isNotEmpty>
+	</select>
+		<!-- 待处理、已处理短流程需求列表总数量 -->
+	<select id="getWorkFlowByTypeInfoCount" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT
+		 COUNT(*)
+		FROM ACT_WORKFLOW_INFO S  WHERE 1=1
+		<isNotEmpty prepend="AND" property="workflow_sort">
+		S.WORKFLOW_SORT = #workflow_sort#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="workflow_type">
+		S.WORKFLOW_TYPE = #workflow_type#
+		</isNotEmpty> 
+	</select>
+	<!-- APP查询登录角色-->
+	<select id="qryStaffRoleById" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+			SELECT * FROM TB_CPC_SYS_ROLE_O_REL A WHERE A.O_REL_ID=#staff_id#
+	</select>
+	<!-- 查询节点部门领导人-->
+	<select id="qrySumitLeadIdByDept" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+			<isEqual property="flag" compareValue="0">
+			SELECT WSO.OPERATOR_ID,  
+				   WSO.OPERATOR_NAME,
+				   WSO.OPERATOR_DEPT, 
+				   WSO.OPERATOR_DEPT_ID 
+			FROM ACT_WORKFLOW_STAFF_OPSTAFF WSO,SYS_STAFF S 
+			WHERE WSO.DEMAND_SUMIT_DEPT_ID =S.DEPARTMENT_ID  
+			AND S.STAFF_ID = #staff_id#
+			</isEqual>
+			<isEqual property="flag" compareValue="1">
+				SELECT 
+				  WSO.OPERATOR_ID,
+				  WSO.OPERATOR_NAME,
+				  WSO.OPERATOR_DEPT,
+				  WSO.OPERATOR_DEPT_ID 
+				FROM
+				  ACT_DEMAND_TASK S,
+				  ACT_WORKFLOW_STAFF_OPSTAFF WSO 
+				WHERE S.WORKFLOW_ID = #workflowId#
+				  AND WSO.DEMAND_SUMIT_DEPT_ID = S.OPERATOR_DEPT_ID 
+				  AND S.NODE_ID = (SELECT 
+					    SELECTNODE_ID 
+					  FROM
+					    ACT_PROCESS_NODE_EXAMPLE 
+					  WHERE WORKFLOW_ID =  #workflowId# 
+					    AND NODE_ID IN (#nodeId#))
+				  GROUP BY  S.NODE_ID
+			</isEqual>
+	</select>
+		   <select id="querynodesListPageCount" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+				select count(1)  from (
+					<!--SELECT NOW_NODE_ID, NEXT_NODE_ID,NODE_NAME FROM (
+			                  	SELECT 
+							  from_node_id NOW_NODE_ID,
+							  to_node_id NEXT_NODE_ID,
+							  i.node_name NODE_NAME,
+							  (SELECT 
+							    COUNT(1) 
+							  FROM
+							    ACT_WORKFLOW_LINE ct2 
+							  WHERE ct2.to_node_id = ct.FROM_NODE_ID 
+							  
+							    AND ct.WORKFLOW_ID = #workflowId#
+							    AND ct2.WORKFLOW_ID = #workflowId#) PARENTS 
+							FROM
+							  ACT_WORKFLOW_LINE ct,ACT_NODEALIAS_NODEID_REALITION i 
+							WHERE ct.WORKFLOW_ID =#workflowId#
+							AND ct.WORKFLOW_ID=i.WORKFLOW_ID
+							AND ct.from_node_id=i.NODE_ID
+							  AND ct.TO_NODE_ID =#node_Id#
+							UNION
+							SELECT 
+							 from_node_id NOW_NODE_ID,
+							  to_node_id NEXT_NODE_ID,
+							  i.node_name NODE_NAME,
+							  (SELECT 
+							    COUNT(1) 
+							  FROM
+							    ACT_WORKFLOW_LINE ct2 
+							  WHERE ct2.to_node_id = ct.FROM_NODE_ID 
+							    AND ct.WORKFLOW_ID =#workflowId#
+							    AND ct2.WORKFLOW_ID =#workflowId#) PARENTS 
+							FROM
+							  ACT_WORKFLOW_LINE ct ,ACT_NODEALIAS_NODEID_REALITION i
+							  
+							WHERE ct.WORKFLOW_ID =#workflowId#
+							AND ct.WORKFLOW_ID=i.WORKFLOW_ID
+							AND ct.from_node_id=i.NODE_ID
+							  AND ct.TO_NODE_ID IN(SELECT from_node_id FROM  ACT_WORKFLOW_LINE WHERE TO_NODE_ID =#node_Id#  )
+							  
+							  UNION
+							SELECT 
+							 from_node_id NOW_NODE_ID,
+							  to_node_id NEXT_NODE_ID,
+							  i.node_name NODE_NAME,
+							  (SELECT 
+							    COUNT(1) 
+							  FROM
+							    ACT_WORKFLOW_LINE ct2 
+							  WHERE ct2.to_node_id = ct.FROM_NODE_ID 
+							    AND ct.WORKFLOW_ID = #workflowId# 
+							    AND ct2.WORKFLOW_ID = #workflowId#) PARENTS 
+							FROM
+							  ACT_WORKFLOW_LINE ct ,ACT_NODEALIAS_NODEID_REALITION i
+							WHERE ct.WORKFLOW_ID =#workflowId#
+							AND ct.WORKFLOW_ID=i.WORKFLOW_ID
+							AND ct.from_node_id=i.NODE_ID
+							     AND ct.from_node_id IN(SELECT MIN(from_node_id) FROM  ACT_WORKFLOW_LINE WHERE WORKFLOW_ID = #workflowId# )
+							     ) z
+							  GROUP BY NOW_NODE_ID 
+  								ORDER BY NOW_NODE_ID -->
+  				SELECT NOW_NODE_ID,NEXT_NODE_ID,NODE_NAME FROM (
+				SELECT ct.from_node_id NOW_NODE_ID,ct.to_node_id NEXT_NODE_ID FROM ACT_WORKFLOW_LINE ct
+				WHERE FIND_IN_SET(ct.to_node_id,getParentLst(#node_Id#)) AND  ct.WORKFLOW_ID=#workflowId#) AS cat,ACT_NODEALIAS_NODEID_REALITION i
+				WHERE cat.NOW_NODE_ID=i.NODE_ID
+				AND i.WORKFLOW_ID=#workflowId#
+				) t
+
+ </select>
+	  <select id="querynodesListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+					<!--SELECT NOW_NODE_ID, NEXT_NODE_ID,NODE_NAME FROM (
+						SELECT 
+							  from_node_id NOW_NODE_ID,
+							  to_node_id NEXT_NODE_ID,
+							  i.node_name NODE_NAME,
+							  (SELECT 
+							    COUNT(1) 
+							  FROM
+							    ACT_WORKFLOW_LINE ct2 
+							  WHERE ct2.to_node_id = ct.FROM_NODE_ID 							  
+							    AND ct.WORKFLOW_ID = #workflowId#
+							    AND ct2.WORKFLOW_ID = #workflowId#) PARENTS 
+							FROM
+							  ACT_WORKFLOW_LINE ct,ACT_NODEALIAS_NODEID_REALITION i 
+							WHERE ct.WORKFLOW_ID =#workflowId#
+							AND ct.WORKFLOW_ID=i.WORKFLOW_ID
+							AND ct.from_node_id=i.NODE_ID
+							  AND ct.TO_NODE_ID =#node_Id#
+							UNION
+							SELECT 
+							 from_node_id NOW_NODE_ID,
+							  to_node_id NEXT_NODE_ID,
+							  i.node_name NODE_NAME,
+							  (SELECT 
+							    COUNT(1) 
+							  FROM
+							    ACT_WORKFLOW_LINE ct2 
+							  WHERE ct2.to_node_id = ct.FROM_NODE_ID 
+							    AND ct.WORKFLOW_ID =#workflowId#
+							    AND ct2.WORKFLOW_ID =#workflowId#) PARENTS 
+							FROM
+							  ACT_WORKFLOW_LINE ct ,ACT_NODEALIAS_NODEID_REALITION i							  
+							WHERE ct.WORKFLOW_ID =#workflowId#
+							AND ct.WORKFLOW_ID=i.WORKFLOW_ID
+							AND ct.from_node_id=i.NODE_ID
+							  AND ct.TO_NODE_ID IN(SELECT from_node_id FROM  ACT_WORKFLOW_LINE WHERE TO_NODE_ID =#node_Id#  )							  
+							  UNION
+							SELECT 
+							 from_node_id NOW_NODE_ID,
+							  to_node_id NEXT_NODE_ID,
+							  i.node_name NODE_NAME,
+							  (SELECT 
+							    COUNT(1) 
+							  FROM
+							    ACT_WORKFLOW_LINE ct2 
+							  WHERE ct2.to_node_id = ct.FROM_NODE_ID 
+							    AND ct.WORKFLOW_ID = #workflowId# 
+							    AND ct2.WORKFLOW_ID = #workflowId#) PARENTS 
+							FROM
+							  ACT_WORKFLOW_LINE ct ,ACT_NODEALIAS_NODEID_REALITION i
+							WHERE ct.WORKFLOW_ID =#workflowId#
+							AND ct.WORKFLOW_ID=i.WORKFLOW_ID
+							AND ct.from_node_id=i.NODE_ID
+							     AND ct.from_node_id IN(SELECT MIN(from_node_id) FROM  ACT_WORKFLOW_LINE WHERE WORKFLOW_ID = #workflowId# )
+								 ) t 
+							  GROUP BY NOW_NODE_ID 
+							  ORDER BY NOW_NODE_ID -->
+			SELECT NOW_NODE_ID,NEXT_NODE_ID,NODE_NAME FROM (
+			SELECT ct.from_node_id NOW_NODE_ID,ct.to_node_id NEXT_NODE_ID FROM ACT_WORKFLOW_LINE ct
+			WHERE FIND_IN_SET(ct.to_node_id,getParentLst(#node_Id#)) AND  ct.WORKFLOW_ID=#workflowId#) AS cat,ACT_NODEALIAS_NODEID_REALITION i
+			WHERE cat.NOW_NODE_ID=i.NODE_ID
+			AND i.WORKFLOW_ID=#workflowId#					
+			<isNotEmpty prepend="" property="pageSize">
+			limit $limit$,$pageSize$
+		</isNotEmpty>
+ </select>
+ 	<!-- 查询动态节点授权人信息 -->
+	<select id="getWorkflowTrendsNodeIdAuthorStaffInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  WA.ERA_OPERATOR_ID,
+			  WA.ERA_OPERATOR_NAME,
+			  WA.ERA_OPERATOR_DEPTID,
+			  WA.ERA_OPERATOR_DEPTNAME
+			FROM
+			  ACT_WORKFLOW_AUTHORITY WA 
+			WHERE WA.WORKFLOW_ID = #workflowId#  
+			  AND WA.AUTHOR_STAFFID IN (#trendNodeStaff#)
+			  AND WA.AUTHOR_STATUS = 0
+			  AND WA.AUTHORITY_START_TIME  <![CDATA[<]]>  NOW() 
+			  AND WA.AUTHORITY_END_TIME  <![CDATA[>]]> NOW()
+	</select>
+	<!--查询虚拟部门 -->
+	<select id="searchClockDeptInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  DEPT_TYPE_ID,
+			  DEPT_TYPE_NAME 
+			FROM
+			  ACT_WORKFLOW_DEPT_TYPE_CLOCK 
+			WHERE dept_level = #disType#
+			and latn_id in (SELECT REGION_ID FROM sys_staff ss WHERE STAFF_ID=#staff_id#)
+			GROUP BY dept_type_id
+	</select>
+	<!-- 查询岗位 -->
+	<select id="searchDeptTypeId" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT * FROM (
+			SELECT 
+			  WPI.POST_ID,
+			  WPI.POST_NAME,
+			  WDTC.DEPT_LEVEL,
+			  WDTC.DEPT_TYPE_ID,
+			  WDTC.DEPT_TYPE_NAME
+			FROM
+			  ACT_WORKFLOW_POST_INFO WPI,
+			  ACT_WORKFLOW_DEPT_TYPE_CLOCK WDTC 
+			WHERE WDTC.POST_ID = WPI.POST_ID 
+			      AND WDTC.DEPT_TYPE_ID =#dept_type_Id#
+			      AND WDTC.DEPT_LEVEL = #disType#) A WHERE 1=1
+		<isNotEmpty prepend="" property="pageSize">
+			limit $limit$,$pageSize$
+		</isNotEmpty>
+	</select>
+	<!-- 查询处理人总数 -->
+	<select id="searchDeptTypeIdCount" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+		SELECT COUNT(1) FROM (
+		   SELECT 
+			  WPI.POST_ID,
+			  WPI.POST_NAME,
+			  WDTC.DEPT_LEVEL,
+			  WDTC.DEPT_TYPE_ID,
+			  WDTC.DEPT_TYPE_NAME
+			FROM
+			  ACT_WORKFLOW_POST_INFO WPI,
+			  ACT_WORKFLOW_DEPT_TYPE_CLOCK WDTC 
+			WHERE WDTC.POST_ID = WPI.POST_ID 
+			      AND WDTC.DEPT_TYPE_ID =#dept_type_Id#
+			      AND WDTC.DEPT_LEVEL = #disType#
+		)B
+	</select>
+	<!--发起查询动态节点处理人（虚拟部门） -->
+	<select id="qrySumitLeadIdByDisDept" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		<isEqual property="flag" compareValue="0">
+		 		SELECT 
+			    SS.STAFF_NAME,
+			    SS.STAFF_ID,
+			    AWNI.DEPT_NAME,
+			    AWNI.DEPT_ID
+			FROM
+			<isEqual property="dept_level" compareValue="5">
+			  SYS_STAFF SS,
+			  ACT_WORKFLOW_DEPT_INFO AWNI
+			  where SS.dept_id=AWNI.DEPT_ID
+			  and SS.staff_id=(
+			  select dept_leader_id from ACT_WORKFLOW_DEPT_INFO AWDI,SYS_STAFF ST
+			  where AWDI.DEPT_ID=ST.dept_id
+			  and ST.staff_id=#staff_id#
+			  )
+			</isEqual>
+			<isNotEqual property="dept_level" compareValue="5">
+			 ACT_WORKFLOW_POST_STAFF AWPS,
+			  SYS_STAFF SS,
+			  ACT_WORKFLOW_DEPT_INFO AWNI
+			WHERE  SS.STAFF_ID = AWPS.POST_STAFF_ID
+			AND AWNI.DEPT_ID = AWPS.POST_DEPT_ID
+			AND AWPS.POST_WORKFLOW_TYPE = #workFlowTypeCode#
+			AND AWPS.POST_ID = #post_id#
+			AND AWPS.POST_DEPT_ID = 
+			</isNotEqual>
+			<isEqual property="dept_level" compareValue="1">
+				(SELECT 
+				  DEPT_ID 
+				FROM
+				  ACT_WORKFLOW_DEPT_INFO 
+				WHERE 
+				
+					DEPT_LEVEL = #dept_level# 
+					AND DEPT_TYPE_ID = #dept_type_id#)			
+				</isEqual>
+				<isEqual property="dept_level" compareValue="2">
+				(SELECT 
+				  DEPT_ID 
+				FROM
+				  ACT_WORKFLOW_DEPT_INFO 
+				WHERE
+					AREA_ID = 
+						  (SELECT 
+						    AREA_ID 
+						  FROM
+						    ACT_WORKFLOW_DEPT_INFO 
+						  WHERE DEPT_ID = 
+						    (SELECT 
+						      DEPT_ID 
+						    FROM
+						      SYS_STAFF 
+						    WHERE STAFF_ID = #staff_id#)) 
+						  AND DEPT_LEVEL = #dept_level# 
+						  AND DEPT_TYPE_ID = #dept_type_id#)
+				</isEqual>
+				<isEqual property="dept_level" compareValue="3">
+				(SELECT 
+				  DEPT_ID 
+				FROM SYS_STAFF st
+				where st.STAFF_ID=#staff_id#)
+				</isEqual>
+		</isEqual>
+		<isEqual property="flag" compareValue="1">
+			SELECT 
+				   SS.STAFF_NAME,
+				   SS.STAFF_ID,
+				   AWNI.DEPT_NAME,
+				   AWNI.DEPT_ID
+				FROM
+			<isEqual property="dept_level" compareValue="5">
+			  SYS_STAFF SS,
+			  ACT_WORKFLOW_DEPT_INFO AWNI
+			  where SS.dept_id=AWNI.DEPT_ID
+			  and SS.staff_id=(
+			  select dept_leader_id from ACT_WORKFLOW_DEPT_INFO AWDI
+			  where AWDI.dept_id=(SELECT 
+						      DEPT_ID 
+						    FROM
+						      SYS_STAFF 
+						    WHERE STAFF_ID IN (SELECT 
+							  OPERATOR_ID 
+							FROM
+							   ACT_DEMAND_TASK   
+							WHERE WORKFLOW_ID = #workflowId# 
+							  AND DEMAND_ID = #demandId# 
+							  AND NODE_ID = #selectNodeId#))
+			  )
+			</isEqual>
+			<isNotEqual property="dept_level" compareValue="5">
+				  ACT_WORKFLOW_POST_STAFF AWPS,
+				  SYS_STAFF SS,
+				  ACT_WORKFLOW_DEPT_INFO AWNI,
+  				  ACT_PROCESS_NODE_EXAMPLE APNE
+				WHERE  SS.STAFF_ID = AWPS.POST_STAFF_ID
+				AND AWNI.DEPT_ID = AWPS.POST_DEPT_ID
+				AND AWPS.POST_ID =APNE.POST_ID
+				AND APNE.WORKFLOW_ID= #workflowId#
+				AND APNE.NODE_ID in (#nodeId#) 
+				AND AWPS.POST_WORKFLOW_TYPE = #workFlowTypeCode#
+				AND AWPS.POST_DEPT_ID = 
+			</isNotEqual> 
+				<isEqual property="dept_level" compareValue="1">
+					(SELECT 
+					  DEPT_ID 
+					FROM
+					  ACT_WORKFLOW_DEPT_INFO 
+					WHERE
+					DEPT_LEVEL = #dept_level# 
+					AND DEPT_TYPE_ID = #dept_type_id#)			
+				</isEqual>
+				<isEqual property="dept_level" compareValue="2">
+					(SELECT 
+					  DEPT_ID 
+					FROM
+					  ACT_WORKFLOW_DEPT_INFO 
+					WHERE
+					AREA_ID = 
+						  (SELECT 
+						    AREA_ID 
+						  FROM
+						    ACT_WORKFLOW_DEPT_INFO 
+						  WHERE DEPT_ID = 
+						    (SELECT 
+						      DEPT_ID 
+						    FROM
+						      SYS_STAFF 
+						    WHERE STAFF_ID IN (SELECT 
+							  OPERATOR_ID 
+							FROM
+							   ACT_DEMAND_TASK   
+							WHERE WORKFLOW_ID = #workflowId# 
+							  AND DEMAND_ID = #demandId# 
+							  AND NODE_ID = #selectNodeId#))) 
+						  AND DEPT_LEVEL = #dept_level# 
+						  AND DEPT_TYPE_ID = #dept_type_id#)
+				</isEqual>
+				<isEqual property="dept_level" compareValue="3">
+				(SELECT 
+				  DEPT_ID 
+				FROM SYS_STAFF st
+				where st.STAFF_ID=(SELECT 
+							  OPERATOR_ID 
+							FROM
+							   ACT_DEMAND_TASK   
+							WHERE WORKFLOW_ID = #workflowId# 
+							  AND DEMAND_ID = #demandId# 
+							  AND NODE_ID = #selectNodeId#))
+				</isEqual>
+		</isEqual>
+	</select>
+	<!--查询节点实例虚拟部门及岗位-->
+	<select id="qrySumitLeadIdByDisDeptInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT NODE_ID,POST_ID,DEPT_TYPE_ID,DEPT_LEVEL,SELECTNODE_ID FROM  ACT_PROCESS_NODE_EXAMPLE WHERE workflow_id = #workflowId# AND node_id IN(#nodeId#)
+	</select>
+	<!--打回发起节点-->
+	<insert id="toStartWorkflowneed" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_DEMAND_TASK
+		(
+		DEMAND_ID,
+		WORKFLOW_ID,
+		NODE_ID,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		OPERATOR_DEPT_ID,
+		OPERATOR_DEPT,
+		ERA_OPERATOR_ID,
+		ERA_OPERATOR_NAME,
+		ERA_OPERATOR_DEPT_ID,
+		ERA_OPERATOR_DEPT,
+		CREATE_TIME,
+		START_TIME,
+		END_TIME,
+		TASK_TYPE,
+		URGE_COUNT,
+		TASK_STATUS,
+		REPULSE_TYPE
+		)
+		VALUES
+		(
+		#demandId#,
+		#workflowId#,
+		#node2#,
+		#chulirenid2#,
+		#chulirenname2#,
+		#chulideptid2#,
+		#chulideptname2#,
+		#ear_chulirenid2#,
+		#ear_chulirenname2#,
+		#ear_chulideptid2#,
+		#ear_chulideptname2#,
+		NOW(),
+		NOW(),
+		DATE_FORMAT(#endtime2#, "%Y-%m-%d %T"),
+		#questtype#,
+		'0',
+		'1',
+		'1')
+	</insert>
+	<update id="updateWorkflowneed1" parameterClass="java.util.HashMap">
+		UPDATE 
+		  ACT_DEMAND_INFO 
+		SET
+		  DEMAND_NAME = #demandName#,
+		  DEMAND_DESC = #demandDesc#,
+		  OVER_TIME = #isNotTime#,
+		  DCREATE_TIME = NOW(),
+		  BEGIN_TIME = NOW()
+		WHERE DEMAND_ID = #demandId# 
+		      AND WORKFLOW_ID =#workflowId#
+	</update>
+	<update id="updateWorkflowDemandTemplateData" parameterClass="java.util.HashMap">
+		UPDATE 
+		  ACT_DEMAND_TEMPLATE_DATA 
+		SET
+		  ATTR_ID = #attrId#,
+		  ATTR_NAME = #attrName#,
+		  ATTR_ONAME = #attrOname#,
+		  ATTR_VALUE = #attrValue#,
+		  CREATE_DATETIME = NOW()
+		WHERE TEMPLATE_ID = #templateId# 
+		      AND DEMAND_ID =#demandId# 
+	</update>
+		<!-- 文件删除 -->
+	<delete id="dealFileInfos" parameterClass="java.util.HashMap">
+		DELETE FROM tb_cpc_attachment 
+		WHERE  OTHER_ATTACHMENT_NAME = #other_attachment_name# AND attachment_type = #attachment_type#
+		<isEqual property="attachment_type" compareValue="shortProcess">
+		  and attachment_value = #attachment_value# 
+		  </isEqual>
+		  <isEqual property="attachment_type" compareValue="workFlow">
+		  and workflowId = #workflowId# 
+		  </isEqual>
+	</delete>
+		<!--查询发起人部门-->
+	<select id="qryshortProcessDeptInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT s.dept_name FROM SYS_STAFF S WHERE S.STAFF_ID = #staff_id#
+	</select>
+	<!--查询发起人部门（区分区县局）  -->
+	<select id="queryStarPerDeptment" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT d.dept_id,d.dept_name,d.area_id,d.area_name,d.dept_level FROM act_workflow_dept_info d WHERE dept_id=(SELECT dept_id FROM sys_staff WHERE staff_id=#staffId#)
+	</select>
+	<!-- 查询上传文件序列 -->
+	<select id="qry_FileInfoId" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		SELECT nextval('seq_picture_id') AS picture_id FROM dual_test
+	</select>
+	<!--查询单选规则信息 -->
+	<select id="queryWorkflowRadioInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT * FROM act_workflow_radio_info WHERE latn_id = 888 OR latn_id = #latn_Id#
+	</select>
+	<!-- 校验节点线是否已选择单选规则 -->
+	<select id="checkWorkFlowRadioInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT * FROM ACT_WORKFLOW_RADIO_LINE WHERE line_id = #currentNodeId# AND radio_Content_Id = #radio_Content_Id#
+	</select>
+	<!-- 查询上节点单选规则ID及属性 -->
+	<select id="getWorkFlowRadioInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  WRI.RADIO_NAME,
+			  WRI.RADIO_ID,
+			  WRC.CONTENT_ID,
+			  WRC.CONTENT_VALUE,
+			  WRC.CONTENT_NAME 
+			FROM
+			  ACT_WORKFLOW_RADIO_INFO WRI,
+			  ACT_WORKFLOW_RADIO_CONTENT WRC
+			WHERE WRI.RADIO_ID = 
+			  (SELECT 
+			    RADIO_ID 
+			  FROM
+			    ACT_PROCESS_NODE_EXAMPLE 
+			  WHERE NODE_ID = 
+			    (SELECT 
+			      WL.FROM_NODE_ID 
+			    FROM
+			      ACT_WORKFLOW_LINE WL 
+			    WHERE WL.LINE_ID = #currentNodeId# 
+			      AND WL.WORKFLOW_ID = #workflowId#)) 
+			  AND WRC.RADIO_ID = WRI.RADIO_ID
+	</select>
+	<!-- 查询上节点单选规则ID及属性 -->
+	<select id="getWorkFlowRadioInfo1" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  WRI.RADIO_NAME,
+			  WRI.RADIO_ID,
+			  WRC.CONTENT_ID,
+			  WRC.CONTENT_VALUE,
+			  WRC.CONTENT_NAME 
+			FROM
+			  ACT_WORKFLOW_RADIO_INFO WRI,
+			  ACT_WORKFLOW_RADIO_CONTENT WRC,
+  			  ACT_WORKFLOW_RADIO_LINE wrl  
+			WHERE WRL.RADIO_ID = WRI.RADIO_ID
+				  AND WRC.RADIO_ID = WRI.RADIO_ID 
+				  AND WRC.CONTENT_ID = WRL.RADIO_CONTENT_ID
+				  AND WRL.WORKFLOWID = #workflowId#
+	</select>
+	<!-- 保存单选规则与节点线关系-->
+	<insert id="addRadioLineInfo" parameterClass="java.util.HashMap">
+		INSERT INTO
+		ACT_WORKFLOW_RADIO_LINE
+		(
+		 workflowId,
+		 radio_Content,
+		 radio_ID,
+		 radio_Content_Id,
+		 line_Id,
+		 nowNodeId,
+		 nextNodeId
+		)
+		VALUES
+		(#workflowId#,
+		 #radio_Content_Value#,
+		 #radio_Id#,
+		 #radio_Content_Id#,
+		 #line_id#,
+		 #nowNodeId#,
+		 #nextNodeId#
+		)
+	</insert>
+	<!--修改单选规则与节点线关系 -->
+	<update id="updateRadioLineInfo" parameterClass="java.util.HashMap">
+			UPDATE 
+			  ACT_WORKFLOW_RADIO_LINE FL 
+			SET
+			  FL.radio_Content=#radio_Content_Value#,
+			  FL.radio_ID=#radio_Id#,
+			  FL.radio_Content_Id=#radio_Content_Id#
+			WHERE FL.workflowId = #workflowId# 
+			AND  FL.line_Id = #LineId#
+	</update>
+	<!--显示单选规则与节点线关系 -->
+	<select id="queryRadioLineInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  WRI.RADIO_NAME,
+			  WRC.CONTENT_ID,
+			  WRC.CONTENT_NAME 
+			FROM
+			  ACT_WORKFLOW_RADIO_LINE WRL,
+			  ACT_WORKFLOW_RADIO_INFO WRI,
+			  ACT_WORKFLOW_RADIO_CONTENT WRC 
+			WHERE WRC.RADIO_ID = WRI.RADIO_ID 
+			  AND WRL.RADIO_ID = WRI.RADIO_ID 
+			  AND WRL.RADIO_CONTENT_ID = WRC.CONTENT_ID 
+			  <isNotEmpty property="LineId">
+			   AND WRL.LINE_ID = #LineId#
+			  </isNotEmpty>
+			  
+  			  AND WRL.workflowId = #workflowId#
+	</select>
+	<!--获取单选规则属性模板 -->
+	<select id="qrySelectedRadioInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  WRI.RADIO_NAME,
+			  WRI.RADIO_ID,
+			  WRC.CONTENT_NAME,
+			  WRC.CONTENT_VALUE,
+			  WRC.CONTENT_ID 
+			FROM
+			  ACT_PROCESS_NODE_EXAMPLE S,
+			  ACT_WORKFLOW_RADIO_INFO WRI,
+			  ACT_WORKFLOW_RADIO_CONTENT WRC 
+			WHERE S.NODE_ID =#nodeId#
+				  AND S.RADIO_ID = WRI.RADIO_ID 
+  				  AND S.RADIO_ID = WRC.RADIO_ID 
+	</select>
+	<!--获取单选规则事件信息-->
+	<select id="qrySelectedRadioInfoDispose" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  WRL.NEXTNODEID,
+		  APNE.NODE_EXECUTOR_ID,
+		  APNE.NODE_EXECUTOR,
+		  APNE.NODE_EXECUTE_DEPART_ID,
+		  APNE.NODE_EXECUTE_DEPART,
+		  APNE.NODE_EXECUTORTEL
+		FROM
+		  ACT_WORKFLOW_RADIO_LINE WRL,
+		  ACT_PROCESS_NODE_EXAMPLE APNE
+		WHERE WRL.NOWNODEID = #nodeId# 
+		  AND WRL.WORKFLOWID = #workflowId# 
+		  AND WRL.RADIO_CONTENT_ID = #radioContentId#
+		  AND APNE.NODE_ID = WRL.NEXTNODEID 
+	</select>
+	<!-- 发短信 -->
+	<select id="qrySmsStaffMobTel" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT S.MOB_TEL , S.LOGIN_CODE FROM SYS_STAFF S WHERE 			  
+		<isNotEmpty property="chulirenid2">
+			  S.STAFF_ID = #chulirenid2#
+		</isNotEmpty>
+		<isNotEmpty property="ear_operator_Id">
+			  S.STAFF_ID = #ear_operator_Id#
+		</isNotEmpty>
+	</select>
+	<!--当前处理人的部门信息  -->
+	<select id="qryRealDeptLevel" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    select d.dept_id,d.dept_name,d.dept_level,d.dept_type_id
+	     from act_workflow_dept_info d
+	    <isEqual property="flag" compareValue="0"> 
+	    where d.dept_id in (select dept_id from sys_staff where staff_id=#staff_id#)
+	    </isEqual>
+	    <isEqual property="flag" compareValue="1">
+	    where d.dept_id in 
+	    (SELECT 
+				  DEPT_ID 
+				FROM SYS_STAFF st
+				where st.STAFF_ID=(SELECT 
+							  OPERATOR_ID 
+							FROM
+							   ACT_DEMAND_TASK   
+							WHERE WORKFLOW_ID = #workflowId# 
+							  AND DEMAND_ID = #demandId# 
+							  AND NODE_ID = #selectNodeId#))
+	    
+	    </isEqual>
+	</select>
+	<!--插入打印流水号信息  -->
+	<insert id="addPrintDemandInfo" parameterClass="java.util.HashMap">
+	insert into print_demand_warter(pwater_seq,demand_id,staff_id,create_date)
+	values(#waterSeq#,#demandId#,#staffId#,NOW())
+	</insert>
+	<!--插入下载水印文件人信息  -->
+	<insert id="insertDownWatermarkFileInfo" parameterClass="java.util.HashMap">
+	insert into act_workflow_downfile_log(downFileStaffId,downFileStaffName,downFilePath,downFileName,downFileDate)
+	values(#staff_Id#,#staff_Name#,#attachment_path#,#attachment_name#,NOW())
+	</insert>
+	<!--更新任务状态作废  -->
+	<!--更新流程工单状态 作废  -->
+	<update id="cancleWorkflowDemandInfo" parameterClass="java.util.HashMap">
+	    UPDATE
+		ACT_DEMAND_INFO SET demand_status='1003'
+		WHERE DEMAND_ID= #demandId#
+	</update>
+	<!--发起人申请作废对任务表操作  -->
+	<insert id="insertCancleWorkflow" parameterClass="java.util.HashMap">
+	INSERT INTO
+		ACT_DEMAND_TASK
+		(
+		DEMAND_ID,
+		WORKFLOW_ID,
+		NODE_ID,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		OPERATOR_DEPT_ID,
+		OPERATOR_DEPT,
+		CREATE_TIME,
+		START_TIME,
+		END_TIME,
+		TASK_TYPE,
+		URGE_COUNT,
+		TASK_STATUS
+		)(
+		select
+		#demandId#,
+		#workflowId#,
+		NODE_ID,
+		OPERATOR_ID,
+		OPERATOR_NAME,
+		OPERATOR_DEPT_ID,
+		OPERATOR_DEPT,
+		NOW(),
+		NOW(),
+		NOW(),
+		TASK_TYPE,
+		'0',
+		'0'
+		from ACT_DEMAND_TASK t
+		where t.task_id=(select min(task_id) from ACT_DEMAND_TASK
+		where DEMAND_ID=#demandId# and WORKFLOW_ID=#workflowId#
+		and OPERATOR_ID=#start_staff_id#)
+		)
+	</insert>
+	<insert id="insertCancleWorkflowLog" parameterClass="java.util.HashMap">
+	INSERT INTO ACT_DEMAND_TASK_LOG (
+	    TASK_LOG_ID,
+		TASK_ID,
+		WORKFLOW_ID,
+		DEMAND_ID,
+		APPROVAL_TIME,
+		OPERATION,
+		OPERATION_INFO,
+		SUBMIT_ID,
+		SUBMIT_NAME,
+		NODE_ID,
+		NODE_EXECUTE_DEPART,
+		CREATE_TIME,
+		URGE_COUNT,
+		URGE_TIME
+		)
+		(SELECT
+		#taskLogId#,
+		TASK_ID AS TASK_ID,
+		WORKFLOW_ID AS WORKFLOW_ID,
+		DEMAND_ID AS DEMAND_ID,
+		NOW()
+		APPROVAL_TIME,
+		'toCancle' AS OPERATION,
+		#reason_info# as OPERATION_INFO,
+		OPERATOR_ID AS SUBMIT_ID,
+		OPERATOR_NAME AS SUBMIT_NAME,
+		NODE_ID AS NODE_ID,
+		OPERATOR_DEPT AS NODE_EXECUTE_DEPART,
+		NOW() CREATE_TIME,
+		URGE_COUNT,
+		URGE_TIME
+		FROM
+		ACT_DEMAND_TASK t
+		WHERE t.task_id=(select max(task_id) from ACT_DEMAND_TASK
+		where DEMAND_ID=#demandId# and WORKFLOW_ID=#workflowId#
+		and OPERATOR_ID=#start_staff_id#)
+		)
+	</insert>
+	<!--发起人作废流程时将其他未处理的任务都作废  -->
+	<update id="updateWorkflowCancle" parameterClass="java.util.HashMap">
+	update ACT_DEMAND_TASK set TASK_STATUS=2 where DEMAND_ID=#demandId#
+	and WORKFLOW_ID=#workflowId# and TASK_STATUS=1
+	</update>
+	<!--查询附件信息  -->
+	<select id="queryAttachmentFile" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT attachment_name,attachment_path,other_attachment_name,attachment_value FROM tb_cpc_attachment 
+	WHERE attachment_value=#demandId# AND attachment_type=#attachment_type#
+	</select>
+	<!-- 查询taskLogId -->
+	<select id="queryTaskLogId"  resultClass="java.util.HashMap">
+		SELECT nextval('seq_task_log_id') AS TASK_LOG_ID FROM dual_test
+	</select>
+	<!--根据taskLogId查询附件列表信息  -->
+	<select id="queryFileForTaskLog" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	SELECT 
+		  attachment_name,
+		  attachment_path,
+		  attachment_type,
+		  attachment_value,
+		  OTHER_ATTACHMENT_NAME,
+		  create_time,
+		  upload_person,
+		  upload_person_name 
+		FROM
+		  tb_cpc_attachment 
+		WHERE attachment_value = #demandId# 
+		  AND task_log_id = #taskLogId#
+		  and attachment_type='shortProcess'
+	</select>
+	<!--查询护照申领页面的公共下拉信息  -->
+	<select id="queryComonType" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	select type_id,type_name,value from act_certificate_handle_type
+	where type_id=#type#
+	</select>
+	<!--护照申领流程中查询下一节点处理人和处理部门  -->
+	<select id="qryDocumentNextPerson" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	SELECT 
+		   SS.STAFF_NAME,
+		   SS.STAFF_ID,
+		   AWNI.DEPT_NAME,
+		   AWNI.DEPT_ID
+		FROM
+		act_workflow_dept_info AWNI,
+	    sys_staff SS,
+	    act_workflow_post_staff AWPS
+	    where AWNI.dept_id=AWPS.post_dept_id
+	    and AWPS.post_staff_id=SS.staff_id
+	    and AWPS.post_id=#post_id#
+	<isEqual property="flag" compareValue="0">
+	    and AWPS.post_dept_id in
+	    (select post_dept_id from act_workflow_post_staff where post_staff_id=#staff_id#)
+	</isEqual>
+	<isEqual property="flag" compareValue="1">
+	   and AWPS.post_dept_id=#dept_id#
+	</isEqual>
+	</select>
+	<!--护照申领流程发起和处理页面得到当前节点信息  -->
+	<select id="qryDocumentCurrenNode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	select node_id,node_name,node_level,dept_id,post_id,flow_id
+	from tb_leave_flow_node where flow_id=1101 and node_level=#node_level#
+	</select>
+	<!--生成queryDocApplyId  -->
+	<select id="queryDocApplyId"  resultClass="java.util.HashMap">
+		SELECT nextval('seq_docpaper_apply_id') AS documentApplyId FROM dual_test
+	</select>
+</sqlMap>

@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="taskBook">
+   	<!-- 专业系统列表查询 总页数-->
+	<select id="qry_task_book_sum" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT 
+	       COUNT( DISTINCT t.task_code) AS COUNT 
+	    FROM
+	    	task_book_info t 
+			  LEFT JOIN tb_pty_grid_tree g
+			  ON t.`obu_id`=g.`TREE_ID`
+			  LEFT JOIN task_book_flow_record f 
+			  ON t.`curr_record_id`=f.`record_id`
+			  AND f.`record_status`=0
+			  LEFT JOIN tb_cpc_dic d
+			  ON t.`task_type`=d.`dic_code` 
+			  AND d.`dic_type`='taskBookType'
+			   where 1=1
+			  <isNotEmpty  prepend="AND" property="obuTreeLevel">
+			     <isEqual property="obuTreeLevel" compareValue="2">
+			         t.latn_id=#latnId#
+			     </isEqual>
+			     <isEqual property="obuTreeLevel" compareValue="3">
+			         g.p_tree_id=#obuTreeId#
+			         or t.obu_id=#obuTreeId#
+			     </isEqual>
+			     <isEqual property="obuTreeLevel" compareValue="4">
+			         t.obu_id=#obuTreeId#
+			     </isEqual>
+			  </isNotEmpty>
+			   <isNotEmpty prepend="AND" property="optId">
+			   f.opt_id=#optId#
+			  </isNotEmpty>
+			  <isNotEmpty prepend="AND" property="curr_node_id" >
+		         f.curr_node_id=#curr_node_id#
+	          </isNotEmpty>
+			  <isNotEmpty prepend = "AND" property = "year" >
+			        DATE_FORMAT(t.create_time, '%Y')=#year#
+			  </isNotEmpty > 
+			  <isNotEmpty prepend = "AND" property = "bookType" > 
+				t.task_type = #bookType#
+			  </isNotEmpty >
+			  <isNotEmpty prepend="AND" property="bookState" >
+		         f.curr_node_id=#bookState#
+	          </isNotEmpty>
+	         <isNotEmpty prepend="AND" property="OBUName" >
+		         g.tree_name like concat('%', #OBUName#, '%')
+          	  </isNotEmpty>
+			  <isNotEmpty prepend = "AND" property = "contractorName" > 
+			    t.promoters_name like concat('%',#contractorName#,'%')
+			  </isNotEmpty > 
+	</select>
+	
+	
+	<!-- 专业系统列表查询 分页数据 -->
+	<select id="qry_task_book_list" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+			SELECT 
+			  t.`task_code`,
+			  t.`obu_id`,
+			  g.tree_name obu_name,
+			  t.`promoters_id`,
+			  t.`promoters_name`,
+			  t.`mob_tel`,
+			  t.`task_type`,
+			  d.`dic_value` task_type_name,
+			  t.`curr_record_id`,
+			  f.`curr_node_id`,
+			  f.`curr_node_name`
+			FROM
+			  task_book_info t 
+			  LEFT JOIN tb_pty_grid_tree g
+			  ON t.`obu_id`=g.`TREE_ID`
+			  LEFT JOIN task_book_flow_record f 
+			  ON t.`curr_record_id`=f.`record_id`
+			  AND f.`record_status`=0
+			  LEFT JOIN tb_cpc_dic d
+			  ON t.`task_type`=d.`dic_code` 
+			  AND d.`dic_type`='taskBookType'
+			   where 1=1
+			  <isNotEmpty  prepend="AND" property="obuTreeLevel">
+			     <isEqual property="obuTreeLevel" compareValue="2">
+			         t.latn_id=#latnId#
+			     </isEqual>
+			     <isEqual property="obuTreeLevel" compareValue="3">
+			         g.p_tree_id=#obuTreeId#
+			         or t.obu_id=#obuTreeId#
+			     </isEqual>
+			     <isEqual property="obuTreeLevel" compareValue="4">
+			         t.obu_id=#obuTreeId#
+			     </isEqual>
+			  </isNotEmpty>
+			   <isNotEmpty prepend="AND" property="optId">
+			   f.opt_id=#optId#
+			  </isNotEmpty>
+			  <isNotEmpty prepend="AND" property="curr_node_id" >
+		         f.curr_node_id=#curr_node_id#
+	          </isNotEmpty>
+			  <isNotEmpty prepend = "AND" property = "year" >
+			        DATE_FORMAT(t.create_time, '%Y')=#year#
+			  </isNotEmpty > 
+			  <isNotEmpty prepend = "AND" property = "bookType" > 
+				t.task_type = #bookType#
+			  </isNotEmpty >
+			  <isNotEmpty prepend="AND" property="bookState" >
+		         f.curr_node_id=#bookState#
+	          </isNotEmpty>
+	          <isNotEmpty prepend="AND" property="OBUName" >
+		         g.tree_name like concat('%', #OBUName#, '%')
+          	  </isNotEmpty>
+			  <isNotEmpty prepend = "AND" property = "contractorName" > 
+			    t.promoters_name like concat('%',#contractorName#,'%')
+			  </isNotEmpty > 
+            <isNotEmpty prepend="" property="pagesize" >
+	         limit $page_num$,$pagesize$
+          </isNotEmpty>
+	</select>
+	<!-- 查询流程记录id -->
+	<select id="qry_task_record_id" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+	     SELECT nextval('seq_task_record_id') FROM dual_test
+	</select>
+	<!-- 修改责任书信息表 -->
+	<update id="update_task_info" parameterClass="java.util.HashMap">
+	  update task_book_info set curr_record_id=#curr_record_id#
+	  <isNotEmpty prepend="," property="createTime">
+	   create_time=#createTime#
+	  </isNotEmpty>
+	  where task_code=#taskCode#
+	</update>
+	<!-- 查询节点信息 -->
+	<select id="qry_node_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		   SELECT n.flow_id,n.node_id,n.node_name,n.node_level,n.group_id FROM tb_cpc_flow_node n WHERE 1=1
+		   <isNotEmpty prepend="AND" property="flow_id" >
+	          n.flow_id=#flow_id#
+          </isNotEmpty>
+	</select>
+	<!-- 查询审批人 -->
+	<select id="qry_opt_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	   SELECT 
+		  c.`first_opt_id`,
+		  c.`first_opt_name`,
+		  c.`second_opt_id`,
+		  c.`second_opt_name`
+		FROM
+		  task_sys_config c, 
+		  tb_pty_grid_tree t 
+		  WHERE CONVERT(c.`district_id` USING utf8) = CONVERT(t.`P_TREE_ID` USING utf8) 
+		  AND t.`TREE_ID` = #obu_id#
+	</select>
+	<!-- 保存流程信息 -->
+	<insert id="save_task_record"  parameterClass="java.util.HashMap">
+	INSERT INTO task_book_flow_record (
+	  record_id,
+	  curr_node_id,
+	  curr_node_name,
+	  opt_id,
+	  opt_name,
+	  opt_time,
+	  mob_tel,
+	  next_node_id,
+	  next_node_name,
+	  time_count,
+	  urge_count,
+	  busi_id,
+	  opt_desc,
+	  record_status,
+	  on_record_id
+	)values(
+		#record_id#,
+		#curr_node_id#,
+		#curr_node_name#,
+		#opt_id#,
+		#opt_name#,
+		#opt_time#,
+		#mob_tel#,
+		#next_node_id#,
+		#next_node_name#,
+		#time_count#,
+		#urge_count#,
+		#busi_id#,
+		#opt_desc#,
+		#record_status#,
+		#on_record_id#
+	)
+  
+	</insert>
+	<!-- 查询责任书详情 -->
+	<select id="qry_task_book_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT 
+	  t.`obu_id`,
+	  t.`promoters_id`,
+	  t.`promoters_name`,
+	  t.`mob_tel`,
+	  t.`task_code`,
+	  t.`task_type`,
+	  d.`dic_value` task_type_name,
+	  t.`curr_record_id`,
+	  t.`create_time` 
+	FROM
+	  task_book_info t
+	   LEFT JOIN tb_cpc_dic d
+       ON t.`task_type`=d.`dic_code` 
+	   AND d.`dic_type`='taskBookType' 
+	WHERE t.`task_code` = #taskCode#
+	</select>
+	<!-- 查询责任书流程信息 -->
+	<select id="qry_task_book_record" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT 
+		t.record_id,
+		t.curr_node_id,
+		t.curr_node_name,
+		t.opt_id,
+		t.opt_name,
+		DATE_FORMAT(t.opt_time,"%Y-%m-%d %T") as opt_time,
+		t.mob_tel,
+		t.next_node_id,
+		t.next_node_name,
+		t.time_count,
+		t.busi_id,
+		t.opt_desc,
+		t.record_status,
+		t.fun_id,
+		t.on_record_id,
+		f.`fun_name`
+		 FROM task_book_flow_record t
+		 LEFT JOIN tb_cpc_sys_fun f
+		 ON t.`fun_id`=f.`fun_id`
+	 WHERE t.`busi_id` = #taskCode#
+	 order by t.record_id
+	</select>
+	<select id="qry_node_by_funId" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT 
+		  r.flow_id,
+		  n.node_id,
+		  n.node_level,
+		  n.node_name,
+		  r.fun_id
+		FROM
+		  tb_cpc_flow_f_rel r 
+		  LEFT JOIN tb_cpc_flow_node n 
+		    ON r.node_id = n.node_id
+		 WHERE r.fun_id = #fun_id#
+		 group by n.node_id
+	</select>
+	<update id="updateFlowRecord" parameterClass="java.util.HashMap">
+		update task_book_flow_record 
+			SET 
+			<iterate  property="updateColSet" conjunction=",">
+			    $updateColSet[].col_name$ = #updateColSet[].col_value# 
+			</iterate>
+			WHERE  1=1 
+		   <isNotEmpty property="record_id" prepend="AND">  
+                <![CDATA[  
+                    record_id = #record_id#
+                ]]>  
+            </isNotEmpty>
+            <isNotEmpty property="busi_id" prepend="AND">  
+                <![CDATA[  
+                   busi_id = #busi_id#
+                ]]>  
+            </isNotEmpty>
+            <isNotEmpty property="recordStatus" prepend="AND">  
+                <![CDATA[  
+                    record_status = #recordStatus#
+                ]]>  
+            </isNotEmpty>
+	</update>
+	<update id="updateTaskBook" parameterClass="java.util.HashMap">
+		update task_book_info
+			SET 
+			<iterate  property="updateColSet" conjunction=",">
+			    $updateColSet[].col_name$ = #updateColSet[].col_value# 
+			</iterate>
+			WHERE  1=1 
+		   <isNotEmpty property="task_code" prepend="AND">  
+                <![CDATA[  
+                    task_code = #task_code#
+                ]]>  
+            </isNotEmpty>
+	</update>
+	<!-- 查询责任书规范书模板信息 -->
+	<select id="search_norm_book_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT model_id, model_column, model_context FROM tb_cpc_task_book_model where 1=1
+        <isNotEmpty property="model_id" prepend="AND">  
+             <![CDATA[  
+                 model_id = #model_id#
+             ]]>  
+        </isNotEmpty>
+	</select>
+	<!-- 查询责任书规范书人员信息 -->
+	<select id="search_staff_book_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT model_type, staff_code, model_id, model_column, model_context FROM tb_cpc_sys_model_rel WHERE 1=1
+		<isNotEmpty property="model_type" prepend="AND">  
+             <![CDATA[  
+                 model_type = #model_type#
+             ]]>  
+        </isNotEmpty>
+        <isNotEmpty property="staff_code" prepend="AND">  
+             <![CDATA[  
+                 staff_code = #staff_code#
+             ]]>  
+        </isNotEmpty>
+	</select>
+	<!-- 保存人员规范书信息 -->
+	<update id="update_taskBook_info" parameterClass="java.util.HashMap">
+		UPDATE tb_cpc_sys_model_rel SET model_context=#model_context# WHERE model_column=#model_column# AND model_type=#modelType# and staff_code = #staff_code# 
+	</update>
+	<!-- 保存员工对应的模板信息 -->
+	<insert id="save_staff_bookinfo"  parameterClass="java.util.HashMap">
+	    INSERT INTO  
+	    tb_cpc_sys_model_rel(model_type, staff_code, model_id, model_column, model_context) 
+	    values
+	     (
+	      	#model_type#,
+	      	#staff_code#,
+	      	#model_id#,
+	      	#model_column#,
+	      	#model_context#
+	      )  
+	</insert>
+	
+	<!-- 查询登录者的树信息 -->
+	<select id="qry_login_staff_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  t.`TREE_ID`,
+		  t.`TREE_NAME`,
+		  t.`TREE_LEVEL`,
+		  t.`P_TREE_ID`,
+		  t.`LATN_ID`,
+		  t.`LATN_NAME`
+		FROM
+		  tb_cpc_tree_resources r,
+		  tb_pty_grid_tree t 
+		WHERE r.obu_id = t.`TREE_ID` 
+		  AND r.staff_id = #staffId#
+	</select>
+	<!-- 查询对应的组织树 -->
+	<select id="qry_tree_list" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		 SELECT 
+		  g.`TREE_ID` ID,
+		  g.`TREE_NAME` NAME,
+		  g.`TREE_LEVEL` LEVEL,
+		  g.`P_TREE_ID` PID,
+		  g.`LATN_ID` ,
+		  g.`LATN_NAME`
+		FROM
+		  tb_pty_grid_tree g
+		WHERE g.state = 1 
+		<isNotEmpty property="latn_id" prepend="and">
+		  g.latn_id=#latn_id#
+		</isNotEmpty>
+		<isNotEmpty property="tree_id" prepend="and">
+		  g.p_tree_id=#tree_id#
+		  or g.tree_id=#tree_id#
+		</isNotEmpty>
+		<![CDATA[
+			AND g.tree_level<=4
+		 ]]> 
+	</select>
+	<!-- 查询模板列表 -->
+	<select id="qry_task_model_list" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT 
+	  model_id,
+	  task_type,
+	  task_type_name,
+	  state,
+	  latn_id 
+	FROM
+	  task_book_making_state 
+	WHERE latn_id = #latn_id# 
+	  AND create_time =#year#
+	  <isNotEmpty property="taskType" prepend="and">
+	     task_type=#taskType#
+	  </isNotEmpty> 
+	  <isNotEmpty property="taskState" prepend="and">
+	    state=#taskState#
+	  </isNotEmpty>
+	</select>
+	<!-- 查询具体的模板 -->
+	<select id="qry_task_model" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT 
+	  model_id,
+	  task_type,
+	  task_type_name,
+	  state,
+	  latn_id,
+	  create_time
+	FROM
+	  task_book_making_state 
+	WHERE 1=1
+	  <isNotEmpty property="modelId" prepend="and">
+	     model_id=#modelId#
+	  </isNotEmpty>
+	  <isNotEmpty property="taskType" prepend="and">
+	     task_type=#taskType#
+	  </isNotEmpty> 
+	  <isNotEmpty property="taskState" prepend="and">
+	    state=#taskState#
+	  </isNotEmpty>
+	</select>
+	<!-- 查询待发布的obu管理员 -->
+	<select id="qry_release_obu_list" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	   SELECT 
+		  s.staff_id,
+		  s.staff_name,
+		  s.mob_tel,
+		  t.obu_id,
+		  t.obu_type task_type,
+          t.region_id latn_id
+		FROM
+		  TB_CPC_TREE_RESOURCES t,
+		  sys_staff s
+		WHERE t.`STAFF_ID` = s.`STAFF_ID`
+		  AND t.`OBU_TYPE` = #task_type# 
+		  AND t.`REGION_ID` = #latn_id# 
+	</select>
+	<!-- 给obu生成代办 -->
+	<insert id="insert_task_book_info" parameterClass="java.util.HashMap">
+	   INSERT into task_book_info (
+		  task_code,
+		  obu_id,
+		  promoters_id,
+		  promoters_name,
+		  mob_tel,
+		  task_type,
+		  create_time,
+		  latn_id
+		) 
+		VALUES
+		  (#task_code#,
+		  #obu_id#,
+		  #promoters_id#,
+		  #promoters_name#,
+		  #mob_tel#,
+		  #task_type#,
+		  #create_time#,
+		  #latn_id#)
+	</insert>
+	<!-- 修改模板状态 -->
+	<update id="update_model_state" parameterClass="java.util.HashMap">
+		UPDATE task_book_making_state SET state = 1 WHERE model_id = #modelId# 
+	</update>
+	<!-- 查询上传文件 -->
+	<select id="search_task_file_list" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	    SELECT 
+		  attachment_name,
+		  attachment_path,
+		  attachment_type,
+		  attachment_value,
+		  OTHER_ATTACHMENT_NAME,
+		  create_time,
+		  upload_person,
+		  upload_person_name 
+		FROM
+		  tb_cpc_attachment 
+		WHERE attachment_type = #attachment_type#
+		  <isEqual property="attachment_type" compareValue="shortProcess">
+		  and attachment_value = #attachment_value# 
+		  </isEqual>
+		  <isEqual property="attachment_type" compareValue="workFlow">
+		  and workflowId = #workflowId# 
+		  </isEqual>
+	</select>
+</sqlMap>

@@ -1,0 +1,116 @@
+@charset "utf-8";
+/* CSS Document */
+/*头部*/
+.header{width:100%;height:44px;overflow:hidden;border-bottom:solid 1px #dedede;}
+.background-img{background:#fff;width:100%;height:44px;}
+.zuo_img{padding-left:10px;float:left;width:138px;font-size:24px;font-family:Microsoft YaHei;}
+.zuo_img a{padding-left:10px;color:#000;font-size:16px;overflow:hidden;float:left}
+.zuo_img img{width:10px;float:left;margin-top: 2px;}
+.biaoti{font-size:16px;font-family:Microsoft YaHei;left:50%;float:left;position:absolute;margin-left:-15px;width:100%;}
+.you_img{padding-right:20px;float:right;width:10px;}
+.you_img img{width:20px;margin-top: 2px;}
+.header_top{width:100%;padding-top:15px;overflow:hidden;position:relative;}
+/**/
+/**/
+.d_list{background:#fff;margin-top:10px;font-size:16px;
+		height:60px;color:#000;padding:0 10px;
+		 font-weight:bold;letter-spacing:1px;overflow:hidden;border-top:solid 1px #dedede;position: relative;}
+.d_list img{width:40px;float:left;padding:10px 10px}	
+.d_list span{display:block;float:left;vertical-align: middle;padding:18px 0px;} 
+.d_list dt{float:left;}
+.d_list dd{float:right;}
+.d_list dd a{width:15%;background:#0475b9;color:#fff;padding:5px 10px;border-radius:5px;border:solid 1px #25aae2;font-size:14px;}
+/*xqmc*/
+.xqmc_box{background-color:#fff;font-size: 15px;}
+.xq_content{overflow:hidden;height:50px;border-top:solid 1px #dedede;}
+.xq_content a{font-size:14px;width:30px;height:30px;line-height:29px;background:#dedede;display:inline-block;color:#fff;
+			  text-align:center;border-radius:25px;}
+.xq_content dt{float:left;padding: 15px 20px;color:#444444;} 
+.xq_content dd{float:right;position: relative;height: 30px;padding:5px 8px;} 
+.xqmc{border:0px;width:93%;color: #888;border: solid 1.5px #356998;margin: 15px 0px;border-radius:5px;line-height: 30px;}
+.xqmc img{width:25px;}
+.wbk{font-size:12px;overflow:hidden;border-top:solid 1px #dedede;padding: 10px 10px;}
+.wbk dt{float:left;margin-top:10px;padding: 7px 5px;}
+.wbk_yj{width:75%;float:left;}
+.wby{border:solid 1px #dedede;border-radius:5px;width:100%;margin:10px;color:#888;}
+.qxz{border-radius: 3px; border: solid 1px #dedede;width:32%;color: #888;height: 30px}
+.xq_content p{margin:5px 0px}
+.scwj{border:solid 1px #dedede;}
+.sc{display:inline-block;margin: 8px 0px;}
+.sc a{border: solid 1px #25aae2;background: #0475b9;color:#fff;
+	 border-radius: 5px;text-align: center;padding:5px 3px;font-size: 12px;padding: 7px;}
+.tj_box{ border-radius:5px;text-align: center;border: solid 1px #25aae2;padding:5px 0px;
+		width:120px;margin:auto;margin-top: 20px;font-size:14px;color:#0475B9;font-weight:bold;font-weight:bolder;}
+.tj_box img{display:inline-block;vertical-align: middle;width:20px;margin-top: -2px;}
+/*tk*/
+	.reveal-modal-bg { 
+		position: fixed; 
+		height: 100%;
+		width: 100%;
+		background: #000;
+		background: rgba(0,0,0,.6);
+		z-index: 100;
+		display: none;
+		top: 0;
+		left: 0; 
+		}
+	
+	.reveal-modal {
+		border:solid 1px #dedede;
+		visibility: hidden;
+		top: 100px; 
+		left:8.2%;
+		width: 80%;
+		background: #fff;
+		position: absolute;
+		z-index: 101;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		-moz-box-shadow: 0 0 10px rgba(0,0,0,.4);
+		-webkit-box-shadow: 0 0 10px rgba(0,0,0,.4);
+		-box-shadow: 0 0 10px rgba(0,0,0,.4);
+		}
+	.col-xs-12 dl{line-height:30px;text-align:center;padding: 4px;}
+
+	.col-xs-12 .dx{line-height:30px;border-bottom:solid 1px #dedede;overflow:hidden;}
+	.col-xs-12 .dx dt{float:left;margin-left:20px;border:0px}
+	.col-xs-12 .dx dd{float:right;margin-right:20px;border:0px}
+	.col-xs-12 .yibai{border-bottom:solid 1px #dfdeee;font-weight: 700;}
+	.reveal-modal .btn{width:80%;line-height:32px;background:#356998;display:inline-block;color:#fff;border-radius:5px;}
+	.reveal-modal.small 		{ width: 200px; margin-left: -140px;}
+	.reveal-modal.medium 		{ width: 400px; margin-left: -240px;}
+	.reveal-modal.large 		{ width: 600px; margin-left: -340px;}
+	.reveal-modal.xlarge 		{ width: 800px; margin-left: -440px;}
+	
+	.reveal-modal .close-reveal-modal {
+		font-size: 22px;
+		line-height: .5;
+		position: absolute;
+		top: 9px;
+		right: 8px;
+		color: #aaa;
+		text-shadow: 0 -1px 1px rbga(0,0,0,.6);
+		font-weight: bold;
+		cursor: pointer;
+		} 
+.close-reveal-modal img{width:25px;}
+.reveal-modal tr{line-height:60px;border-bottom:dashed 1px #666;}
+.reveal-modal td{border-bottom:dashed 1px #A9A9A9;text-align:center;color:#888;width: 25%;font-size:14px}
+.reveal-modal .bor{border-right:0px;}
+.bt_top{ border-radius:5px 5px 0px 0px;background:#3668a5;height:35px;}
+.badgespan{display: inline-block;
+    min-width: 10px;
+    padding: 3px 9px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    background-color: #516EBB;
+    border-radius: 10px;
+    margin: 5px;}
+
+
+

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>综支工作台</title>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<link href="../../../web/css/common.css" rel="stylesheet" type="text/css">
+<link href="../../../web/css/jquery.datetimepicker.css" rel="stylesheet" type="text/css">
+<script  type="text/javascript" src="../../../web/js/common/jquery-1.9.1.min.js"></script>
+<script  type="text/javascript" src="../../../web/js/common/layer/layer.min.js"></script>
+<script  type="text/javascript" src="../../../web/js/common/servlet.url.js"></script>
+<script type="text/javascript" src="../../../web/js/common/util.js"></script>
+<script type="text/javascript" src="../../../web/js/common/common.js"></script>
+<script type="text/javascript" src="../../../web/js/common/jq.ui.js"></script>
+<script type="text/javascript" src="../../../web/js/common/jquery.datetimepicker.js"></script>
+<script type="text/javascript" src="../../../web/js/common/orderDealData.js"></script>
+<script type="text/javascript" src="../../../web/js/orderDetail/recordOfDemandView.js"></script>
+ <script type="text/javascript" src="/CpcWeb/web/js/orderDetail/sysRegion.js"></script>
+ 
+
+</head>
+
+<body id="recordOfDemandViewInfo">
+<div id='Layer_Loading' 
+			style="position: fixed; left: 48%; top: 40%; width: 110px; height: 75px; padding-top: 35px; margin-left: -55px; margin-top: -37px; text-align: center;  border-radius: 8px; background: #000; opacity: 0.6; filter:alpha(opacity=60); z-index: 99999999; visibility: hidden;" align='absmiddle'>
+	<img alt='正在加载...' src='../../../web/images/loading.gif'>
+	</div>
+<div id="_SysDialogBGDiv" class="backgroudDiv" style="z-index: 99999;">
+	<div>
+   		<div></div>
+	</div>
+</div>
+<div id='sysRegionDiv'></div>
+<div class="list-main" id='recordOfDemand_view_main'>
+<div class="list-nav f18 mt10"><span name ="flowName">流程信息详情</span></div>
+<table width="100%" border="0" cellspacing="0" cellpadding="0"  class="tab5 mt10 lines f14">
+   	 	<thead>
+   	         <tr >
+                <th align="center" style="width: 4%;">序号</th>
+                <th align="center" style="width: 6%;">当前环节</th>
+                <th align="center" style="width: 6%;">操作</th>
+                <th align="center" style="width: 15%;">处理 人</th>
+                <th align="center" style="width: 15%;">处理时间</th>
+                <th align="center" style="width: 10%;">联系电话</th>
+                <th align="center" style="width: 6%;">环节耗时</th>
+                <th align="center" style="width: 6%;">催单次数</th>
+                <th align="center" style="width: 8%;">状态</th>
+           </tr>
+        </thead>
+   		<tbody id="tableDataTbody">
+        </tbody>
+    </table>
+</div>
+<br/>
+<br/>
+<br/>
+<br/>
+</body>
+</html>

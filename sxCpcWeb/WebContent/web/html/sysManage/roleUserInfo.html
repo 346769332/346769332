@@ -1,0 +1,92 @@
+<link href="../../css/common.css" rel="stylesheet" type="text/css">
+<script  type="text/javascript" src="../../js/common/jquery-1.9.1.min.js"></script>
+<script  type="text/javascript" src="../../js/common/layer/layer.min.js"></script>
+<script  type="text/javascript" src="../../js/common/servlet.url.js"></script>
+<script type="text/javascript" src="../../js/common/jq.ui.js"></script>
+<script type="text/javascript" src="../../js/common/util.js"></script>
+<script type="text/javascript" src="../../js/common/common.js"></script>
+<script type="text/javascript" src="../../js/sysManage/roleUserInfo.js"></script>
+
+<div id="diaLogDiv" >
+</div>
+<div id="_ShowDialogBGDiv" class="backgroudDiv" >
+	<div>
+   		<div></div>
+	</div>
+</div>
+<div id="_SysDialogBGDiv" class="backgroudDiv" style="z-index: 99999;">
+	<div>
+   		<div></div>
+	</div>
+</div>
+<div id='Layer_Loading' 
+			style="position: fixed; left: 48%; top: 40%; width: 110px; height: 75px; padding-top: 35px; margin-left: -55px; margin-top: -37px; text-align: center;  border-radius: 8px; background: #000; opacity: 0.6; filter:alpha(opacity=60); z-index: 99999999; visibility: hidden;" align='absmiddle'>
+	<img alt='正在加载...' src='images/loading.gif'>
+</div>
+	
+
+
+<div  class="tanchu_box"  id ='roleUserInfoPageDiv' style="width:980px; height: 560px;">
+	<table style="width:970px" border="0" cellspacing="0" cellpadding="0" class="table1">
+		 <tr>
+		    <th width="132">角色名称：</th>
+		    <td width="137" id="roleNameTd"></td>
+		    <th width="147">状态：</th>
+		    <td width="131" id="roleStateTd"></td>
+		  </tr>
+		<tr>
+			<td colspan="4">
+				<div style="width:40%;height:415px; border:1px solid #dedede;margin: 15px;" class="fl" id='first'>
+					<!--
+						<div>
+							 员工姓名<input id="search_staff_name" type="text" style="width:130px;">
+	                 		 <a href="javascript:void(0)"class="but" id='chooseBtn'>查询</a>
+						</div>
+						<div class="main-nav">工号资源</div>
+					    <div class="ny_zblb2" style="width:380px; height:330px; overflow:auto" >
+					-->
+					 <div class="main-nav">工号资源</div>
+				    <div class="ny_zblb2" style="width:380px; height:360px; overflow:auto" >
+				     	
+				     		<ul class="clearfix" name="roleUserUl">
+				     		<!-- 
+								<li>
+									<a class="cur" href="javascript:void(0)">工单管理</a>
+									<ul style="display:block;">               
+										<li><a href="#">需求查看</a></li>  
+									</ul>
+								</li>
+				     		 -->
+							</ul>
+				     </div>
+				 </div>
+				 <div class="fl"  style="width: 10% ;padding-top:15%; vertical-align:middle">
+					 <input type="button" id="right_one" value=">">  
+					 	<br/><br/>
+					 <input type="button" id="left_one" value="&lt;"> 
+				  </div>
+				 <div style="width:40%;height:415px; border:1px solid #dedede;margin: 15px;" class="fr"  id='second'>
+					<div class="main-nav">已选取工号</div>
+				      <div class="ny_zblb1" style="width:380px; height:360px; overflow:auto" >
+				    		 <ul class="clearfix" name="roleUserUl">
+								<!-- 
+									<li>
+										<a class="cur" href="javascript:void(0)">工单管理</a>
+										<ul style="display:block;">               
+											<li><a href="#">需求查看</a></li>  
+										</ul>
+									</li>
+					     		 -->
+							</ul>
+					</div>
+				 </div>
+			</td>
+		</tr>
+	 	<tr>
+	     	<td colspan="4"  align="center" >
+		     	<a href="javascript:void(0)" class="but" id="saveBtn">保存</a>
+		     	<a href="javascript:void(0)" class="but hs_bg ml10" id="closeBtn">关闭</a>
+		     </td>
+	    </tr>
+	</table>
+</div>

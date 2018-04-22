@@ -1,0 +1,37 @@
+﻿<script type="text/javascript" src="js/orderSend/evalDemandList.js"></script>
+
+<div class="list-main">
+<h2>工单评价</h2>
+<div style="margin-top:5px;" id="evalDemandPage">
+<dl class="bd-list">
+		<dt style="margin:8px 5px;width:80px;">主题搜索：</dt>
+		<dd>
+			<input id="themeSeach" type="text" class=" w130">
+		</dd>
+		<dt style="margin:8px -5px">发起时间：</dt>
+		<dd>
+			<input id="sendDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearSendDate">
+		 </dd>
+		<dd>
+			<a href="#" class="butInit" id="senior">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+	<div class="lable-box">
+		<a  href="javascript:void(0)" class="lable" id="demandInfoBtn">查看并评价</a>
+	</div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10">
+		<thead>
+			<tr>
+			    <th style="width:8%;">选择</th>
+				<th style="width:32%;">需求主题</th>
+				<th style="width:20%;">环节操作</th>
+				<th style="width:20%;">发起时间</th>
+				<th style="width:20%;">到期时间</th>
+			</tr>
+		</thead>
+		<tbody id="evalDemandBody"></tbody>
+	</table>
+	<div class="page mt10" id="evalDemandFoot"></div>
+ </div>
+</div>
