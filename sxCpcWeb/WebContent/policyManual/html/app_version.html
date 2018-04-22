@@ -1,0 +1,92 @@
+
+<div id="appVersionModelDiv">
+	<div class="modal fade" id="myModal_1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="dialogTitle"></h4>
+	      </div>
+	      <div class="modal-body" id="dialogMsg">
+	      	   
+	      </div>
+	      <div class="modal-footer">
+	          	<button type="button" id="bAlfter" class="btn btn-default btn-sm">以后再说</button>
+	          	
+	      		<button type="button" id="bDown" class="btn btn-primary btn-sm">下载更新</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	
+var AppVersion = new Function();
+
+/**
+ * currVersion: 当前版本号
+ * param:  服务器端版本信息登录AuthLogin获取
+ * resultFun:版本管控，通过，完毕响应方法
+ * failFun:用户不 执行 强制更新版本，返回方法
+ **/
+ AppVersion.validate = function(parentObj,currVersion,param,successFun,failFun){
+	if(!param) 
+		return;
+	if(param.app_version != currVersion){
+		var dialogMsg = "新版本编号：<b>"+param.app_version+"</b>";
+		AppVersion.showDialog(parentObj,"版本更新提醒",dialogMsg,param,successFun,failFun);
+	}else{
+		successFun();
+	}
+};
+
+
+AppVersion.showDialog = function(parentObj,dialogTitle,dialogMsg,param,successFun,failFun){
+	debugger;
+	var updateType = param.update_type;
+	
+	var appObj = "".findById("div","appVersionModelDiv",parentObj)[0];
+	
+	var myModalDIV = "".findById("div","myModal_1",appObj)[0];
+	var dialogTitleObj = "".findById("h4","dialogTitle",myModalDIV)[0];
+	dialogTitleObj.html(dialogTitle);
+	var dialogMsgObj = "".findById("div","dialogMsg",myModalDIV)[0];
+	dialogMsgObj.html(dialogMsg);
+	
+	var bAlfter = "".findById("button","bAlfter",appObj)[0];
+	var bDown = "".findById("button","bDown",appObj)[0];
+	
+	if(updateType == "M"){
+		bAlfter.html("暂不更新");
+	}
+	//显示
+	myModalDIV.modal('toggle');
+	//关闭
+	myModalDIV.on('hide.bs.modal', function () {
+		debugger;
+		if(updateType == "M"){
+			alert("烦请点击“下载更新”，否则将影响您的使用，谢谢！");
+			return false;
+			//failFun();
+		}else if(successFun){
+			successFun();
+		}
+	});
+	//以后再说 关闭
+	bAlfter.unbind("click").bind("click",function(){
+		debugger;
+		if(updateType == "M"){
+			failFun();
+		}else{
+			myModalDIV.modal('hide');
+		}
+			
+	});
+	//以后再说 关闭
+	bDown.unbind("click").bind("click",function(){
+		debugger;
+		window.open(param.app_url,"_system");
+	});
+};
+</script>

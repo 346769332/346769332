@@ -1,0 +1,49 @@
+<script type="text/javascript" src="js/shortProcess/singatureHasSolveProcessList.js"></script>
+
+<div class="list-main" id="hasSolveProcessPage">
+	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;已处理会签列表</div>
+	<div class="bd-list">
+		<div class="form-group">
+		    <label class="form-label">需求编号:</label>
+		    <input id="demandCode" name="demandCode"  type="text" class=" w130"style="width: 220px;">
+		</div>
+		<div class="form-group">
+		    <label class="form-label">需求名称:</label>
+		    <input id="demandName" name="demandName" type="text" class=" w130" style="width: 220px;">
+		</div>
+		<div class="form-group">
+		    <label class="form-label">需求状态:</label>
+		    <select  class="select_w153" name="demandStatus" id="demandStatus" style="width: 220px;">
+		    		<option value="">-请选择-</option>
+		    	<option value="1000">审批中</option>
+		    	<option value="1001">审批完结</option>
+		    </select>
+		</div>
+		<div class="form-group">
+		    <label class="form-label">所属短流程名称:</label>
+		    <input id="workflowName" name="workflowName" type="text" class=" w130" style="width: 222px;"/>
+		</div>
+		<div class="form-search" style=" margin-left: 200px;">
+		    <a href="#" class="but" id="search">查询</a>
+		</div>
+		<div class="form-search">
+		    <a href="#" class="but" id="reset">重置</a>
+		</div>
+	</div>
+	<div id="dateQuery"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10 d_top">
+		<thead>
+			<tr>
+				<td>需求编号</td>
+				<td>需求名称</td>
+				<td>需求状态</td>
+				<td>所属短流程名称</td>
+				<td>操作</td>
+			</tr>
+		</thead>
+		<tbody id="hasSolveProcessBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="hasSolveProcessFoot"></div>
+</div>

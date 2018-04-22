@@ -1,0 +1,43 @@
+﻿<script type="text/javascript" src="js/taskBook/taskBookApproval.js"></script>
+<div class="list-main" id="taskApprovalPage">
+
+	<h2>责任书审批</h2>
+
+	<dl class="bd-list">
+		<dt>年份：</dt>
+		<dd>
+			<input id="yearDate" type="text" class="w120" readonly>
+		</dd>
+		<dt>责任书类型：</dt>
+		<dd>
+			<select id="bookType" class="w130" style="width: 156px;height:26px;">全部</select>
+		</dd>
+		<dd>
+			<a href="#" class="butInit" id="search">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+	<!-- 组织树 -->
+    <div>
+     	
+		<div id="listPage" style="height:520px; border:0px solid #dedede;margin:10px;float:center;">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0"
+				class="tab2 mt10">
+				<thead>
+					<tr>
+						<td>责任书编号</td>
+						<td>归属OBU</td>
+						<td>承包人姓名</td>
+						<td>承包人联系电话</td>
+						<td>责任书类型</td>
+						<td>责任书状态</td>
+						<td>操作</td>
+					</tr>
+				</thead>
+				<tbody id="taskListBody">
+				</tbody>
+			</table>
+			<div class="page mt10" id="taskListFoot"></div>
+		</div>
+    </div>
+</div>

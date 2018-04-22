@@ -1,0 +1,2815 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="search">
+    <!-- 缓存 -->
+    <cacheModel id="user-cache" type ="LRU" readOnly="true" serialize="false">  
+	   <flushInterval seconds="60"/>  
+	   <property value="500" name="size"/>  
+	</cacheModel> 
+    
+    <!-- 查询专业系统来单where条件 -->
+	<sql id="select_out_sys_flow_where">
+	    1=1
+	    <isNotEmpty prepend="AND" property="outSysId" >
+	        out_sys_id 	= #outSysId#
+	    </isNotEmpty>
+	    
+	    <isNotEmpty prepend="AND" property="flowTheme" >
+	        flow_theme like concat('%', #flowTheme#, '%')
+          </isNotEmpty>
+	    
+	    <isNotEmpty prepend="AND" property="latnId" >
+	        latn_id 	= #latnId#
+	    </isNotEmpty>
+	    
+	    <isNotEmpty prepend="AND" property="flowStatus" >
+	        flow_status = #flowStatus#
+	    </isNotEmpty>
+	    
+	    <isNotEmpty prepend="AND" property="flowRecordId" >
+	        flow_record_id = #flowRecordId#
+	    </isNotEmpty>
+	    
+	    <isNotEmpty prepend="AND" property="startCreateTime" >
+	        create_time >= #startCreateTime#
+	    </isNotEmpty>
+	    
+	    <isNotEmpty prepend="AND" property="endCreateTime" >
+	        create_time <![CDATA[<=]]> #endCreateTime#
+	    </isNotEmpty>
+	    
+	</sql>
+	
+	<select id="query_service" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  s.service_id,
+		  s.service_theme,
+		  s.service_desc,
+		  s.department_id,
+		  s.department,
+		  s.promoters,
+		  s.promoters_id,
+		  DATE_FORMAT(s.send_time, "%Y-%m-%d %T") send_time,
+		  DATE_FORMAT(s.over_limit, "%Y-%m-%d %T") over_limit,
+		  f.curr_node_id,
+		  f.curr_node_name,
+		  f.next_node_id,
+		  f.next_node_name,
+		  f.default_opt_id,
+		  f.default_opt_name,
+		  f.opt_id,
+		  f.opt_name,
+		  st.LOGIN_CODE AS opt_code,
+		  st.MOB_TEL AS opt_mebTel,
+		  DATE_FORMAT(f.opt_time, "%Y-%m-%d %T") opt_time,
+		  f.record_id 
+		FROM
+		  tb_cpc_busi_flow_rel r,
+		  tb_cpc_service s,
+		  tb_cpc_flow_record f ,
+		  sys_staff st
+		WHERE f.record_id = s.curr_record_id 
+		  AND r.service_id = s.service_id 
+		  AND r.demand_id = #demandId# 
+		  AND f.opt_id = st.STAFF_ID
+		  order by s.service_id desc
+	</select>
+	
+    
+    <!-- 查询需求单实例 -->
+	<select id="select_demand" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    select 
+	    	demand_id        ,
+			demand_theme      ,
+			demand_details    ,
+			demand_type       ,
+			demand_type_name ,
+			promoters_id     , 
+			promoters        , 
+			department_id    , 
+			department        ,
+			tel              , 
+			DATE_FORMAT(create_time, "%Y-%m-%d %T") create_time     , 
+			urge_count       , 
+			DATE_FORMAT(over_time, "%Y-%m-%d %T") over_time        	, 
+			summary          , 
+			over_eval ,
+			over_opinion     , 
+			curr_record_id   ,  
+			DATE_FORMAT(over_limit , "%Y-%m-%d %T") over_limit		,
+			DATE_FORMAT(calim_limit, "%Y-%m-%d %T") calim_limit    	,
+			DATE_FORMAT(urge_time, "%Y-%m-%d %T") 	urge_time		,
+			operator_id,
+			operator_name,
+			rank_id,
+			rank_name,
+			up_photo_names	,
+			limit_time,
+			eval_time,
+			eval_atti
+	    from		
+	    	tb_cpc_demand
+	    where
+	    1=1
+	    <isNotEmpty prepend="AND" property="demandId" >
+	    	demand_id = #demandId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="AND" property="promoters_id" >
+	    	promoters_id = #promoters_id#
+	    </isNotEmpty>
+	    <isEqual prepend="AND" property="isDraft" compareValue="Y">
+	        <![CDATA[
+	        curr_record_id = ''
+	        ]]>
+	    </isEqual>
+	    
+	</select>
+	<select id="getDemandsaveLstPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    select 
+	    	demand_id        ,
+			demand_theme      ,
+			demand_details    ,
+			demand_type       ,
+			demand_type_name ,
+			promoters_id     , 
+			promoters        , 
+			department_id    , 
+			department        ,
+			operator_id,
+			operator_name,
+			rank_id,
+			rank_name,
+			tel              , 
+			DATE_FORMAT(create_time, "%Y-%m-%d %T") create_time     , 
+			urge_count       , 
+			DATE_FORMAT(over_time, "%Y-%m-%d %T") over_time        	, 
+			summary          , 
+			(CASE
+      over_eval 
+      WHEN '1' 
+      THEN '差评' 
+      WHEN '2' 
+      THEN '中评' 
+      WHEN '3' 
+      THEN '好评' 
+      ELSE NULL 
+    END  ) AS over_eval ,
+			over_opinion     , 
+			curr_record_id   ,  
+			DATE_FORMAT(over_limit , "%Y-%m-%d %T") over_limit		,
+			DATE_FORMAT(calim_limit, "%Y-%m-%d %T") calim_limit    	,
+			DATE_FORMAT(urge_time, "%Y-%m-%d %T") 	urge_time		,
+			up_photo_names	,
+			limit_time		
+	    from		
+	    	tb_cpc_demand
+	    where
+	    1=1
+	    <isNotEmpty prepend="AND" property="demandId" >
+	    	demand_id = #demandId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="AND" property="promoters_id" >
+	    	promoters_id = #promoters_id#
+	    </isNotEmpty>
+	    <isEqual prepend="AND" property="isDraft" compareValue="Y">
+	        <![CDATA[
+	        curr_record_id = ''
+	        ]]>
+	    </isEqual>
+	     <isNotEmpty prepend="AND" property="demand_theme" >
+	       demand_theme LIKE CONCAT('%', #demand_theme#, '%')
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="start_create_time" >
+	         <![CDATA[ 
+	          create_time >= #start_create_time#
+	         ]]>
+          </isNotEmpty>
+	         ORDER BY create_time DESC
+	    	 <isNotEmpty prepend="" property="pagesize" >
+	         limit $pagenum$,$pagesize$
+          </isNotEmpty>
+	</select>
+    <!-- 查询需求单实例总数 -->
+	<select id="getDemandsaveLstSum" resultClass="String" parameterClass="java.util.HashMap">
+	    select 
+	    	count(1)
+	    from		
+	    	tb_cpc_demand
+	    where
+	    1=1
+	    <isNotEmpty prepend="AND" property="demandId" >
+	    	demand_id = #demandId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="AND" property="promoters_id" >
+	    	promoters_id = #promoters_id#
+	    </isNotEmpty>
+	    <isEqual prepend="AND" property="isDraft" compareValue="Y">
+	        <![CDATA[
+	        curr_record_id = ''
+	        ]]>
+	    </isEqual>
+	    
+	</select>
+	<!-- 查询验证需求单实例 -->
+	<select id="select_demand_vie" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT 
+  COUNT(1) AS curr 
+FROM
+  tb_cpc_demand d 
+WHERE d.`demand_id` IN (
+    #demandId#
+  ) 
+  AND 
+ <![CDATA[
+  (SELECT 
+    COUNT(1) 
+  FROM
+    tb_cpc_flow_record r 
+	      WHERE r.`busi_id` = d.`demand_id`) < 4 
+	        ]]>
+  AND NOT EXISTS 
+  (SELECT 
+    * 
+  FROM
+    tb_cpc_busi_flow_rel rs 
+  WHERE d.`demand_id` = rs.`demand_id`)
+	</select>
+	 <!-- 查询服务单实例 -->
+	<select id="select_service" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		      SELECT 
+			  s.service_id,
+			  s.service_theme,
+			  s.service_desc,
+			  s.service_type_id,
+			  s.service_type,
+			  s.promoters_id,
+			  s.promoters,
+			  s.department_id,
+			  s.department,
+			  s.tel,
+			  DATE_FORMAT(s.send_time, "%Y-%m-%d %T") send_time ,
+			  DATE_FORMAT(s.over_time, "%Y-%m-%d %T") over_time,
+			  DATE_FORMAT(s.calim_limit, "%Y-%m-%d %T") calim_limit,
+			  DATE_FORMAT(s.over_limit, "%Y-%m-%d %T") over_limit,
+			  s.summary,
+			  s.curr_record_id,
+			  c.demand_id,
+  (SELECT d.demand_details  FROM  tb_cpc_demand  d WHERE d.demand_id=c.demand_id) AS demand_details, 
+   (SELECT d.promoters  FROM  tb_cpc_demand  d WHERE d.demand_id=c.demand_id) AS demand_promoters,
+  (SELECT d.tel  FROM  tb_cpc_demand  d WHERE d.demand_id=c.demand_id) AS demand_tel,
+ (SELECT  d.up_photo_names FROM tb_cpc_demand d  WHERE d.demand_id = c.demand_id) AS up_photo_names,
+  (SELECT region_id FROM sys_org  WHERE org_id=s.`department_id` )  region_id
+			FROM 
+			  tb_cpc_service s 
+			  LEFT JOIN   tb_cpc_busi_flow_rel c  ON c.service_id =s.service_id
+	    where
+	    	1=1
+	    <isNotEmpty prepend="AND" property="serviceId" >
+	    	s.service_id = #serviceId#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="AND" property="promoters_id" >
+	    	s.promoters_id = #promoters_id#
+	    </isNotEmpty>
+	   
+	    <isEqual prepend="AND" property="isDraft" compareValue="Y">
+	        <![CDATA[
+	        curr_record_id = ''
+	        ]]>
+	    </isEqual>
+	     GROUP BY s.service_id
+	</select>
+	 <!-- 查询专业系统单实例 -->
+	<select id="select_sys" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  DATE_FORMAT(r.create_time, '%Y-%m-%d %T') create_time,
+		  r.flow_name,
+		  r.flow_record_id,
+		  r.flow_status,
+		  r.flow_theme,
+		  r.latn_id,
+		  r.node_name,
+		  r.node_name,
+		  r.node_record_id,
+		  r.opter_id ,
+		  r.opter_name,
+		  r.opter_org_id,
+		  r.opter_org_name,
+		  r.opt_remark,
+		  r.opt_status,
+		  DATE_FORMAT(r.opt_time, '%Y-%m-%d %T') opt_time,
+		  r.out_sys_id
+		FROM
+		  tb_out_sys_flow_record r 
+		  WHERE 1=1
+		  <isNotEmpty prepend="AND" property="flow_record_id" >
+		    r.flow_record_id = #flow_record_id#
+		  </isNotEmpty>
+	</select>
+	
+	<select id="select_draft_count" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    select 
+	    	count(1) as count,
+	    	'tb_cpc_demand' as order_type
+	    from
+	    	tb_cpc_demand
+	    where curr_record_id = ''
+	    	 and promoters_id = #promoters_id#
+	    	 
+	</select>
+	
+	
+	<!-- 查询需求单流转记录ID -->
+	<select id="select_flow_record" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    select 
+	       record_id       ,
+		   curr_node_id    ,
+		   curr_node_name  ,
+		   opt_id          ,
+		   opt_name        ,
+		   DATE_FORMAT(opt_time, "%Y-%m-%d %T") as opt_time        ,
+		   next_node_id    ,
+		   next_node_name  ,
+		   default_opt_id  ,
+		   default_opt_name,
+		   time_count      ,
+		   urge_count      ,
+		   busi_id         ,
+		   opt_desc        ,
+		   record_status   ,
+		  (SELECT dic_value FROM tb_cpc_dic dic WHERE dic.dic_code = t.record_status AND dic.dic_type = 'record_status') AS record_status_name,
+		   t.mob_tel		,
+		    t.staff_id,
+		    t.staff_name,
+		    t.department_id,
+		    t.department_name,
+		    DATE_FORMAT(t.opt_limit, "%Y-%m-%d %T") as opt_limit        ,
+		   fun_id,
+  		  (SELECT  fun_name FROM tb_cpc_sys_fun fun WHERE fun.fun_id = t.fun_id) AS fun_name,
+  		  t.on_record_id
+	   	 from
+	    	tb_cpc_flow_record t 
+	    where
+	    	1=1
+	    <isNotEmpty  prepend="AND" property="recordServiceFlag" >
+	         t.busi_id IN (SELECT 
+    			a.service_id
+               FROM tb_cpc_busi_flow_rel a
+               WHERE t.busi_id = a.service_id
+                   AND a.demand_id = #demandId#)
+	    </isNotEmpty>
+	    <isEmpty  prepend="AND" property="recordServiceFlag" >
+	            busi_id = #demandId#
+	    </isEmpty>
+	    <isNotEmpty prepend="AND" property="recordId" >
+	        record_id = #recordId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="record_status" >
+	        record_status = #record_status#
+        </isNotEmpty>
+        order by record_id 
+	</select>
+	
+	
+	<!-- 查询需求单流转记录ID -->
+	<select id="select_sys_flow_record" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+		  DATE_FORMAT(f.create_time, "%Y-%m-%d %T") as create_time,
+		  f.flow_name,
+		  f.flow_record_id,
+		  f.flow_status,
+		  f.flow_theme,
+		  f.latn_id,
+		  f.node_name,
+		  f.node_record_id,
+		  f.opter_id,
+		  f.opter_name,
+		  f.opter_org_id,
+		  f.opter_org_name,
+		  f.opt_remark,
+		  f.opt_status,
+		  DATE_FORMAT(f.opt_time, "%Y-%m-%d %T") as opt_time,
+		  f.out_sys_id
+		FROM
+		  tb_out_sys_flow  f 
+		WHERE 1 = 1 
+	    <isNotEmpty prepend="AND" property="flow_record_id" >
+	       f.flow_record_id = #flow_record_id#  
+	    </isNotEmpty>
+	    order by flow_record_id
+	</select>
+	
+	<!-- 查询业务单属性实例 -->
+	<select id="select_record_proc" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    select 
+ 			record_id  ,
+			attr_id    ,
+			attr_value ,
+			busi_id    ,
+			attr_group  	 
+	    from
+	    	tb_cpc_record_proc
+	    where
+	    	1=1
+	    <isNotEmpty prepend="AND" property="demandId" >
+	        busi_id = #demandId#
+        </isNotEmpty>
+	    
+	    <isNotEmpty prepend="AND" property="recordId" >
+	        record_id = #recordId#
+        </isNotEmpty>
+	</select>
+	<!-- 附件信息保存-->
+	<insert id="insertAttachInfo" parameterClass="java.util.HashMap">
+		INSERT INTO tb_cpc_attachment(attachment_name, attachment_path, attachment_type, attachment_value, create_time)
+		 VALUES(#attachment_name#,#attachment_path#,#attachment_type#,#attachment_value#, now())
+	</insert>
+	<!-- 获取附件信息 -->
+	<select id="getAttachInfo"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	     SELECT * FROM tb_cpc_attachment T
+	     WHERE t.attachment_type = #attachment_type# 
+	     <isNotEmpty prepend="AND" property="attachment_value" >
+		   t.attachment_value = #attachment_value#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="attachment_name" >
+		   t.attachment_name = #attachment_name#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="attachment_path" >
+		   t.attachment_path = #attachment_path#
+		</isNotEmpty>
+	</select>
+	<delete id="delete_file_info" parameterClass="java.util.HashMap">
+	   delete from tb_cpc_attachment 
+	   where attachment_value=#attachment_value#
+	   and attachment_type=#attachment_type#
+	   <isNotEmpty prepend="AND" property="attachment_name" >
+		   attachment_name = #attachment_name#
+	   </isNotEmpty>
+	   <isNotEmpty prepend="AND" property="attachment_path" >
+		   attachment_path = #attachment_path#
+	   </isNotEmpty>
+	</delete>
+	 <!-- 查询字典 -->
+	<select id="select_dic" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    select 
+	    	dic_code,
+	    	dic_value,
+	    	dic_type,
+	    	dic_type_desc 
+	    from 
+	    	tb_cpc_dic 
+	    where 
+	    	dic_type = #dicType#
+		<isNotEmpty prepend="AND" property="dicCode" >
+	        dic_code = #dicCode#
+        </isNotEmpty>
+	</select>
+	 <!-- 查询省市领导工号信息 -->
+	<select id="showStaff" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+					   SELECT 
+				  s.`STAFF_ID`,
+				  s.`STAFF_NAME`,
+				  s.`LOGIN_CODE`,
+				  s.`DEPARTMENT_CODE`,
+				  s.`DEPARTMENT`,
+				  s.`REGION_ID`,
+				  s.MOB_TEL
+				  
+				FROM
+				  sys_staff s 
+				WHERE s.`personnel_type` ='type' 
+				  AND s.`DEPARTMENT_CODE` IN
+				  (SELECT 
+				    f.`DEPARTMENT_CODE` 
+				  FROM
+				    sys_staff f 
+				  WHERE staff_id =#staff_id#)
+	</select>
+	<select id="showStaff_s" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+					   SELECT 
+				  s.`STAFF_ID`,
+				  s.`STAFF_NAME`,
+				  s.`LOGIN_CODE`,
+				  s.`DEPARTMENT_CODE`,
+				  s.`DEPARTMENT`,
+				  s.`REGION_ID`,
+				  s.MOB_TEL
+				  
+				FROM
+				  sys_staff s 
+				WHERE s.`personnel_type` ='types' 
+				  AND s.`DEPARTMENT_CODE` IN
+				  (SELECT 
+				    f.`DEPARTMENT_CODE` 
+				  FROM
+				    sys_staff f 
+				  WHERE staff_id =#staff_id#)
+	</select>
+	
+	<!-- 需求单列表查询 总页数-->
+	<select id="getDemandListSum" resultClass="String" parameterClass="java.util.HashMap">
+			    select 
+	       count( distinct t2.demand_id) as count 
+	    FROM
+			   tb_cpc_flow_record t1 
+			  LEFT JOIN  tb_cpc_demand      t2 
+			  ON t1.busi_id = t2.demand_id
+			  LEFT JOIN tb_cpc_flow_record t3
+			  ON t2.curr_record_id = t3.record_id,sys_staff f
+			where t1.busi_id = t3.busi_id
+			and t2.promoters_id = f.staff_id
+	      <isNotEmpty prepend="AND" property="latnId">
+			     EXISTS (
+					SELECT 1 FROM  sys_org org
+					WHERE CONVERT(org.ORG_ID USING utf8)=CONVERT(t2.department_id USING utf8)
+					AND CONVERT(org.REGION_ID USING utf8)=#latnId#
+				)
+			</isNotEmpty>
+			<isNotEmpty  property="regionCode">
+				<isNotEqual property="regionCode" compareValue="888" >
+					and f.region_id = #regionCode#
+				</isNotEqual>
+			</isNotEmpty>
+			
+	       <isEmpty prepend="AND" property="ifopted" >
+	                t1.record_id = t2.curr_record_id
+          </isEmpty>
+	        <isNotEmpty prepend="AND" property="record_status" >
+	        (t1.record_status = #record_status# or t1.record_status ='3')
+          </isNotEmpty>
+ 	         <!--  <isNotEmpty prepend="AND" property="curr_node_id" >
+	        (SELECT r.curr_node_id FROM tb_cpc_flow_record r,tb_cpc_demand d WHERE r.record_id = d.curr_record_id AND d.demand_id = t2.demand_id LIMIT 1) in ($curr_node_id$)
+          </isNotEmpty>--> 
+          <isNotEmpty prepend="AND" property="curr_node_id" >
+	        t1.curr_node_id in ($curr_node_id$)
+          </isNotEmpty>
+	       <isNotEmpty prepend="AND" property="demand_id" >
+	        t2.demand_id = #demand_id#
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="demand_theme" >
+	        t2.demand_theme like concat('%', #demand_theme#, '%')
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="start_create_time" >
+	         <![CDATA[ 
+	         t2.create_time >= #start_create_time#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="end_create_time" >
+	         <![CDATA[ 
+	         t2.create_time <= #end_create_time#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="promoters_id" >
+	        t2.promoters_id =  #promoters_id#
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="qryColSet" >
+	         <iterate  property="qryColSet" conjunction="or" close=")" open="(">
+			    t1.opt_id = #qryColSet[].optId# 
+			</iterate>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit" >
+	         <![CDATA[ 
+	          t2.calim_limit <= #calim_limit#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit_begin" >
+	         <![CDATA[ 
+	          t2.calim_limit >= #calim_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_time" >
+	         <![CDATA[ 
+	          t2.over_time <= #over_time#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="over_limit" >
+	         <![CDATA[ 
+	          t2.over_limit <= #over_limit#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_limit_begin" >
+	         <![CDATA[ 
+	          t2.over_limit >= #over_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="demand_type" >
+	        t2.demand_type =  #demand_type#
+          </isNotEmpty>
+           <isNotNull prepend="AND" property="default_opt_id" >
+           	<isNotEmpty property="default_opt_id" >
+           		<![CDATA[ 
+	        	t1.default_opt_id in (#default_opt_id#)
+	         	]]>
+           	</isNotEmpty>
+           	<isEmpty property="default_opt_id" >
+           		t1.default_opt_id = #default_opt_id#
+           	</isEmpty>
+          </isNotNull>
+          
+            <isNotEmpty prepend="AND" property="opt_id" >
+               <isEqual property="curr_node_id" compareValue="401102">
+                 (t1.opt_id in  (#opt_id#) or t1.opt_id 
+                 		in (SELECT 
+					 	 	poolopts.`pool_id` 
+						FROM
+						  tb_cpc_pool_opts poolopts 
+						WHERE poolopts.`rel_value`=#department_id# ))
+             </isEqual>
+             <isNotEqual property="curr_node_id" compareValue="401102">
+		          <isNotEmpty property="orgId">
+                      (t1.opt_id in  (#opt_id#) or t1.opt_id=#orgId#)
+                  </isNotEmpty>
+                  <isEmpty property="orgId">
+                       t1.opt_id in  (#opt_id#)
+                  </isEmpty>
+             </isNotEqual>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calimTimeOutFlag" >
+	         <isEqual property="calimTimeOutFlag" compareValue="timeOut">
+	         	<![CDATA[
+			  		SYSDATE() > t2.calim_limit 
+	         	]]>
+	         </isEqual>
+	         <isEqual property="calimTimeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         			SYSDATE() < t2.calim_limit 
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="overTimeOutFlag" >
+	         <isEqual property="overTimeOutFlag" compareValue="timeOut">
+	         	<![CDATA[
+			  		SYSDATE() > t2.over_limit 
+	         	]]>
+	         </isEqual>
+	         <isEqual property="overTimeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         			SYSDATE() < t2.over_limit 
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+	</select>
+	
+	<!-- 需求单列表查询 分页数据 -->
+	<select id="getDemandListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+			SELECT 
+			  t3.record_id,
+			  t3.curr_node_id,
+			  t3.curr_node_name,
+			  t3.opt_id ,
+			  t3.opt_name ,
+			  DATE_FORMAT(t1.opt_time, "%Y-%m-%d %T") AS opt_time,
+			  t3.next_node_id,
+			  t3.next_node_name,
+			  t3.default_opt_id,
+			  t3.default_opt_name,
+			  t3.time_count,
+			  t3.urge_count,
+			  t3.busi_id,
+			  t3.opt_desc,
+			  t3.record_status,
+			  t1.record_status  AS his_record_status,
+			  t2.demand_id,
+			  t2.demand_theme,
+			  t2.demand_details,
+			  t2.demand_type,
+			  t2.promoters_id,
+			  t2.promoters,
+			  t2.department_id,
+			  t2.department,
+			  t2.rank_id,
+			  t2.rank_name,
+			  t2.tel,
+			  DATE_FORMAT(t2.create_time, '%Y-%m-%d %T') create_time,
+			  t2.urge_count,
+			  DATE_FORMAT(t2.over_time, '%Y-%m-%d %T') over_time,
+			  t2.summary,
+			  t2.over_eval,
+			  t2.eval_time,
+			  t2.eval_atti,
+			  t2.over_opinion,
+			  t2.curr_record_id,
+			  DATE_FORMAT(t2.calim_limit, '%Y-%m-%d %T') calim_limit,
+			  DATE_FORMAT(t2.over_limit, '%Y-%m-%d %T') over_limit,
+			  t2.demand_type_name ,
+			  (SELECT DATE_FORMAT(r.opt_time , '%Y-%m-%d %T') FROM tb_cpc_flow_record r WHERE r.busi_id = t2.demand_id  AND r.curr_node_id ='100103' LIMIT 1) AS actual_time
+			FROM
+			   tb_cpc_flow_record t1 
+			  LEFT JOIN  tb_cpc_demand      t2 
+			  ON t1.busi_id = t2.demand_id
+			  LEFT JOIN tb_cpc_flow_record t3
+			  ON t2.curr_record_id = t3.record_id,sys_staff f
+			where t1.busi_id = t3.busi_id
+			and t2.promoters_id = f.staff_id
+			<isNotEmpty prepend="AND" property="latnId">
+			   EXISTS (
+					SELECT 1 FROM  sys_org org
+					WHERE CONVERT(org.ORG_ID USING utf8)=CONVERT(t2.department_id USING utf8)
+					AND CONVERT(org.REGION_ID USING utf8)=#latnId#
+				)
+			</isNotEmpty>
+			<isNotEmpty  property="regionCode">
+				<isNotEqual property="regionCode" compareValue="888" >
+					and f.region_id = #regionCode#
+				</isNotEqual>
+			</isNotEmpty>
+	       <isEmpty prepend="AND" property="ifopted" >
+				 t1.record_id = t2.curr_record_id
+          </isEmpty>
+ 	       <isNotEmpty prepend="AND" property="record_status" >
+	       (t1.record_status = #record_status# or t1.record_status ='3')
+          </isNotEmpty>
+          <isEmpty  property="isNowNodeId">
+          		 <isNotEmpty prepend="AND" property="curr_node_id" >
+	       			 t1.curr_node_id in ($curr_node_id$)
+          		 </isNotEmpty>
+          </isEmpty>
+           <isNotEmpty  property="isNowNodeId" >
+	           <isNotEmpty prepend="AND" property="curr_node_id" >
+		        t3.curr_node_id in ($curr_node_id$)
+	          </isNotEmpty>
+           </isNotEmpty>
+         
+	       <isNotEmpty prepend="AND" property="demand_id" >
+	        t2.demand_id = #demand_id#
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="demand_theme" >
+	        t2.demand_theme like concat('%', #demand_theme#, '%')
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="start_create_time" >
+	         <![CDATA[ 
+	          t2.create_time >= #start_create_time#
+	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="end_create_time" >
+	         <![CDATA[ 
+	          t2.create_time <= #end_create_time#
+	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="promoters_id" >
+	        t2.promoters_id =  #promoters_id#
+          </isNotEmpty>
+	       <isNotEmpty prepend="AND" property="qryColSet" >
+	         <iterate  property="qryColSet" conjunction="or" close=")" open="(">
+	         <![CDATA[ 
+			    t1.opt_id like  concat('%',  #qryColSet[].optId#, '%')
+			   ]]>
+			</iterate>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit" >
+	         <![CDATA[ 
+ 	         t2.calim_limit <= #calim_limit#
+	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit_begin" >
+	         <![CDATA[ 
+	          t2.calim_limit >= #calim_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_time" >
+	         <![CDATA[ 
+ 	         t2.over_time <= #over_time#
+	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_limit" >
+	         <![CDATA[ 
+	          t2.over_limit <= #over_limit#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="over_limit_begin" >
+	         <![CDATA[ 
+	          t2.over_limit >= #over_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="demand_type" >
+	        t2.demand_type =  #demand_type#
+          </isNotEmpty>
+           <isNotNull prepend="AND" property="default_opt_id" >
+           	<isNotEmpty property="default_opt_id">
+           		<![CDATA[ 
+	        	t1.default_opt_id in ($default_opt_id$)
+	         	]]>
+           	</isNotEmpty>
+           	<isEmpty property="default_opt_id">
+           		t1.default_opt_id = #default_opt_id#
+           	</isEmpty>
+          </isNotNull>
+          <isNotEmpty prepend="AND" property="opt_id" >
+             <isEqual property="curr_node_id" compareValue="401102">
+                 (t1.opt_id in  (#opt_id#) or t1.opt_id 
+                 		in (SELECT 
+					 	 	poolopts.`pool_id` 
+						FROM
+						  tb_cpc_pool_opts poolopts 
+						WHERE poolopts.`rel_value`=#department_id# ))
+             </isEqual>
+             <isNotEqual property="curr_node_id" compareValue="401102">
+	             <isNotEmpty property="orgId">
+                      (t1.opt_id in  (#opt_id#) or t1.opt_id=#orgId#)
+                  </isNotEmpty>
+                  <isEmpty property="orgId">
+                       t1.opt_id in  (#opt_id#)
+                  </isEmpty>
+             </isNotEqual>
+          </isNotEmpty>
+          
+          <isNotEmpty prepend="AND" property="calimTimeOutFlag" >
+	         <isEqual property="calimTimeOutFlag" compareValue="timeOut">
+	         	<![CDATA[
+			  		SYSDATE() > t2.calim_limit 
+	         	]]>
+	         </isEqual>
+	         <isEqual property="calimTimeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         			SYSDATE() < t2.calim_limit 
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="overTimeOutFlag" >
+	         <isEqual property="overTimeOutFlag" compareValue="timeOut">
+	         	<![CDATA[
+			  		SYSDATE() > t2.over_limit 
+	         	]]>
+	         </isEqual>
+	         <isEqual property="overTimeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         			SYSDATE() < t2.over_limit 
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+          	group by t2.demand_id
+           order by t2.rank_id Desc,t2.demand_id Desc
+            <isNotEmpty prepend="" property="pagesize" >
+	         limit $page_num$,$pagesize$
+          </isNotEmpty>
+	</select>
+	<!-- 需求单列表查询 总页数-->
+	<select id="getComprehensiveListSum" resultClass="String" parameterClass="java.util.HashMap">
+	    select 
+	       count( distinct t2.demand_id) as count 
+	    FROM
+			   tb_cpc_flow_record t1 
+			  LEFT JOIN  tb_cpc_demand      t2 
+			  ON t1.busi_id = t2.demand_id
+			  LEFT JOIN tb_cpc_flow_record t3
+			  ON t2.curr_record_id = t3.record_id
+              LEFT JOIN tb_pty_grid_tree a1 
+              ON a1.`TREE_NAME` = t2.`department`
+              LEFT JOIN tb_pty_grid_tree a2
+              ON a2.`TREE_ID`= a1.`P_TREE_ID`
+			where t1.busi_id = t3.busi_id
+			<isNotEmpty prepend="AND" property="latnId">
+			   EXISTS (
+					SELECT 1 FROM  sys_org org
+					WHERE CONVERT(org.ORG_ID USING utf8)=CONVERT(t2.department_id USING utf8)
+					AND CONVERT(org.REGION_ID USING utf8)=#latnId#
+				)
+			</isNotEmpty>
+ 	       <isNotEmpty prepend="AND" property="record_status" >
+	       (t1.record_status = #record_status# or t1.record_status ='3')
+          </isNotEmpty>
+          <isEmpty  property="isNowNodeId">
+          		 <isNotEmpty prepend="AND" property="curr_node_id" >
+	       			 t1.curr_node_id in ($curr_node_id$)
+          		 </isNotEmpty>
+          </isEmpty>
+           <isNotEmpty  property="isNowNodeId" >
+	           <isNotEmpty prepend="AND" property="curr_node_id" >
+		        t3.curr_node_id in ($curr_node_id$)
+	          </isNotEmpty>
+           </isNotEmpty>
+         
+	       <isNotEmpty prepend="AND" property="demand_id" >
+	        t2.demand_id = #demand_id#
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="demand_theme" >
+	        t2.demand_theme like concat('%', #demand_theme#, '%')
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="demand_details" >
+	        t2.demand_details like concat('%', #demand_details#, '%')
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="start_create_time" >
+	         <![CDATA[ 
+	          t2.create_time >= #start_create_time#
+	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="end_create_time" >
+	         <![CDATA[ 
+	          t2.create_time <= #end_create_time#
+	         ]]>
+          </isNotEmpty>
+          <!-- 发起人信息 -->
+           <isNotEmpty prepend="AND" property="promoters_id" >
+	        t2.promoters_id =  #promoters_id#
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="department" >
+	        t2.department like concat('%',#department#,'%')
+          </isNotEmpty>
+          <isNotEmpty prepend="and" property="tel">
+            t2.tel=#tel#
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="tree_name" >
+	        a2.`TREE_NAME` like concat('%',#tree_name#,'%')
+          </isNotEmpty>
+          <!-- 曾处理人信息 -->
+          <isNotEmpty prepend="AND" property="lastOptName" >
+	        t1.opt_name like concat('%',#lastOptName#,'%') 
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="lastOptTel" >
+	        t1.mob_tel =  #lastOptTel#
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="lastOptDept" >
+              t1.opt_name like concat('%',#lastOptDept#,'%')
+          </isNotEmpty>
+          <!-- 工单首问部门 -->
+          <isNotEmpty prepend="and" property="pool_id">
+            EXISTS(SELECT 1 FROM tb_cpc_flow_record r , tb_cpc_flow_record r1 
+			  where r.`on_record_id`=r1.`record_id`
+			  AND r1.`curr_node_id`='100100'
+			  AND r.curr_node_id = '100101' and r.busi_id = t2.demand_id  AND r.opt_id=#pool_id# LIMIT 1)
+          </isNotEmpty>
+          <isNotEmpty prepend="and" property="over_eval">
+            t2.over_eval=#over_eval#
+          </isNotEmpty>
+	       <isNotEmpty prepend="AND" property="qryColSet" >
+	         <iterate  property="qryColSet" conjunction="or" close=")" open="(">
+	         <![CDATA[ 
+			    t1.opt_id like  concat('%',  #qryColSet[].optId#, '%')
+			   ]]>
+			</iterate>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit" >
+	         <![CDATA[ 
+ 	         t2.calim_limit <= #calim_limit#
+	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit_begin" >
+	         <![CDATA[ 
+	          t2.calim_limit >= #calim_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_time" >
+	         <![CDATA[ 
+ 	         t2.over_time <= #over_time#
+	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_limit" >
+	         <![CDATA[ 
+	          t2.over_limit <= #over_limit#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="over_limit_begin" >
+	         <![CDATA[ 
+	          t2.over_limit >= #over_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="demand_type" >
+	        t2.demand_type =  #demand_type#
+          </isNotEmpty>
+           <isNotNull prepend="AND" property="default_opt_id" >
+           	<isNotEmpty property="default_opt_id">
+           		<![CDATA[ 
+	        	t1.default_opt_id in ($default_opt_id$)
+	         	]]>
+           	</isNotEmpty>
+           	<isEmpty property="default_opt_id">
+           		t1.default_opt_id = #default_opt_id#
+           	</isEmpty>
+          </isNotNull>
+          <isNotEmpty prepend="AND" property="opt_id" >
+             <isEqual property="curr_node_id" compareValue="401102">
+                 (t1.opt_id in  (#opt_id#) or t1.opt_id 
+                 		in (SELECT 
+					 	 	poolopts.`pool_id` 
+						FROM
+						  tb_cpc_pool_opts poolopts 
+						WHERE poolopts.`rel_value`=#department_id# ))
+             </isEqual>
+             <isNotEqual property="curr_node_id" compareValue="401102">
+	             <isNotEmpty property="orgId">
+                      (t1.opt_id in  (#opt_id#) or t1.opt_id=#orgId#)
+                  </isNotEmpty>
+                  <isEmpty property="orgId">
+                       t1.opt_id in  (#opt_id#)
+                  </isEmpty>
+             </isNotEqual>
+          </isNotEmpty>
+          
+          <isNotEmpty prepend="AND" property="calimTimeOutFlag" >
+	         <isEqual property="calimTimeOutFlag" compareValue="timeOut">
+	         	<![CDATA[
+			  		((SYSDATE() > t2.calim_limit and t3.curr_node_id='100101')
+			  		or (t1.opt_time>t2.calim_limit and t1.curr_node_id='100101' and t1.record_status=1))
+	         	]]>
+	         </isEqual>
+	         <isEqual property="calimTimeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         			((SYSDATE() < t2.calim_limit and t3.curr_node_id='100101')
+			  		or (t1.opt_time < t2.calim_limit and t1.curr_node_id='100101' and t1.record_status=1))
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="overTimeOutFlag" >
+	         <isEqual property="overTimeOutFlag" compareValue="timeOut">
+	         	<![CDATA[
+	            ((t1.opt_time>t2.over_limit and t3.curr_node_id='100104' and t1.next_node_id='100103' 
+	            and t1.record_id=(select f.on_record_id from tb_cpc_flow_record f where f.record_id=t3.on_record_id))
+	              or (SYSDATE() > t2.over_limit and t3.curr_node_id in('100102','200102'))
+	              or (t1.opt_time>t2.over_limit and t3.curr_node_id='100103' and t1.record_id=t3.on_record_id)
+	            )
+	         	]]>
+	         </isEqual>
+	         <isEqual property="overTimeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         	 ((t1.opt_time < t2.over_limit and t3.curr_node_id='100104' and t1.next_node_id='100103' 
+	            and t1.record_id=(select f.on_record_id from tb_cpc_flow_record f where f.record_id=t3.on_record_id))
+	         	  or (SYSDATE() < t2.over_limit and t3.curr_node_id in('100102','200102'))
+	              or (t1.opt_time < t2.over_limit and t3.curr_node_id='100103' and t1.record_id=t3.on_record_id)
+	            )
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+	</select>
+	<!-- 综合查询列表 -->
+	<select id="getComprehensiveListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+			SELECT 
+			  t3.record_id,
+			  t3.curr_node_id,
+			  t3.curr_node_name,
+			  t3.opt_id ,
+			  t3.opt_name ,
+			  DATE_FORMAT(t1.opt_time, "%Y-%m-%d %T") AS opt_time,
+			  t3.next_node_id,
+			  t3.next_node_name,
+			  t3.default_opt_id,
+			  t3.default_opt_name,
+			  t3.time_count,
+			  t3.urge_count,
+			  t3.busi_id,
+			  t3.opt_desc,
+			  t3.record_status,
+			  t1.record_status  AS his_record_status,
+			  t2.demand_id,
+			  t2.demand_theme,
+			  t2.demand_details,
+			  t2.demand_type,
+			  t2.promoters_id,
+			  t2.promoters,
+			  t2.department_id,
+			  t2.department,
+			  t2.rank_id,
+			  t2.rank_name,
+			  t2.tel,
+			  DATE_FORMAT(t2.create_time, '%Y-%m-%d %T') create_time,
+			  t2.urge_count,
+			  DATE_FORMAT(t2.over_time, '%Y-%m-%d %T') over_time,
+			  t2.summary,
+			  t2.over_eval,
+			  t2.over_opinion,
+			  t2.eval_time,
+			  t2.eval_atti,
+			  t2.curr_record_id,
+			  DATE_FORMAT(t2.calim_limit, '%Y-%m-%d %T') calim_limit,
+			  DATE_FORMAT(t2.over_limit, '%Y-%m-%d %T') over_limit,
+			  t2.demand_type_name ,
+			  case when a2.`TREE_NAME` is not null then a2.`TREE_NAME` else t2.`department` end tree_name,
+			  (SELECT r.opt_name FROM tb_cpc_flow_record r , tb_cpc_flow_record r1 
+			  where r.`on_record_id`=r1.`record_id`
+			  AND r1.`curr_node_id`='100100'
+			  AND r.curr_node_id = '100101' and r.busi_id = t2.demand_id  LIMIT 1) AS pool_name,
+			  (SELECT 
+				  DATE_FORMAT(r.opt_time, '%Y-%m-%d %T') back_time 
+				FROM
+				  tb_cpc_flow_record r 
+				WHERE r.busi_id = t2.demand_id 
+				  AND r.curr_node_id = 100102 
+				  AND r.record_status=1
+				ORDER BY r.record_id DESC 
+				LIMIT 1) back_time,
+			  (select DATE_FORMAT(r1.opt_time,'%Y-%m-%d %T') calim_time from  tb_cpc_flow_record r1
+			    where r1.busi_id = t2.demand_id and r1.curr_node_id=100101 and
+			    r1.record_status = 1 limit 1) calim_time
+			FROM
+			   tb_cpc_flow_record t1 
+			  LEFT JOIN  tb_cpc_demand      t2 
+			  ON t1.busi_id = t2.demand_id
+			  LEFT JOIN tb_cpc_flow_record t3
+			  ON t2.curr_record_id = t3.record_id
+             LEFT JOIN tb_pty_grid_tree a1 
+              ON a1.`TREE_NAME` = t2.`department`
+              LEFT JOIN tb_pty_grid_tree a2
+              ON a2.`TREE_ID`= a1.`P_TREE_ID`
+			where t1.busi_id = t3.busi_id
+			
+			<isNotEmpty prepend="AND" property="latnId">
+			   EXISTS (
+					SELECT 1 FROM  sys_org org
+					WHERE CONVERT(org.ORG_ID USING utf8)=CONVERT(t2.department_id USING utf8)
+					AND CONVERT(org.REGION_ID USING utf8)=#latnId#
+				)
+			</isNotEmpty>
+ 	       <isNotEmpty prepend="AND" property="record_status" >
+	       (t1.record_status = #record_status# or t1.record_status ='3')
+          </isNotEmpty>
+          <isEmpty  property="isNowNodeId">
+          		 <isNotEmpty prepend="AND" property="curr_node_id" >
+	       			 t1.curr_node_id in ($curr_node_id$)
+          		 </isNotEmpty>
+          </isEmpty>
+           <isNotEmpty  property="isNowNodeId" >
+	           <isNotEmpty prepend="AND" property="curr_node_id" >
+		        t3.curr_node_id in ($curr_node_id$)
+	          </isNotEmpty>
+           </isNotEmpty>
+         
+	       <isNotEmpty prepend="AND" property="demand_id" >
+	        t2.demand_id = #demand_id#
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="demand_theme" >
+	        t2.demand_theme like concat('%', #demand_theme#, '%')
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="demand_details" >
+	        t2.demand_details like concat('%', #demand_details#, '%')
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="start_create_time" >
+	         <![CDATA[ 
+	          t2.create_time >= #start_create_time#
+	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="end_create_time" >
+	         <![CDATA[ 
+	          t2.create_time <= #end_create_time#
+	         ]]>
+          </isNotEmpty>
+          <!-- 发起人信息 -->
+           <isNotEmpty prepend="AND" property="promoters_id" >
+	        t2.promoters_id =  #promoters_id#
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="department" >
+	        t2.department like concat('%',#department#,'%')
+          </isNotEmpty>
+          <isNotEmpty prepend="and" property="tel">
+            t2.tel=#tel#
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="tree_name" >
+	        a2.`TREE_NAME` like concat('%',#tree_name#,'%')
+          </isNotEmpty>
+          <!-- 曾处理人信息 -->
+          <isNotEmpty prepend="AND" property="lastOptName" >
+	        t1.opt_name like concat('%',#lastOptName#,'%')  
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="lastOptTel" >
+	        t1.mob_tel =  #lastOptTel#
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="lastOptDept" >
+            t1.opt_name like concat('%',#lastOptDept#,'%')
+          </isNotEmpty>
+          <!-- 工单首问部门 -->
+          <isNotEmpty prepend="and" property="pool_id">
+            EXISTS(SELECT 1 FROM tb_cpc_flow_record r , tb_cpc_flow_record r1 
+			  where r.`on_record_id`=r1.`record_id`
+			  AND r1.`curr_node_id`='100100'
+			  AND r.curr_node_id = '100101' and r.busi_id = t2.demand_id  AND r.opt_id=#pool_id# LIMIT 1)
+          </isNotEmpty>
+          <isNotEmpty prepend="and" property="over_eval">
+            t2.over_eval=#over_eval#
+          </isNotEmpty>
+	       <isNotEmpty prepend="AND" property="qryColSet" >
+	         <iterate  property="qryColSet" conjunction="or" close=")" open="(">
+	         <![CDATA[ 
+			    t1.opt_id like  concat('%',  #qryColSet[].optId#, '%')
+			   ]]>
+			</iterate>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit" >
+	         <![CDATA[ 
+ 	         t2.calim_limit <= #calim_limit#
+	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit_begin" >
+	         <![CDATA[ 
+	          t2.calim_limit >= #calim_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_time" >
+	         <![CDATA[ 
+ 	         t2.over_time <= #over_time#
+	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_limit" >
+	         <![CDATA[ 
+	          t2.over_limit <= #over_limit#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="over_limit_begin" >
+	         <![CDATA[ 
+	          t2.over_limit >= #over_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="demand_type" >
+	        t2.demand_type =  #demand_type#
+          </isNotEmpty>
+           <isNotNull prepend="AND" property="default_opt_id" >
+           	<isNotEmpty property="default_opt_id">
+           		<![CDATA[ 
+	        	t1.default_opt_id in ($default_opt_id$)
+	         	]]>
+           	</isNotEmpty>
+           	<isEmpty property="default_opt_id">
+           		t1.default_opt_id = #default_opt_id#
+           	</isEmpty>
+          </isNotNull>
+          <isNotEmpty prepend="AND" property="opt_id" >
+             <isEqual property="curr_node_id" compareValue="401102">
+                 (t1.opt_id in  (#opt_id#) or t1.opt_id 
+                 		in (SELECT 
+					 	 	poolopts.`pool_id` 
+						FROM
+						  tb_cpc_pool_opts poolopts 
+						WHERE poolopts.`rel_value`=#department_id# ))
+             </isEqual>
+             <isNotEqual property="curr_node_id" compareValue="401102">
+	             <isNotEmpty property="orgId">
+                      (t1.opt_id in  (#opt_id#) or t1.opt_id=#orgId#)
+                  </isNotEmpty>
+                  <isEmpty property="orgId">
+                       t1.opt_id in  (#opt_id#)
+                  </isEmpty>
+             </isNotEqual>
+          </isNotEmpty>
+          
+          <isNotEmpty prepend="AND" property="calimTimeOutFlag" >
+	         <isEqual property="calimTimeOutFlag" compareValue="timeOut">
+	         	<![CDATA[
+			  		((SYSDATE() > t2.calim_limit and t3.curr_node_id='100101')
+			  		or (t1.opt_time>t2.calim_limit and t1.curr_node_id='100101' and t1.record_status=1))
+	         	]]>
+	         </isEqual>
+	         <isEqual property="calimTimeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         			((SYSDATE() < t2.calim_limit and t3.curr_node_id='100101')
+			  		or (t1.opt_time < t2.calim_limit and t1.curr_node_id='100101' and t1.record_status=1))
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="overTimeOutFlag" >
+	         <isEqual property="overTimeOutFlag" compareValue="timeOut">
+	         
+	         	<![CDATA[
+	            ((t1.opt_time > t2.over_limit and t3.curr_node_id='100104' and t1.next_node_id='100103' 
+	            and t1.record_id=(select f.on_record_id from tb_cpc_flow_record f where f.record_id=t3.on_record_id))
+	              or (SYSDATE() > t2.over_limit and t3.curr_node_id in('100102','200102'))
+	              or (t1.opt_time>t2.over_limit and t3.curr_node_id='100103' and t1.record_id=t3.on_record_id)
+	            )
+	         	]]>
+	         </isEqual>
+	         <isEqual property="overTimeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         	 ((t1.opt_time < t2.over_limit and t3.curr_node_id='100104' and t1.next_node_id='100103' 
+	            and t1.record_id=(select f.on_record_id from tb_cpc_flow_record f where f.record_id=t3.on_record_id))
+	         	  or (SYSDATE() < t2.over_limit and t3.curr_node_id in('100102','200102'))
+	              or (t1.opt_time < t2.over_limit and t3.curr_node_id='100103' and t1.record_id=t3.on_record_id)
+	            )
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+          	group by t2.demand_id
+           order by t2.rank_id Desc,t2.demand_id Desc
+            <isNotEmpty prepend="" property="pagesize" >
+	         limit $page_num$,$pagesize$
+          </isNotEmpty>
+	</select>
+	<!-- 服务单列表查询 总页数-->
+	
+	<select id="getServiceListSum" resultClass="String" parameterClass="java.util.HashMap">
+		select 
+	       count( distinct t2.service_id) as count 
+	    from
+	    	tb_cpc_flow_record t1,
+	    	tb_cpc_service      t2
+	      where t1.busi_id =  t2.service_id
+	      <isNotEmpty prepend="AND" property="latnId">
+			    EXISTS (
+					SELECT 1 FROM  sys_org org
+					WHERE CONVERT(org.ORG_ID USING utf8)=CONVERT(t2.department_id USING utf8)
+					AND CONVERT(org.REGION_ID USING utf8)=#latnId#
+				)
+			</isNotEmpty>
+	       <isEmpty prepend="AND" property="ifopted" >
+	                t1.record_id = t2.curr_record_id
+          </isEmpty>
+	        <isNotEmpty prepend="AND" property="record_status" >
+	        t1.record_status = #record_status#
+          </isNotEmpty>
+ 	        <isNotEmpty prepend="AND" property="curr_node_id" >
+	        (SELECT r.curr_node_id FROM tb_cpc_flow_record r,tb_cpc_service d WHERE r.record_id = d.curr_record_id  AND d.service_id = t2.service_id ) in ($curr_node_id$)
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="service_id" >
+	        t2.service_id = #service_id#
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="demand_id" >
+          	t2.service_id in (SELECT r.service_id FROM tb_cpc_busi_flow_rel r WHERE r.demand_id =#demand_id#)
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="service_theme" >
+	        t2.service_theme like concat('%', #service_theme#, '%')
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="start_create_time" >
+	         <![CDATA[ 
+	         t2.send_time >= #start_create_time#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="end_create_time" >
+	         <![CDATA[ 
+	         t2.send_time <= #end_create_time#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="promoters_id" >
+	        t2.promoters_id =  #promoters_id#
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="qryColSet" >
+	         <iterate  property="qryColSet" conjunction="or" close=")" open="(">
+			    t1.opt_id = #qryColSet[].optId# 
+			</iterate>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit" >
+	         <![CDATA[ 
+	          t2.calim_limit <= #calim_limit#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_time" >
+	         <![CDATA[ 
+	          t2.over_time <= #over_time#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="over_limit" >
+	         <![CDATA[ 
+	          t2.over_limit <= #over_limit#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_limit_begin" >
+	         <![CDATA[ 
+	          t2.over_limit >= #over_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotNull prepend="AND" property="default_opt_id" >
+	        t1.default_opt_id =  #default_opt_id#
+          </isNotNull>
+           <isNotEmpty prepend="AND" property="opt_id" >
+             <![CDATA[ 
+	       		 t1.opt_id =  #opt_id#
+	          ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="timeOutFlag" >
+	         <isEqual property="timeOutFlag" compareValue="timeOut">
+	         	<![CDATA[
+	         		(SYSDATE() > t2.over_limit  AND t2.over_time is null)
+	         	]]>
+	         </isEqual>
+	         <isEqual property="timeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         		(SYSDATE() < t2.over_limit  AND t2.over_time is  null)
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+	</select>
+	
+	
+	<!-- 服务单列表查询 分页数据 -->
+	<select id="getServiceListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+			SELECT 
+			  (SELECT 
+			    r.record_id 
+			  FROM
+			    tb_cpc_flow_record r,
+			    tb_cpc_service d 
+			  WHERE r.record_id = d.curr_record_id 
+			    AND d.service_id = t2.service_id
+			  LIMIT 1) AS record_id,
+			  (SELECT 
+			    r.curr_node_id 
+			  FROM
+			    tb_cpc_flow_record r,
+			    tb_cpc_service d 
+			  WHERE r.record_id = d.curr_record_id 
+			    AND d.service_id = t2.service_id
+			  LIMIT 1) AS curr_node_id,
+			  (SELECT 
+			    r.curr_node_name 
+			  FROM
+			    tb_cpc_flow_record r,
+			   tb_cpc_service d 
+			  WHERE r.record_id = d.curr_record_id 
+			    AND d.service_id = t2.service_id
+			  LIMIT 1) AS curr_node_name,
+			  (SELECT 
+			    r.opt_id 
+			  FROM
+			    tb_cpc_flow_record r,
+			   tb_cpc_service d 
+			  WHERE r.record_id = d.curr_record_id 
+			    AND d.service_id = t2.service_id
+			  LIMIT 1) AS opt_id,
+			  (SELECT 
+			    r.opt_name 
+			  FROM
+			    tb_cpc_flow_record r,
+			   tb_cpc_service d 
+			  WHERE r.record_id = d.curr_record_id 
+			    AND d.service_id = t2.service_id
+			  LIMIT 1) AS opt_name,
+			  DATE_FORMAT(t1.opt_time, "%Y-%m-%d %T") AS opt_time,
+			  t1.next_node_id,
+			  t1.next_node_name,
+			  t1.default_opt_id,
+			  t1.default_opt_name,
+			  t1.time_count,
+			  t1.urge_count,
+			  t1.busi_id,
+			  t1.opt_desc,
+			  (SELECT 
+			    r.curr_node_name 
+			  FROM
+			    tb_cpc_flow_record r,
+			    tb_cpc_service d 
+			  WHERE r.record_id = d.curr_record_id 
+			    AND d.service_id = t2.service_id
+			  LIMIT 1) AS record_status,
+			  t2.`service_id`,
+			  t2.`service_theme`,
+			  t2.`service_desc`,
+			  t2.`service_type`,
+			  t2.promoters_id,
+			  t2.promoters,
+			  t2.department_id,
+			  t2.department,
+			  t2.tel,
+			  t2.summary,
+			  DATE_FORMAT(t2.`send_time`, '%Y-%m-%d %T') create_time,
+			  DATE_FORMAT(t2.`over_limit`, '%Y-%m-%d %T') over_time,
+			  t2.curr_record_id,
+			  DATE_FORMAT(t2.calim_limit, '%Y-%m-%d %T') calim_limit,
+			  DATE_FORMAT(t2.over_limit, '%Y-%m-%d %T') over_limit,
+			  t2.service_type
+			FROM
+			  tb_cpc_flow_record t1,
+			  tb_cpc_service t2 
+			WHERE t1.busi_id = t2.service_id
+			<isNotEmpty prepend="AND" property="latnId">
+			    EXISTS (
+					SELECT 1 FROM  sys_org org
+					WHERE CONVERT(org.ORG_ID USING utf8)=CONVERT(t2.department_id USING utf8)
+					AND CONVERT(org.REGION_ID USING utf8)=#latnId#
+				)
+			</isNotEmpty>
+	       <isEmpty prepend="AND" property="ifopted" >
+	                t1.record_id = t2.curr_record_id
+          </isEmpty>
+	        <isNotEmpty prepend="AND" property="record_status" >
+	        t1.record_status = #record_status#
+          </isNotEmpty>
+ 	        <isNotEmpty prepend="AND" property="curr_node_id" >
+	        (SELECT r.curr_node_id FROM tb_cpc_flow_record r,tb_cpc_service d WHERE r.record_id = d.curr_record_id  AND d.service_id = t2.service_id ) in ($curr_node_id$,200102)
+          </isNotEmpty>
+	      <isNotEmpty prepend="AND" property="service_id" >
+	        t2.service_id = #service_id#
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="demand_id" >
+          	t2.service_id in (SELECT r.service_id FROM tb_cpc_busi_flow_rel r WHERE r.demand_id =#demand_id#)
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="service_theme" >
+	        t2.service_theme like concat('%', #service_theme#, '%')
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="start_create_time" >
+	         <![CDATA[ 
+	         t2.send_time >= #start_create_time#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="end_create_time" >
+	         <![CDATA[ 
+	         t2.send_time <= #end_create_time#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="promoters_id" >
+	        t2.promoters_id =  #promoters_id#
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="qryColSet" >
+	         <iterate  property="qryColSet" conjunction="or" close=")" open="(">
+			    t1.opt_id = #qryColSet[].optId# 
+			</iterate>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="calim_limit" >
+	         <![CDATA[ 
+	          t2.calim_limit <= #calim_limit#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="over_time" >
+	         <![CDATA[ 
+	          t2.over_time <= #over_time#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="over_limit" >
+	         <![CDATA[ 
+	          t2.over_limit <= #over_limit#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotEmpty prepend="AND" property="over_limit_begin" >
+	         <![CDATA[ 
+	          t2.over_limit >= #over_limit_begin#
+ 	         ]]>
+          </isNotEmpty>
+           <isNotNull prepend="AND" property="default_opt_id" >
+	        t1.default_opt_id =  #default_opt_id#
+          </isNotNull>
+           <isNotEmpty prepend="AND" property="opt_id" >
+             <![CDATA[ 
+	       		 t1.opt_id =  #opt_id#
+	          ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="timeOutFlag" >
+	         <isEqual property="timeOutFlag" compareValue="timeOut">
+	         	<![CDATA[
+	         		 (SYSDATE() > t2.over_limit  AND t2.over_time is  null)
+	         	]]>
+	         </isEqual>
+	         <isEqual property="timeOutFlag" compareValue="noTimeout">
+	         	<![CDATA[
+	         		(SYSDATE() < t2.over_limit  AND t2.over_time is  null)
+	         	]]>
+	         </isEqual>
+          </isNotEmpty>
+          	group by t2.service_id
+           order by t2.service_id Desc
+            <isNotEmpty prepend="" property="pagesize" >
+	         limit $page_num$,$pagesize$
+          </isNotEmpty>
+	</select>
+
+	
+	
+	<!-- 专业系统列表查询 总页数-->
+	<select id="getSysListSum" resultClass="String" parameterClass="java.util.HashMap">
+		SELECT 
+	       COUNT( DISTINCT t1.flow_record_id) AS COUNT 
+	    FROM
+	    	tb_out_sys_flow_record t1
+	      WHERE 1=1
+	      <isNotEmpty prepend="AND" property="flow_record_id" >
+	        t1.flow_record_id = #flow_record_id#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="flow_theme" >
+	        t1.flow_theme = #flow_theme#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="start_create_time" >
+	         <![CDATA[ 
+	         t1.create_time >= #start_create_time#
+ 	         ]]>
+          </isNotEmpty>
+          <isNotEmpty prepend="AND" property="end_create_time" >
+	         <![CDATA[ 
+	         t1.create_time <= #end_create_time#
+ 	         ]]>
+          </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="flow_status" >
+	        t1.flow_status = #flow_status#
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="opter_name" >
+	        t1.opter_name like concat('%', #opter_name#, '%')
+	     </isNotEmpty>
+	     <isNotEmpty prepend="AND" property="out_sys_id">
+	     	t1.out_sys_id =#out_sys_id#
+	     </isNotEmpty>
+	</select>
+	
+	
+	<!-- 专业系统列表查询 分页数据 -->
+	<select id="getSysListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+			SELECT 
+			  DATE_FORMAT(r.create_time, '%Y-%m-%d %T') create_time,
+			  r.flow_name,
+			  r.flow_record_id,
+			  r.flow_status,
+			  r.flow_theme,
+			  r.latn_id,
+			  r.node_name,
+			  r.node_name,
+			  r.node_record_id,
+			  r.opter_id ,
+			  r.opter_name,
+			  r.opter_org_id,
+			  r.opter_org_name,
+			  r.opt_remark,
+			  r.opt_status,
+			  DATE_FORMAT(r.opt_time, '%Y-%m-%d %T') opt_time,
+			  r.out_sys_id,
+			  (SELECT d.dic_value FROM tb_cpc_dic d WHERE d.dic_code = r.out_sys_id) AS out_sys_name
+			FROM
+			  tb_out_sys_flow_record r 
+			WHERE 1=1
+			  <isNotEmpty prepend = "AND" property = "flow_record_id" >
+			        r.flow_record_id = #flow_record_id#
+			  </isNotEmpty > 
+			  <isNotEmpty prepend = "AND" property = "flow_theme" > 
+				r.flow_theme = #flow_theme#
+			  </isNotEmpty >
+			  <isNotEmpty prepend="AND" property="start_create_time" >
+		         <![CDATA[ 
+		         r.create_time >= #start_create_time#
+	 	         ]]>
+	          </isNotEmpty>
+	          <isNotEmpty prepend="AND" property="end_create_time" >
+		         <![CDATA[ 
+		         r.create_time <= #end_create_time#
+	 	         ]]>
+          	</isNotEmpty>
+			  <isNotEmpty prepend = "AND" property = "flow_status" > 
+			    r.flow_status = #flow_status#
+			  </isNotEmpty > 
+			  <isNotEmpty prepend = "AND" property = "opter_name" > 
+			   r.opter_name like concat('%', #opter_name#, '%')
+			  </isNotEmpty >
+             order by r.flow_record_id Desc
+            <isNotEmpty prepend="" property="pagesize" >
+	         limit $page_num$,$pagesize$
+          </isNotEmpty>
+	</select>
+	
+	<!-- 当前记录状态-->
+	<select id="select_flow_record_status" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	   SELECT 
+		  COUNT(*) AS count,t1.curr_node_id as node_id
+		FROM
+		  tb_cpc_flow_record t1,
+		  tb_cpc_demand t2 
+		WHERE t1.record_id = t2.curr_record_id
+		  AND t2.promoters_id = #promoters_id#
+		  and (
+			  <iterate property="list" conjunction="or">
+						(t1.record_status = $list[].record_status$
+					AND t1.curr_node_id IN ($list[].node_id$)
+					)
+			  </iterate> 
+		  )
+		  group by t1.curr_node_id
+	</select>
+	
+	<!-- 催单-->
+	<update id="update_demand_urge_count"  parameterClass="java.util.HashMap">
+	   update tb_cpc_demand set urge_count = urge_count +1, urge_time = #urge_time# where demand_id = #demand_id#
+	</update>
+	
+	<update id="update_record_urge_count"  parameterClass="java.util.HashMap">
+	   update tb_cpc_flow_record set urge_count = urge_count +1 where busi_id = #demand_id# and record_status = 0
+	</update>
+	<!-- 添加再次处理意见 -->
+	<update id="update_record_opt_desc"  parameterClass="java.util.HashMap">
+	   update tb_cpc_flow_record set opt_desc=#opt_desc# where record_id=#record_id#
+	</update>
+	<!-- 领导留言-->
+	<update id="update_flow_record_service"  parameterClass="java.util.HashMap">
+	   update tb_cpc_flow_record set opt_desc=#opt_desc#,curr_node_name='已查看' where opt_id=#opt_id# AND  busi_id=#busi_id#
+	</update>
+	<!-- 根据流程节点查流程下的所有节点-->
+	<select id="getAllFlowNode" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+			  t2.flow_id,
+			  t2.node_id,
+			  t2.node_name,
+			  t2.node_level
+			FROM
+			  tb_cpc_flow_node t1,
+			  tb_cpc_flow_node t2 
+			WHERE t1.node_id = #node_id# 
+			  AND t1.flow_id = t2.flow_id 
+			  ORDER BY t2.node_level 
+	</select>
+	
+	<!-- 过程处理属性保存-->
+	<insert id="saveRecordProc" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_cpc_record_proc (
+		record_id,
+		attr_id,
+		attr_value,
+		busi_id,
+		attr_group 
+		)VALUES(
+		#record_id#,
+		#attr_id#,
+		#attr_busi_idvalue#,
+		#demand_type#,
+		#attr_group#
+		)
+	</insert>
+	
+	<update id="updateDemand" parameterClass="java.util.HashMap">
+		update tb_cpc_demand 
+			SET 
+			demand_id=#demand_id# ,
+			<iterate  property="updateColSet" conjunction=",">
+			    $updateColSet[].col_name$ = #updateColSet[].col_value# 
+			</iterate>
+		WHERE demand_id=#demand_id#
+	</update>
+	
+	<update id="updateService" parameterClass="java.util.HashMap">
+		update tb_cpc_service 
+			SET 
+			service_id=#service_id# ,
+			<iterate  property="updateColSet" conjunction=",">
+			    $updateColSet[].col_name$ = #updateColSet[].col_value# 
+			</iterate>
+		WHERE service_id=#service_id#
+	</update>
+	
+	<!-- 删除需求单草稿 -->
+	<delete id="delete_demand_draft_list" parameterClass="java.util.HashMap">
+		delete from tb_cpc_demand 			
+		WHERE 
+		demand_id in($delDemandIds$)
+	</delete>
+	<!-- 删除需求单草稿 -->
+	<delete id="delete_demand_save" parameterClass="java.util.HashMap">
+		delete from tb_cpc_demand 			
+		WHERE 
+		demand_id =#demand_id#
+	</delete>
+ 
+	<!-- 获取渠道-->
+	<select id="getSysOrg" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+			  t1.org_id,
+			  t1.pid,
+			  t1.org_name,
+			  t2.region_name,
+			  t2.region_code,
+			  t2.control_number,
+			  t1.org_flag ,
+			  d.`COUNT(*)`,
+			  (SELECT COUNT(1) FROM sys_staff a1 WHERE a1.department_id = t1.org_id AND a1.personnel_type='professional') has_professional	
+			FROM
+			
+			  sys_org t1
+			  INNER JOIN sys_region t2 
+              ON t1.region_id = t2.REGION_ID 
+              LEFT JOIN  tb_cpc_demand_view d
+              ON t1.`ORG_NAME`=d.operator_name 
+			WHERE 1=1
+			<isNotEqual property="cpcAndroid" compareValue="androidCpcCall">
+				AND t1.state = '1'
+			</isNotEqual>
+			<isEqual  property="cpcAndroid" compareValue="androidCpcCall">
+				AND t2.state = '10A'
+			</isEqual>
+			 <isNotEmpty prepend="AND" property="org_name" >
+	         t1.org_name like concat('%', #org_name#, '%')
+             </isNotEmpty>
+              <isNotEmpty prepend="AND" property="region_code" >
+	         t2.region_code = #region_code#
+             </isNotEmpty>
+              <isNotEmpty prepend="AND" property="org_code" >
+	         t1.org_code = #org_code#
+             </isNotEmpty>
+             	ORDER BY org_flag,org_id
+             
+	</select>
+	
+	<!--获取专业部门的信息  -->
+	<select id="getDeptSysOrg" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		    SELECT 
+			  t1.org_id,
+			  t1.org_name,
+			  t2.region_name,
+			  t2.region_code,
+			  t2.control_number,
+			  t1.org_flag 
+			  from sys_org t1,sys_region t2  
+			WHERE t1.region_id = t2.REGION_ID
+			<isNotEmpty prepend="AND" property="region_code" >
+	         t2.region_code = #region_code#
+             </isNotEmpty> 
+			<isNotEmpty prepend="AND" property="org_id" >
+	         t1.org_id = #org_id#
+             </isNotEmpty>
+             <isNotEmpty prepend="AND" property="org_flag">
+             t1.`ORG_FLAG`=#org_flag#
+             </isNotEmpty>
+			 <isNotEmpty prepend="AND" property="org_name" >
+	         t1.org_name like concat('%', #org_name#, '%')
+             </isNotEmpty>
+	</select>
+	
+	<select id="getSysOrgByPid" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	   SELECT 
+			  t1.org_id,
+			  t1.org_name,
+			  t1.org_flag,
+			  t1.pid,
+			  d.`COUNT(*)`
+			  FROM sys_org t1
+              LEFT JOIN  tb_cpc_demand_view d
+              ON t1.org_name=d.operator_name 
+			WHERE 1=1
+			<isNotEmpty prepend="AND" property="region_code" >
+	         t1.`REGION_ID`= #region_code#
+             </isNotEmpty>
+			<isNotEmpty prepend="AND" property="pid" >
+	         t1.`PID`=#pid#
+             </isNotEmpty>
+			<isNotEmpty prepend="AND" property="org_id" >
+	         t1.org_id = #org_id#
+             </isNotEmpty>
+             ORDER BY d.`COUNT(*)` DESC
+	</select>
+	
+	<!-- 获取小CEO部门信息 -->
+	<select id="getSysOrgByType" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	  SELECT DISTINCT 
+		  t1.org_id,
+		  t1.pid,
+		  t1.org_name,
+		  t2.region_name,
+		  t2.region_code,
+		  t2.control_number,
+		  t1.org_flag 
+		FROM
+		  sys_org t1 
+		  LEFT JOIN sys_region t2 
+		    ON t1.region_id = t2.REGION_ID 
+		  LEFT JOIN sys_staff t3 
+		    ON t1.org_id = t3.DEPARTMENT_CODE 
+		WHERE 1=1
+		<isNotEmpty prepend="and" property="qryType">
+			 t3.personnel_type=#qryType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="region_code">
+			 t2.REGION_CODE=#region_code#
+		</isNotEmpty>
+	</select>
+ 
+	<!-- 登陆查询 -->
+	<select id="qry_user_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+	  s.STAFF_ID,
+	  s.STAFF_NAME,
+	  s.LOGIN_CODE,
+	  s.REGION_ID,
+	  s.STATE,
+	  s.MOB_TEL,
+	  s.DEPARTMENT_CODE 
+	FROM
+	  sys_staff s 
+	WHERE 
+	  s.LOGIN_CODE = #LOGIN_CODE# 
+	  <isNotEqual property="cpcAndroid" compareValue="androidCpcCall">
+	 	 AND s.PASSWORD = #PASSWORD# 
+	  </isNotEqual>
+	  
+	  	<!--  <isNotEqual property="cpcAndroid" compareValue="androidCpcCall">
+	  	    AND s.PASSWORD = #PASSWORD# 
+	  	    AND s.STATE = 1 
+		</isNotEqual>
+        <isEqual  property="cpcAndroid" compareValue="androidCpcCall">
+	         AND s.STATE = '10A'
+        </isEqual>-->
+		
+	</select>
+	
+	
+	<!-- 查询员工信息 -->
+	<select id="qry_staff_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  s.staff_id,
+		  s.staff_name,
+		  s.login_code,
+		  s.region_id,
+		  s.state,
+		  s.mob_tel,
+		  s.department_code 
+		FROM
+		  sys_staff s 
+		WHERE 
+			1=1
+		<isNotEmpty prepend="AND" property="staffId" >
+         	s.staff_id = #staffId#		
+         </isNotEmpty>
+         <isNotEmpty prepend="AND" property="login_code" >
+         	s.login_code = #login_code#		
+         </isNotEmpty>
+	</select>
+	
+ 
+	<!-- 获取员工-->
+	<select id="getStaffByOrgId" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	   SELECT t.mob_tel, t.staff_id,t.staff_name,t.login_code,t.DEPARTMENT_CODE as org_id,t2.region_code ,t.DEPARTMENT org_name,org_flag,
+	 	t.personnel_type,
+	    (SELECT a1.`department_id` FROM tb_cpc_demand a1 WHERE demand_id = #busiId#) opt_dept_id
+	    FROM sys_region t2 
+  INNER JOIN sys_staff t 
+    ON t.region_id = t2.region_id 
+  LEFT JOIN sys_org s 
+    ON t.`DEPARTMENT_CODE` = s.org_id 
+	    WHERE t.state in ( '1','10A') and t.region_id = t2.region_id and t2.state = '10A'
+	         <isNotEmpty prepend="AND" property="org_name" >
+	         t.department like concat('%', #org_name#, '%')
+             </isNotEmpty>
+			 <isNotEmpty prepend="AND" property="staff_name" >
+	         t.staff_name like concat('%', #staff_name#, '%')
+             </isNotEmpty>
+            <isNotEmpty prepend="AND" property="region_code" >
+	         t2.region_code = #region_code#
+             </isNotEmpty>
+              <isNotEmpty prepend="AND" property="org_flag" >
+              
+	         <![CDATA[
+	         			 s.org_flag<>#org_flag#
+	         	]]>
+             </isNotEmpty>
+             
+             <isNotEmpty prepend="AND" property="staff_phone" >
+	         t.MOB_TEL like concat('%', #staff_phone#, '%')
+             </isNotEmpty>
+              
+             <isNotEmpty prepend="AND" property="ceoType" >
+	         CONVERT(t.staff_id USING UTF8) IN 
+			  (SELECT 
+			    CONVERT(t4.limit_value USING UTF8) 
+			  FROM
+			    tb_cpc_flow_limit t4)
+             </isNotEmpty>
+             <isNotEmpty prepend="AND" property="qryType" >
+	         	t.personnel_type = #qryType#
+             </isNotEmpty>
+             <isNotEmpty prepend="AND" property="optDefault">
+                 t.personnel_service="service"
+             </isNotEmpty>
+             <isNotEmpty prepend="AND" property="proDept" >
+                <![CDATA[
+	         			 t.staff_id<>#staff_id#
+	         	]]>
+             </isNotEmpty>
+              <isNotEmpty prepend="AND" property="org_id" >
+	         t.department_code = #org_id#
+             </isNotEmpty>
+             <isEqual property="pid" compareValue='search'>
+	             <isNotEmpty prepend="AND" property="busiId" >
+		         	t.DEPARTMENT_CODE IN(
+				  		SELECT a1.`department_id` FROM tb_cpc_demand a1 WHERE demand_id=#busiId#
+				  	)
+	             </isNotEmpty>  
+	             
+             </isEqual>      
+
+             
+             
+             order by t.def_index asc;
+	</select>
+	
+ 	<!-- 查询单池关系 -->
+	<select id="qryPoolOpts" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  o.rel_id,
+		  o.rel_type,
+		  o.rel_value ,
+		  o.pool_id 
+		FROM
+		  tb_cpc_pool_opts o 
+		WHERE 
+	        <iterate  property="qryPoolColSet" conjunction="or" >
+			   <![CDATA[
+			    (o.rel_type = #qryPoolColSet[].relType# 
+			    and o.rel_value = #qryPoolColSet[].relValue# )
+			    ]]>
+		 	</iterate>
+		
+	</select>
+	
+	<!-- 专业系统流程记录 -->
+	<insert id="insert_out_sys_flow" parameterClass="java.util.HashMap">
+	    insert into tb_out_sys_flow(
+		    flow_record_id,
+			node_record_id,
+			flow_theme	  ,
+			flow_name     ,
+			node_name     ,
+			flow_status   ,
+			opt_time      ,
+			create_time   ,
+			opt_status    ,
+			opt_remark    ,
+			opter_id      ,
+			opter_name    ,
+			opter_org_id  ,
+			opter_org_name,
+			latn_id       ,
+			out_sys_id
+		)values(
+			#flowRecordId# ,
+			#nodeRecordId# ,
+			#flowTheme#    ,
+			#flowName#     ,
+			#nodeName#     ,
+			#flowStatus#   ,
+			#optTime#      ,
+			#createTime#   ,
+			#optStatus#    ,
+			#optRemark#    ,
+			#opterId#      ,
+			#opterName#    ,
+			#opterOrgId#  ,
+			#opterOrgName#,
+			#latnId#      ,
+			#outSysId#
+		)     
+	</insert>
+	
+	<!-- 更新流程记录 -->
+	<update id="update_out_sys_flow" parameterClass="java.util.HashMap">
+	    update tb_out_sys_flow
+	    set
+	    	node_record_id 	= #nodeRecordId# ,
+			flow_Theme 		= #flowTheme#    ,
+			flow_Name 		= #flowName#     ,
+			node_Nname 		= #nodeName#     ,
+			flow_Status 	= #flowStatus#   ,
+			opt_Time 		= #optTime#      ,
+			opt_Status 		= #optStatus#    ,
+			opt_Remark 		= #optRemark#    ,
+			opter_Id 		= #opterId#      ,
+			opter_Name 		= #opterName#    ,
+			opter_Org_Id 	= #opterOrgId#   ,
+			opter_Org_Name 	= #opterOrgName#
+		where
+			flow_record_id 	= #flowRecordId#
+		and out_Sys_Id 		= #outSysId#
+	</update>
+	
+	<!-- 专业系统流程 过程记录 -->
+	<insert id="insert_out_sys_flow_record" parameterClass="java.util.HashMap">
+	    insert into tb_out_sys_flow_record(
+		    flow_record_id,
+			node_record_id,
+			flow_theme	  ,
+			flow_name     ,
+			node_name     ,
+			flow_status   ,
+			opt_time      ,
+			create_time   ,
+			opt_status    ,
+			opt_remark    ,
+			opter_id      ,
+			opter_name    ,
+			opter_org_id  ,
+			opter_org_name,
+			latn_id       ,
+			out_sys_id
+		)values(
+			#flowRecordId# ,
+			#nodeRecordId# ,
+			#flowTheme#    ,
+			#flowName#     ,
+			#nodeName#     ,
+			#flowStatus#   ,
+			#optTime#      ,
+			#createTime#   ,
+			#optStatus#    ,
+			#optRemark#    ,
+			#opterId#      ,
+			#opterName#    ,
+			#opterOrgId#  ,
+			#opterOrgName#,
+			#latnId#      ,
+			#outSysId#
+		)     
+	</insert>
+	
+	<update id="update_pwd" parameterClass="java.util.HashMap">
+		UPDATE sys_staff s SET s.password = #passWord# 
+		where  1=1 
+		<isNotEmpty prepend="AND" property="staffId" >
+	         s.staff_id = #staffId#
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="login_code" >
+	         s.login_code = #login_code#
+        </isNotEmpty>
+	</update>
+	
+	
+	<!-- 查询专业系统来单流程 -->
+	<select id="select_out_sys_flow" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    
+	    select 
+	    	flow_record_id,
+			node_record_id,
+			flow_theme    ,
+			flow_name     ,
+			node_name     ,
+			flow_status   ,
+			DATE_FORMAT(opt_time, '%Y-%m-%d %T') opt_time      ,
+			DATE_FORMAT(create_time, '%Y-%m-%d %T') create_time   ,
+			opt_status    ,
+			opt_remark    ,
+			opter_id      ,
+			opter_name    ,
+			opter_org_id  ,
+			opter_org_name,
+			latn_id       ,
+			out_sys_id    ,
+			dic_value out_sys_name
+		from 
+			tb_out_sys_flow a  LEFT JOIN tb_cpc_dic b ON dic_type='outSysId' AND b.dic_code = a.out_sys_id
+		where
+			<include refid="select_out_sys_flow_where"/>
+		<isNotEmpty  property="limit">
+		    limit #limit#,#pagesize#
+		</isNotEmpty>
+	</select>
+	<!-- 查询专业系统来单COUNT(1) -->
+	<select id="select_out_sys_flow_count" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    
+	    select 
+	    	count(1) flowCount
+		from 
+			tb_out_sys_flow
+		where
+			<include refid="select_out_sys_flow_where"/>
+	</select>
+	
+	<!-- 查询专业系统来单流程记录 -->
+	<select id="select_out_sys_flow_record" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    
+	    select 
+	    	flow_record_id,
+			node_record_id,
+			flow_theme    ,
+			flow_name     ,
+			node_name     ,
+			flow_status   ,
+			DATE_FORMAT(opt_time, '%Y-%m-%d %T') opt_time      ,
+			DATE_FORMAT(create_time, '%Y-%m-%d %T') create_time   ,
+			opt_status    ,
+			opt_remark    ,
+			opter_id      ,
+			opter_name    ,
+			opter_org_id  ,
+			opter_org_name,
+			latn_id       ,
+			out_sys_id	  ,
+			dic_value out_sys_name
+		from 
+			tb_out_sys_flow_record a  LEFT JOIN tb_cpc_dic b ON dic_type='outSysId' AND b.dic_code = a.out_sys_id
+		where
+			flow_record_id 	= #flowRecordId#
+		and out_Sys_Id 		= #outSysId#
+	</select>
+	
+	
+	<!-- 查询业务流程关系表 -->
+	<select id="select_busi_flow_rel" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+	    	demand_id,
+	    	out_flow_record_id,
+	    	service_id 
+	    FROM 
+	    	tb_cpc_busi_flow_rel
+	    WHERE
+	    	1=1
+	    	<iterate property="condList"  prepend="AND" conjunction="AND">  
+               	#condList[].key# = #condList[].value#
+            </iterate>  
+	</select>
+	
+	<insert id="insert_busi_flow_rel" parameterClass="java.util.HashMap">
+	    insert into tb_cpc_busi_flow_rel
+	    (
+	    	<iterate property="condList" conjunction=",">
+               $condList[].key$
+            </iterate>    
+
+	    )values(
+	    	<iterate property="condList" conjunction=",">
+               #condList[].value#
+            </iterate>    
+	    )
+	</insert>
+	
+	<update id="update_busi_flow_rel" parameterClass="java.util.HashMap">
+	    update set tb_cpc_busi_flow_rel
+	    set
+	    	 <iterate property="changeList" conjunction=",">
+               #changeList[].key# = #changeList[].value#
+            </iterate>  
+	    where
+	    	<iterate property="condList" conjunction=",">
+               #condList[].key# = #condList[].value#
+            </iterate>  
+	</update>
+	
+	<!-- 查询功能点 -->
+	<select id="queryFun" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  f.fun_id,
+		  f.fun_name,
+		  f.menu_id,
+		  f.status,
+		  m.menu_id,
+		  m.menu_name,
+		  m.menu_url,
+		  m.status 
+		FROM
+		  tb_cpc_sys_role_o_rel orl 
+		  LEFT JOIN tb_cpc_sys_role role 
+		    ON orl.role_id = role.role_id 
+		  LEFT JOIN tb_cpc_sys_role_a_rel arl 
+		    ON orl.role_id = arl.role_id 
+		  LEFT JOIN tb_cpc_sys_auth a 
+		    ON arl.a_id = a.a_id 
+		  LEFT JOIN tb_cpc_sys_auth_f_rel r 
+		    ON a.a_id = r.a_id 
+		  LEFT JOIN tb_cpc_sys_fun f 
+		    ON r.f_rel_id = f.fun_id 
+		  LEFT JOIN tb_cpc_sys_menu m 
+		    ON r.f_rel_id = m.menu_id 
+		WHERE role.status = 'Y' 
+		  AND arl.a_status = 'Y' 
+		  AND a.a_status = 'Y' 
+		  AND r.f_status = 'Y' 
+		  AND r.f_type = #f_type# 
+		  <iterate  property="qryUserColSet" conjunction="or" >
+			   <![CDATA[
+			    (orl.o_type = #qryUserColSet[].relType# 
+			    and orl.o_rel_id  = #qryUserColSet[].relValue# )
+			    ]]>
+		  </iterate>
+		  GROUP BY f.fun_id ,m.menu_id
+	</select>
+	
+	<!-- 根据功能ID查询节点数据 -->
+	<select id="queryNodeByFunId" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  r.flow_id,
+		  n.node_id,
+		  n.node_level,
+		  n.node_name,
+		  rel.pool_id,
+		  r.fun_id,
+		  p.calim_limit,
+		  p.default_eval,
+		  p.default_eval_time,
+		  p.default_mob_tel,
+		  p.login_code,
+		  (SELECT s.STAFF_ID FROM sys_staff s WHERE s.LOGIN_CODE=CONVERT(p.login_code USING utf8) COLLATE utf8_unicode_ci) AS staffId,
+  		  (SELECT s.STAFF_NAME FROM sys_staff s WHERE s.LOGIN_CODE=CONVERT(p.login_code USING utf8) COLLATE utf8_unicode_ci) AS staffName,
+		  p.pool_name,
+		  p.urge_span_time
+		FROM
+		  tb_cpc_flow_f_rel r 
+		  LEFT JOIN tb_cpc_flow_node n 
+		    ON r.node_id = n.node_id 
+		  LEFT JOIN tb_cpc_flow_node_pol_rel rel 
+		    ON n.node_id = rel.node_id 
+		   LEFT JOIN tb_cpc_pool p
+		   ON rel.pool_id = p.pool_id
+		 WHERE r.fun_id = #fun_id#
+		 group by n.node_id
+	</select>
+	
+	<!--  查询未读短消息数量 -->
+	<select id="select_notLook_news_count" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+		  count(1) not_look_count
+		FROM
+		  tb_cpc_news 
+		WHERE  status = 'Y'
+		AND eff_time <![CDATA[<]]> now()
+		AND is_look = 'N'
+		<isNotEmpty  property="staff_id">
+		    AND staff_id = #staff_id#
+		</isNotEmpty>
+	</select>
+	
+	<!--  查询短消息 -->
+	<select id="select_news" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+		  news_id,
+		  staff_id,
+		  news_name,
+		  news_desc,
+		  news_type,
+		  DATE_FORMAT(create_time, '%Y-%m-%d %T') create_time      ,
+		  DATE_FORMAT(eff_time, '%Y-%m-%d %T') eff_time      ,
+		  DATE_FORMAT(exp_time, '%Y-%m-%d %T') exp_time      ,
+		  status ,
+		  is_look
+		FROM
+		  tb_cpc_news 
+		WHERE  status = 'Y'
+		AND eff_time <![CDATA[<]]> now()
+		
+		<isNotEmpty  property="staff_id">
+		    AND staff_id = #staff_id#
+		</isNotEmpty>
+		
+		<isNotEmpty  property="news_id">
+		    AND news_id = #news_id#
+		</isNotEmpty>
+	</select>
+	
+	<!-- 查询五星评价汇总 -->
+	<select id="select_starEvalTotal_by_newsType" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+		  a.total_id,
+		  a.total,
+		  (a.total - a.already_total) eval_total,
+		  a.already_total,
+		  a.eval_cycle,
+		  DATE_FORMAT(a.last_eval_time, '%Y-%m-%d %T') last_eval_time      ,
+		  a.news_id
+		FROM
+		  tb_cpc_eval_total a
+		WHERE 
+		a.news_id = #news_id#
+	</select>
+	
+	<!-- 查询五星评价详情 -->
+	<select id="select_starEval_by_newsType" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+		  a.*,
+		  IF(
+		    a.value_type = 'STAFF',
+		    ss.staff_name,
+		    so.org_name
+		  ) value_name,
+		  r.role_id,
+		  r.role_name 
+		FROM
+		  tb_cpc_eval_info a 
+		  LEFT JOIN sys_staff ss 
+		    ON a.value_type = 'STAFF' 
+		    AND CONVERT(a.value_id USING utf8) COLLATE utf8_unicode_ci = ss.staff_id 
+		  LEFT JOIN sys_org so 
+		    ON a.value_type = 'ORG' 
+		    AND CONVERT(a.value_id USING utf8) COLLATE utf8_unicode_ci = so.org_id 
+		  LEFT JOIN tb_cpc_sys_role r 
+		    ON r.role_id = a.role_id 
+		WHERE 
+		  total_id = #total_id#
+	</select>
+	
+	<!-- 更改查看状态 Y/N -->
+	<update id="update_look_news" parameterClass="java.util.HashMap">
+	    update tb_cpc_news
+	    set is_look = #is_look#
+	    where news_id = #news_id#
+	</update>
+	
+	<!-- 更改评价明细表 -->
+	<update id="update_star_eval_info" parameterClass="java.util.HashMap">
+	     update tb_cpc_eval_info
+	    set 
+	    	eval_star 	= #eval_star#,
+	    	eval_td		= #eval_td#, 
+	    	eval_jsd	= #eval_jsd#,
+	    	eval_myd 	= #eval_myd#,
+	    	is_eval 	= 'Y',
+	    	state_time 	= now()
+	    where eval_id = #eval_id#
+	</update>
+	
+	<!-- 更改评价汇总 -->
+	<update id="update_star_eval_total" parameterClass="java.util.HashMap">
+	    update tb_cpc_eval_total
+	    set already_total = (
+	    		select count(1) 
+	    		from tb_cpc_eval_info a
+	    		where a.total_id = #total_id# 
+	    		and a.eval_star>0
+	    		and is_eval = 'Y'
+	    )
+	    where total_id = #total_id# 
+	</update>
+	<!-- 查询本地网-->
+	<select id="getLatnData" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	
+	 	 SELECT
+			  REGION_ID,
+			  REGION_CODE,
+			  REGION_NAME
+			FROM sys_region t
+			WHERE 
+			t.STATE='10A'
+	</select>
+	<!-- 查询应用名称 -->
+	
+	<!--  查询员工资料-->
+	<select id="querySysUserInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  s.STAFF_ID,
+		  s.LOGIN_CODE,
+		  s.STAFF_NAME,
+		  s.MOB_TEL,
+		  o.ORG_ID,
+		  o.ORG_CODE,
+		  o.ORG_NAME,
+		  o.PID,
+		  r.REGION_ID,
+		  r.REGION_CODE,
+		  r.REGION_NAME 
+		FROM
+		  sys_staff s 
+		  LEFT JOIN sys_org o 
+		    ON s.DEPARTMENT_CODE = o.ORG_CODE 
+		  LEFT JOIN sys_region r 
+		    ON o.REGION_ID = r.REGION_ID
+		    WHERE  1=1
+		    <isNotEmpty prepend="AND" property="staff_id" >
+	      	 s.STAFF_ID = #staff_id# 
+	        </isNotEmpty>	
+	        <isNotEmpty prepend="AND" property="login_code" >
+	      	  s.LOGIN_CODE = #login_code#
+	        </isNotEmpty>	
+	        <isNotEmpty prepend="AND" property="mob_tel" >
+	      	s.MOB_TEL = #mob_tel#
+	        </isNotEmpty>	
+	</select>
+	
+	<!-- 查询待评价的数据统计 -->
+	<select id="queryNeedEvalListSum"  resultClass="java.lang.String"  parameterClass="java.util.HashMap">
+	     SELECT 
+			  count(1) num
+			FROM (SELECT DISTINCT 
+				    a.demand_id,
+				    s.`DEPARTMENT_CODE` department_id,
+				    GROUP_CONCAT(DISTINCT c.busi_id) serviceIds 
+				  FROM
+				    (SELECT 
+				      demand_id 
+				    FROM
+				      tb_cpc_demand dt 
+				    WHERE LENGTH(dt.over_time) > 0) a 
+				    INNER JOIN tb_cpc_busi_flow_rel b 
+				      ON a.demand_id = b.`demand_id` 
+				    INNER JOIN 
+				      (SELECT DISTINCT 
+				        clr.busi_id,
+				        clr.opt_id 
+				      FROM
+				        (SELECT 
+				          r.`busi_id`,
+				          MAX(r.`record_id`) lastSbr,
+				          opt_id 
+				        FROM
+				          tb_cpc_flow_record r 
+				        WHERE opt_id =#optId#
+				          AND (
+				            (
+				              r.`fun_id` = '100006' 
+				              AND LEFT(r.`busi_id`, 1) = 'D'
+				            ) 
+				            OR (
+				              r.`curr_node_id` = '100100' 
+				              AND LEFT(r.`busi_id`, 1) = 'S'
+				            )
+				          ) 
+				        GROUP BY r.`busi_id`) dpj 
+				        INNER JOIN 
+				          (SELECT DISTINCT 
+				            record.busi_id,
+				            record.opt_id 
+				          FROM
+				            tb_cpc_flow_record record 
+				          WHERE (
+				              (
+				                LEFT(record.busi_id, 1) = 'S' 
+				                AND record.curr_node_id != '100100'
+				              ) 
+				              OR LEFT(record.busi_id, 1) = 'D' 
+				              AND LEFT(record.`curr_node_id`, 1) = '2'
+				            )) clr 
+				          ON dpj.busi_id = clr.busi_id) c 
+				      ON (
+				        b.`demand_id` = c.busi_id 
+				        OR b.`service_id` = c.busi_id
+				      ) 
+				    INNER JOIN sys_staff s 
+				      ON CONVERT(c.opt_id USING utf8) COLLATE utf8_unicode_ci = s.staff_id 
+				      AND s.`DEPARTMENT_CODE` != #department_id#
+				      AND s.`REGION_ID` = (
+				        CASE
+				          WHEN LEFT(c.busi_id, 1) = 'S' 
+				          THEN #latnId# 
+				          ELSE '888' 
+				        END
+				      ) 
+				  GROUP BY a.demand_id,
+				    s.`DEPARTMENT_CODE`) t1 
+				  INNER JOIN tb_cpc_demand t2 
+				    ON t1.demand_id = t2.demand_id 
+				  LEFT JOIN sys_org org 
+				    ON t1.department_id = org.`ORG_CODE` 
+				WHERE NOT EXISTS 
+				  (SELECT 
+				    1 
+				  FROM
+				    tb_cpc_bill_eval_info info 
+				  WHERE info.demand_id = t1.demand_id 
+				    AND (
+				      CONVERT(info.o_rel_id USING utf8) COLLATE utf8_unicode_ci = t1.department_id 
+				      OR (
+				        INSTR(
+				          CONCAT(',', t1.serviceIds, ','),
+				          info.`service_id`
+				        ) > 0
+				      )
+				    ))
+      		<isNotEmpty prepend="AND" property="demandId" >
+			    t2.demand_id=#demandId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="demandType" >
+			     t2.demand_type=#demandType#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="overLimitBeginDate" >
+			    <![CDATA[ 
+						DATEDIFF(t2.over_time,#overLimitBeginDate#)>=0
+					]]>
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="overLimitEndDate" >
+			     <![CDATA[ 
+					 	DATEDIFF(t2.over_time,#overLimitEndDate#)<=0
+					]]>
+			</isNotEmpty>   
+	</select>
+	<!-- 查询待评价数据 -->
+	<select id="queryNeedEvalListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	        SELECT 
+				  t1.demand_id,
+				  t2.demand_theme,
+				  DATE_FORMAT(t2.create_time, '%Y-%m-%d %T') create_time,
+				  DATE_FORMAT(t2.over_time, '%Y-%m-%d %T') over_time,
+				  t2.summary,
+				  t2.over_eval,
+				  t2.over_opinion,
+				  t1.department_id,
+				  org.`ORG_NAME` department,
+				  t1.serviceIds 
+				FROM
+				  (SELECT DISTINCT 
+				    a.demand_id,
+				    s.`DEPARTMENT_CODE` department_id,
+				    GROUP_CONCAT(DISTINCT c.busi_id) serviceIds 
+				  FROM
+				    (SELECT 
+				      demand_id 
+				    FROM
+				      tb_cpc_demand dt 
+				    WHERE LENGTH(dt.over_time) > 0) a 
+				    INNER JOIN tb_cpc_busi_flow_rel b 
+				      ON a.demand_id = b.`demand_id` 
+				    INNER JOIN 
+				      (SELECT DISTINCT 
+				        clr.busi_id,
+				        clr.opt_id 
+				      FROM
+				        (SELECT 
+				          r.`busi_id`,
+				          MAX(r.`record_id`) lastSbr,
+				          opt_id 
+				        FROM
+				          tb_cpc_flow_record r 
+				        WHERE opt_id =#optId#
+				          AND (
+				            (
+				              r.`fun_id` = '100006' 
+				              AND LEFT(r.`busi_id`, 1) = 'D'
+				            ) 
+				            OR (
+				              r.`curr_node_id` = '100100' 
+				              AND LEFT(r.`busi_id`, 1) = 'S'
+				            )
+				          ) 
+				        GROUP BY r.`busi_id`) dpj 
+				        INNER JOIN 
+				          (SELECT DISTINCT 
+				            record.busi_id,
+				            record.opt_id 
+				          FROM
+				            tb_cpc_flow_record record 
+				          WHERE (
+				              (
+				                LEFT(record.busi_id, 1) = 'S' 
+				                AND record.curr_node_id != '100100'
+				              ) 
+				              OR LEFT(record.busi_id, 1) = 'D' 
+				              AND LEFT(record.`curr_node_id`, 1) = '2'
+				            )) clr 
+				          ON dpj.busi_id = clr.busi_id) c 
+				      ON (
+				        b.`demand_id` = c.busi_id 
+				        OR b.`service_id` = c.busi_id
+				      ) 
+				    INNER JOIN sys_staff s 
+				      ON CONVERT(c.opt_id USING utf8) COLLATE utf8_unicode_ci = s.staff_id 
+				      AND s.`DEPARTMENT_CODE` != #department_id#
+				      AND s.`REGION_ID` = (
+				        CASE
+				          WHEN LEFT(c.busi_id, 1) = 'S' 
+				          THEN #latnId# 
+				          ELSE '888' 
+				        END
+				      ) 
+				  GROUP BY a.demand_id,
+				    s.`DEPARTMENT_CODE`) t1 
+				  INNER JOIN tb_cpc_demand t2 
+				    ON t1.demand_id = t2.demand_id 
+				  LEFT JOIN sys_org org 
+				    ON t1.department_id = org.`ORG_CODE` 
+				WHERE NOT EXISTS 
+				  (SELECT 
+				    1 
+				  FROM
+				    tb_cpc_bill_eval_info info 
+				  WHERE info.demand_id = t1.demand_id 
+				    AND (
+				      CONVERT(info.o_rel_id USING utf8) COLLATE utf8_unicode_ci = t1.department_id 
+				      OR (
+				        INSTR(
+				          CONCAT(',', t1.serviceIds, ','),
+				          info.`service_id`
+				        ) > 0
+				      )
+				    ))
+      	<isNotEmpty prepend="AND" property="demandId" >
+		    t2.demand_id=#demandId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="demandType" >
+		     t2.demand_type=#demandType#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overLimitBeginDate" >
+		    <![CDATA[ 
+					DATEDIFF(t2.over_time,#overLimitBeginDate#)>=0
+				]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="overLimitEndDate" >
+		     <![CDATA[ 
+				 	DATEDIFF(t2.over_time,#overLimitEndDate#)<=0
+				]]>
+		</isNotEmpty> 
+		order by over_limit 
+		 <isNotEmpty prepend="" property="pagesize" >
+	         limit $page_num$,$pagesize$
+          </isNotEmpty>
+	</select>
+	
+	
+	<!-- 获取待评价需求单服务单数据 -->
+	<select id="queryNeedEvalServiceListSum" resultClass="java.lang.String"  parameterClass="java.util.HashMap">
+	    select count(1) num 
+	</select>
+	<select id="queryNeedEvalServiceListPage" resultClass="java.util.HashMap"  parameterClass="java.util.HashMap">
+	     SELECT
+			  t.service_id,
+			  t.service_desc,
+			  DATE_FORMAT(t.send_time, '%Y-%m-%d %T') send_time,
+			  DATE_FORMAT(t.over_time, '%Y-%m-%d %T') over_time,
+			  DATE_FORMAT(t.over_limit, '%Y-%m-%d %T') over_limit,
+			  t.summary
+			FROM tb_cpc_service t
+			WHERE INSTR(CONCAT(',',#serviceIds#,','),CONCAT(',',t.service_id,','))>0 
+	</select>
+	
+	<!-- 保存评价数据 -->
+	<insert id="saveEvalData"  parameterClass="java.util.HashMap">
+	    INSERT INTO  tb_cpc_bill_eval_info(demand_id,info_type,o_rel_id,o_type, eval_star,
+	      								eval_remark, service_id, opt_id,create_time) values
+	    <iterate property="evalList" conjunction=",">
+	     (
+	      	#evalList[].demand_id#,#evalList[].info_type#,#evalList[].o_rel_id#,#evalList[].o_type#,#evalList[].eval_star#,
+	      	#evalList[].eval_remark#,#evalList[].service_id#,#evalList[].opt_id#,#evalList[].create_time#
+	      )  
+	    </iterate>
+	</insert>
+	
+	<!-- 获取获取周内是休息日的集合 -->
+	<select id="queryHoliDayList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+	      DATE_FORMAT( t.datestr  ,'%Y-%m-%d') dateStr
+	     FROM tb_cpc_dateconfig t
+			WHERE t.dateType='holiDay'
+			AND DATEDIFF(t.datestr,#nowDate#)>=0
+	</select>
+	<!-- 获取周末是工作日的数据集合 -->
+	<select id="queryWorkDayList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	     SELECT 
+	      DATE_FORMAT( t.datestr  ,'%Y-%m-%d') dateStr
+	     FROM tb_cpc_dateconfig t
+		 WHERE t.dateType='workDay'
+		 AND DATEDIFF(t.datestr,#nowDate#)>=0
+	</select>
+	<!-- 获取时间配置-->
+	<select id="queryTimeData" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	  SELECT
+		  DATE_FORMAT(startTime,'%T') startTime,
+		  DATE_FORMAT(restStartTime,'%T') restStartTime,
+		  DATE_FORMAT(restEndTime,'%T') restEndTime,
+		  DATE_FORMAT(endTime,'%T')  endTime
+		FROM tb_cpc_datetimeconfig t
+		WHERE t.state = '10A'
+	    and t.latn_id=#latn_id#
+		LIMIT 1
+	</select>
+	
+	<!-- 获取小CEO部门信息 -->
+	<select id="getCeoSysOrg" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	  SELECT DISTINCT 
+		  t1.org_id,
+		  t1.pid,
+		  t1.org_name,
+		  t2.region_name,
+		  t2.region_code,
+		  t2.control_number,
+		  t1.org_flag 
+		FROM
+		  sys_org t1 
+		  LEFT JOIN sys_region t2 
+		    ON t1.region_id = t2.REGION_ID 
+		  LEFT JOIN sys_staff t3 
+		    ON t1.org_id = t3.DEPARTMENT_CODE 
+		WHERE CONVERT(t3.staff_id USING UTF8) IN 
+		  (SELECT 
+		    CONVERT(t4.limit_value USING UTF8) 
+		  FROM
+		    tb_cpc_flow_limit t4)
+		    AND t2.region_code = #region_code#
+	</select>
+	
+	<!-- 修改登录标记 -->
+	<update id="updateLoginState" parameterClass="java.util.HashMap">
+	UPDATE sys_staff SET LOGIN_STATE = #loginState#,SESSION_ID = #sessionId# WHERE login_code = #loginCode#
+	</update>
+	
+	<!-- 检查用户是否登录 -->
+	<select id="checkLogin" resultClass="java.util.HashMap" parameterClass="java.util.HashMap"  cacheModel="user-cache">
+		SELECT login_code,login_state FROM sys_staff WHERE login_code = #loginCode# AND login_state = 'Y' 
+		<isNotEmpty prepend="AND" property="sessionId" >
+	     	session_id = #sessionId#
+		</isNotEmpty>
+	</select>
+	
+	 <!-- 查询上传图片文件是否存在 --> 
+ <select id="getAttachInfoQ"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+         SELECT * FROM tb_cpc_attachment T
+	     WHERE t.attachment_type = #attachment_type# 
+	     <isNotEmpty prepend="AND" property="attachment_value" >
+		   t.attachment_value = #attachment_value#
+		</isNotEmpty>
+		
+ </select>
+  <!-- 查询领导是否留言 --> 
+	 <select id="query_flow_record_service" resultClass="String" parameterClass="java.util.HashMap">
+	 select opt_desc from tb_cpc_flow_record where opt_id=#opt_id# AND  busi_id=#busi_id#
+	    
+	</select>
+	<!-- 根据部门id查找所属部门下的员工 -->
+	<select id="select_login_code_list" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	  SELECT staff_id,staff_name,login_code,mob_tel FROM sys_staff WHERE department_id=#orgId#
+	</select>
+	
+	<!-- 查询越级提醒人的信息 -->
+	<select id="qry_dept_staff_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  s.`ORG_ID`,
+		  s.`ORG_NAME`,
+		  s.`STAFF_ID`,
+		  s.`STAFF_NAME`,
+		  s.`STAFF_RESPECTFUL_NAME` SECOND_NAME,
+		  s.`LOGIN_CODE` 
+		FROM
+		  tb_cpc_back_to_sms s 
+		WHERE 
+			1=1
+		<isNotEmpty prepend="AND" property="org_id" >
+         	s.org_id = #org_id#		
+         </isNotEmpty>
+         <isNotEmpty prepend="AND" property="staff_id" >
+         	s.staff_id = #staff_id#		
+         </isNotEmpty>
+	</select>
+	<!-- 附件信息保存-->
+	<insert id="insertUploadImages" parameterClass="java.util.HashMap">
+		INSERT INTO tb_cpc_upload_imgs(attachment_name, attachment_path, attachment_type, attachment_value, other_attachment_name,create_time)
+		 VALUES(#attachment_name#,#attachment_path#,#attachment_type#,#attachment_value#,#other_attachment_name#, now())
+	</insert>
+	<!-- 获取附件信息 -->
+	<select id="selectUploadImages"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	     SELECT * FROM tb_cpc_upload_imgs T
+	     WHERE t.attachment_type = #attachment_type# 
+	     <isNotEmpty prepend="AND" property="attachment_value" >
+		   t.attachment_value = #attachment_value#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="attachment_name" >
+		   t.attachment_name = #attachment_name#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="attachment_path" >
+		   t.attachment_path = #attachment_path#
+		</isNotEmpty>
+	</select>
+</sqlMap>

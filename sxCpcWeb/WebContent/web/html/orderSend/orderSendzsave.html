@@ -1,0 +1,49 @@
+<script type="text/javascript" src="js/orderSend/orderSendzsave.js"></script>
+
+
+<div class="list-main">
+<h2>需求草稿箱</h2>
+
+<div style="margin-top:5px;" id="orderSendPage">
+<dl class="bd-list">
+		<dt style="margin:8px 5px;width:80px;">主题搜索：</dt>
+		<dd>
+			<input id="themeSeach" type="text" class=" w130">
+		</dd>
+		<dt style="margin:8px 0px;width:80px;">发起人：</dt>
+		<dd>
+			<input id="sendUserName" type="text" class=" w130" readonly>
+		</dd>
+		<dt style="margin:8px -5px">生成时间：</dt>
+		<dd>
+		
+			<input id="sendDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearSendDate">
+		 </dd>
+		<dd>
+			<a href="#" class="butInit" id="senior">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+<div class="lable-box">
+		<a  href="javascript:void(0)"class="lable" id="send">查看并发起</a>
+		<a  href="javascript:void(0)"class="lable btn-success" id="delete">删除</a>
+	</div>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10">
+			<thead>
+				<tr>
+				    <th style="width:4%;text-align: right;"></th>
+					<th style="width:28%;">需求主题</th>
+					<th style="width:28%;">环节操作</th>
+					<th style="width:28%;">生成时间</th>
+					<th style="width:28%;">到期时间</th>
+					
+				</tr>
+			
+			</thead>
+			<tbody id="authListBody">
+				
+			</tbody>
+		</table>
+		<div class="page mt10" id="authListFoot"></div>
+ </div>
+    </div>

@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="sysManage">
+  <!-- 查询角色集合 -->
+ <select id="queryRoleListSum" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+    SELECT count(1) num FROM (
+	     SELECT
+			  role_id,
+			  role_name,
+			  role_desc,
+			  a.status role_status,
+			  (SELECT dic_value FROM tb_cpc_dic dic WHERE dic.dic_code = a.status and dic.dic_type='roleState') role_status_name,
+			  a.type  role_type,
+			  (SELECT  dic_value  FROM tb_cpc_dic dic WHERE dic.dic_code = a.type and dic.dic_type='roleType') role_type_name,
+			  a.latn_id,
+			  b.REGION_NAME    latn_name
+		FROM tb_cpc_sys_role a,
+		  	sys_region b
+		WHERE CONVERT(a.latn_id USING utf8) COLLATE utf8_unicode_ci = b.REGION_ID 
+		<isNotEmpty prepend="and" property="latnId">
+			a.latn_id in (#latnId#,'888')   
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleName">
+			 a.role_name like concat('%', #roleName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleState">
+			a.STATUS=#roleState#	    
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleType">
+			a.TYPE=#roleType#	    
+		</isNotEmpty>
+	) m
+ </select>
+ <select id="queryRoleListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+     SELECT
+		  role_id,
+		  role_name,
+		  role_desc,
+		  a.status role_status,
+		  (SELECT dic_value FROM tb_cpc_dic dic WHERE dic.dic_code = a.status AND dic.dic_type='roleState') role_status_name,
+		  a.type  role_type,
+		  (SELECT  dic_value  FROM tb_cpc_dic dic WHERE dic.dic_code = a.type AND dic.dic_type='roleType') role_type_name,
+		  a.latn_id,
+		  b.REGION_NAME    latn_name
+	FROM tb_cpc_sys_role a,
+	  	sys_region b
+	WHERE CONVERT(a.latn_id USING utf8) COLLATE utf8_unicode_ci = b.REGION_ID 
+	<isNotEmpty prepend="and" property="latnId">
+		a.latn_id in (#latnId#,'888')   
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="roleName">
+		 a.role_name like concat('%', #roleName#, '%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="roleState">
+		a.STATUS=#roleState#	    
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="roleType">
+		a.TYPE=#roleType#	    
+	</isNotEmpty>
+	order by create_time desc
+	<isNotEmpty  property="limit">
+		 limit $page_num$,$pagesize$
+	</isNotEmpty>
+ </select>
+	 <!-- 新增组织机构 -->
+	 <insert id="addOrgInfo" parameterClass="java.util.HashMap">
+	     INSERT INTO SYS_ORG(ORG_ID, ORG_CODE, ORG_NAME, ORG_FLAG, PID, REGION_ID, CREATE_DATE, STATE)
+			VALUES(#orgId#,#orgId#,#orgName#,'2',#pid#,#latnId#,now(),#state#);
+	 </insert>
+ <!-- 增加角色 -->
+ <insert id="addRoleInfo" parameterClass="java.util.HashMap">
+     INSERT INTO  tb_cpc_sys_role(role_id,role_name,role_desc,STATUS,TYPE,latn_id,opt_id,create_time)
+		VALUES(CONCAT(DATE_FORMAT(NOW(),'%y'),LPAD(nextval('seq_sys_role_id'),7 ,'0')),
+		#role_name#,#role_desc#,#role_state#,#role_type#,#latn_id#,#opt_id#, now())
+ </insert>
+ 
+  <!-- 修改角色 -->
+  <update id="updateRoleInfo" parameterClass="java.util.HashMap">
+      UPDATE tb_cpc_sys_role
+		 SET role_name =#role_name#, 
+			 role_desc =#role_desc# , 
+			 STATUS =#role_state# , 
+			 TYPE =#role_type# , 
+			 latn_id =#latn_id#,
+			 modify_opt_id =#opt_id# , 
+			 modify_time = NOW()
+	 WHERE role_id =#role_id#  
+  </update>
+ 
+  <!--判断角色是否使用 -->
+  <select id="queryRoleUseCount"  resultClass="java.lang.String" parameterClass="java.util.HashMap">
+      SELECT
+		  COUNT(*)    num
+		FROM (SELECT
+		        role_id,
+		        a_id       obj_id
+		      FROM tb_cpc_sys_role_a_rel t
+		      WHERE t.role_id = #role_id# 
+		          AND t.a_status = 'Y' 
+         	 UNION ALL
+         	 SELECT
+                  role_id,
+                  o_rel_id    obj_id
+                FROM tb_cpc_sys_role_o_rel t
+                WHERE t.role_id = #role_id# ) m
+  </select>
+  <!-- 删除角色 -->
+  <delete id="deleteRoleInfo" parameterClass="java.util.HashMap">
+      DELETE FROM  tb_cpc_sys_role WHERE role_id = #role_id#  
+  </delete>
+    
+  <!--获取当前已分配的角色 -->
+  <select id="queryUseRoleAuthList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+  		  SELECT DISTINCT
+			  a.a_id,
+			  a.a_name, 
+			  a.a_status ,
+			  (SELECT dic_value FROM tb_cpc_dic dic WHERE dic.dic_code = a.a_status AND dic.dic_type='authState') auth_status_name,
+			  a.a_type  role_type,
+			  (SELECT  dic_value  FROM tb_cpc_dic dic WHERE dic.dic_code = a.a_type AND dic.dic_type='authType') auth_type_name,
+			  a.latn_id,
+			  b.REGION_NAME    latn_name
+			FROM tb_cpc_sys_auth a,
+				sys_region b,
+				tb_cpc_sys_role_a_rel c
+			WHERE a.latn_id = b.REGION_ID 
+			AND a.a_id=c.a_id
+			AND a.a_status='Y'
+			AND c.role_id=#role_id#
+  </select>
+  <!-- 获取所有角色权限 -->
+  
+  
+  <select id="queryAllRoleAuthList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+      SELECT DISTINCT
+		  a_id,
+		  a_name, 
+		  a_status ,
+		  (SELECT dic_value FROM tb_cpc_dic dic WHERE dic.dic_code = a.a_status AND dic.dic_type='authState') auth_status_name,
+		  a_type  role_type,
+		  (SELECT  dic_value  FROM tb_cpc_dic dic WHERE dic.dic_code = a.a_type AND dic.dic_type='authType') auth_type_name,
+		  a.latn_id,
+		  b.REGION_NAME    latn_name
+		FROM tb_cpc_sys_auth a,
+		  	sys_region b
+		WHERE a.latn_id = b.REGION_ID 
+		AND a.a_status='Y'
+  </select><!-- 保存角色权限 -->
+  <!-- 删除角色权限 -->
+  <delete id="saveRoleAuthInfo_delete" parameterClass="java.util.HashMap">
+      DELETE FROM  tb_cpc_sys_role_a_rel  WHERE role_id = #role_id# 
+  </delete>
+  <!-- 增加角色权限 -->
+  <insert id="saveRoleAuthInfo_insert" parameterClass="java.util.HashMap">
+       INSERT INTO  tb_cpc_sys_role_a_rel(role_id,a_id,a_status) values
+	    <iterate property="roleAuthInfoSet" conjunction=",">
+	     (
+	      	#roleAuthInfoSet[].role_id#,#roleAuthInfoSet[].a_id#,#roleAuthInfoSet[].a_status#
+	      )  
+	    </iterate>
+  </insert>
+ <!--20150424权限集合begin  --> 
+  <!-- 查询权限集合 -->
+ <select id="queryAuthListSum" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+    SELECT COUNT(1) num FROM (
+	     SELECT
+			  a_id,
+			  a_name,
+			  a_desc,
+			  a_status ,
+			  (SELECT dic_value FROM tb_cpc_dic dic WHERE dic.dic_code = a.a_status AND dic.dic_type='authState') a_status_name,
+			  a_type,
+			  (SELECT  dic_value  FROM tb_cpc_dic dic WHERE dic.dic_code = a.a_type AND dic.dic_type='authType') a_type_name,
+			  a.latn_id,
+			  b.REGION_NAME    latn_name
+		FROM tb_cpc_sys_auth a,
+		  	sys_region b
+		WHERE CONVERT(a.latn_id USING utf8) COLLATE utf8_unicode_ci = b.REGION_ID
+		<isNotEmpty prepend="and" property="latnId">
+			a.latn_id in (#latnId#,'888')    
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="authName">
+			 a.a_name like concat('%', #authName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="authState">
+			a.a_STATUS=#authState#	    
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="authType">
+			a._TYPE=#authType#	    
+		</isNotEmpty>
+	) m
+ </select>
+ <select id="queryAuthListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+     SELECT
+		  a_id,
+		  a_name,
+		  a_desc,
+		  a_status,
+		  (SELECT dic_value FROM tb_cpc_dic dic WHERE dic.dic_code = a.a_status AND dic.dic_type='authState') a_status_name,
+		  a_type,
+		  (SELECT  dic_value  FROM tb_cpc_dic dic WHERE dic.dic_code = a.a_type AND dic.dic_type='authType') a_type_name,
+		  a.latn_id,
+		  b.REGION_NAME    latn_name
+	FROM tb_cpc_sys_auth a,
+	  	sys_region b
+	WHERE CONVERT(a.latn_id USING utf8) COLLATE utf8_unicode_ci = b.REGION_ID 
+	<isNotEmpty prepend="and" property="latnId">
+		a.latn_id in (#latnId#,'888')      
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="authName">
+		 a.a_name like concat('%', #authName#, '%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="authState">
+		a.a_STATUS=#authState#	    
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="authType">
+		a.a_TYPE=#authType#	    
+	</isNotEmpty>
+	order by create_time desc
+	<isNotEmpty  property="limit">
+		 limit $page_num$,$pagesize$
+	</isNotEmpty>
+ </select>
+
+ <!-- 增加角色 -->
+ <insert id="addAuthInfo" parameterClass="java.util.HashMap">
+     INSERT INTO  tb_cpc_sys_auth(a_id,a_name,a_desc,a_STATUS,a_TYPE,latn_id,opt_id,create_time)
+		VALUES(CONCAT(DATE_FORMAT(NOW(),'%y'),LPAD(nextval('seq_sys_auth_id'),7 ,'0')),
+		#a_name#,#a_desc#,#a_state#,#a_type#,#latn_id#,#opt_id#, now())
+ </insert>
+ 
+  <!-- 修改权限 -->
+  <update id="updateAuthInfo" parameterClass="java.util.HashMap">
+      UPDATE tb_cpc_sys_auth
+		 SET a_name =#a_name#, 
+			 a_desc =#a_desc# , 
+			 a_STATUS =#a_state# , 
+			 a_TYPE =#a_type# , 
+			 latn_id =#latn_id#,
+			 modify_opt_id =#opt_id# , 
+			 modify_time = NOW()
+	 WHERE a_id =#a_id#  
+  </update>
+ 
+  <!--判断权限是否使用 -->
+  <select id="queryAuthUseCount"  resultClass="java.lang.String" parameterClass="java.util.HashMap">
+      select count(*) num from tb_cpc_sys_auth_f_rel    
+  </select>
+  <!-- 删除权限 -->
+  <delete id="deleteAuthInfo" parameterClass="java.util.HashMap">
+      DELETE FROM  tb_cpc_sys_auth WHERE a_id = #a_id#  
+  </delete>
+  
+   <!--获取当前已分配的权限 -->
+  <select id="queryUseAssignAuthList"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT 
+	 DISTINCT    
+	   a.`a_id` auth_id,
+	   (CASE WHEN a.`f_type`='MENU' THEN
+	   M.`menu_name`
+	   WHEN a.`f_type`='FUN' THEN
+	   f.`fun_name`
+	   ELSE d.`data_name`
+	   END) data_name
+	   ,
+	   (CASE WHEN a.`f_type`='MENU' THEN
+	   M.`menu_id`
+	   WHEN a.`f_type`='FUN' THEN
+	   f.`fun_id`
+	   ELSE d.`data_id`
+	   END) data_id
+	   ,
+	   a.`f_type` data_type 
+	FROM
+	  `tb_cpc_sys_auth_f_rel`  a  LEFT JOIN tb_cpc_sys_menu m ON a.`f_type`='MENU' AND a.`f_rel_id`=m.`menu_id`
+	  LEFT JOIN tb_cpc_sys_fun f ON a.`f_type`='FUN' AND a.`f_rel_id`=f.`fun_id`
+	  LEFT JOIN tb_cpc_sys_data d ON a.`f_type`='DATA' AND a.`f_rel_id`=d.`data_id` WHERE a.`f_status`='Y'  AND a.`a_id`=#auth_id#
+  </select>
+  <!-- 获取所有权限 -->
+  <select id="queryAllAssignAuthList"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT  a.`menu_id` data_id,a.`menu_name` data_name ,'MENU'  data_type   FROM tb_cpc_sys_menu a
+	WHERE a.status='Y'
+	UNION  
+	SELECT b.fun_id,b.fun_name,'FUN' data_type   FROM tb_cpc_sys_fun   b
+	WHERE b.status='Y'
+	UNION  
+	SELECT c.data_id,c.data_name,'DATA' data_type   FROM tb_cpc_sys_data  c
+	WHERE c.status='Y' 
+  </select>
+  
+  <!-- 保存角色权限 -->
+  <!-- 删除角色权限 -->
+  <delete id="saveAssignAuthInfo_delete" parameterClass="java.util.HashMap">
+      DELETE FROM  tb_cpc_sys_auth_f_rel  WHERE a_id = #auth_id# 
+  </delete>
+  <!-- 增加角色权限 -->
+  <insert id="saveAssignAuthInfo_insert" parameterClass="java.util.HashMap">
+       INSERT INTO  tb_cpc_sys_auth_f_rel(a_id,f_rel_id,f_type,f_status) values
+	    <iterate property="assignAuthInfoSet" conjunction=",">
+	     (
+	      	#assignAuthInfoSet[].a_id#,#assignAuthInfoSet[].f_rel_id#,#assignAuthInfoSet[].f_type#,#assignAuthInfoSet[].f_status#
+	      )  
+	    </iterate>
+  </insert>
+  
+ <!--20150424权限集合end  --> 
+ 
+ 
+   <!--获取当前已分配用户的角色 -->
+  <select id="queryUseRoleUserList"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	SELECT
+		  m.*,
+		  d.REGION_NAME    latn_name
+		FROM (SELECT DISTINCT
+		        a.role_id,
+		        ( CASE WHEN a.o_type='STAFF' THEN b.staff_id WHEN a.o_type='ORG' THEN c.ORG_ID END)    data_id,
+		        ( CASE WHEN a.o_type='STAFF' THEN b.staff_NAME WHEN a.o_type='ORG' THEN c.ORG_NAME END)    data_name,
+		        ( CASE WHEN a.o_type='STAFF' THEN b.REGION_ID WHEN a.o_type='ORG' THEN c.REGION_ID END)    latn_id,
+		        a.o_type  data_type
+		      FROM tb_cpc_sys_role_o_rel a
+		        LEFT JOIN sys_staff b
+		          ON CONVERT(b.STAFF_ID USING utf8) = a.o_rel_id
+		        LEFT JOIN sys_org c
+		          ON CONVERT(c.ORG_ID USING utf8) = a.o_rel_id
+		      WHERE a.role_id =#role_id#) m,
+		  sys_region d
+		WHERE CONVERT(m.latn_id USING utf8) = CONVERT(d.REGION_ID USING utf8)
+  </select>
+  <!-- 获取所有用户 -->
+  <select id="queryAllRoleUserList_latn" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+       SELECT DISTINCT b.region_id latn_id,
+		   b.region_name latn_name 
+		FROM 
+			sys_staff a,
+			sys_region b
+		WHERE CONVERT(a.REGION_ID USING utf8) = CONVERT(b.REGION_ID USING utf8)
+		AND (a.STATE='10A' OR a.STATE='1' )
+		ORDER BY latn_id 
+  </select>
+  <select id="queryAllRoleUserList_org" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        SELECT DISTINCT  
+			a.DEPARTMENT_CODE department_id,
+		 	a.DEPARTMENT department, 
+			b.region_id latn_id,
+		   b.region_name latn_name 
+		FROM 
+			sys_staff a ,
+			sys_region b
+		WHERE CONVERT(a.REGION_ID USING utf8) = CONVERT(b.REGION_ID USING utf8)
+		AND (a.STATE='10A' OR a.STATE='1' )
+		AND a.REGION_ID=#latnId#
+  </select>
+  <select id="queryRoleUseListSum"   resultClass="java.lang.String" parameterClass="java.util.HashMap">
+      select count(*) num from(
+      SELECT DISTINCT
+		   a.STAFF_ID staff_id,
+		   a.STAFF_NAME staff_name,
+		   a.DEPARTMENT_CODE department_id,
+		   a.DEPARTMENT department, 
+		   b.region_id latn_id,
+		   b.region_name latn_name 
+		FROM 
+			sys_staff a,
+			sys_region b
+		WHERE CONVERT(a.REGION_ID USING utf8) = CONVERT(b.REGION_ID USING utf8)
+		AND (a.STATE='10A' OR a.STATE='1' )
+		<isNotEmpty prepend="and" property="latnId">
+			a.REGION_ID=#latnId#	    
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="departmentId">
+			a.DEPARTMENT_CODE=#departmentId#	    
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="departmentName">
+		    a.DEPARTMENT like concat('%', #departmentName#, '%')
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="staffName">
+		    a.STAFF_NAME like concat('%', #staffName#, '%')
+		</isNotEmpty>
+		)m
+  </select>
+  <select id="queryAllRoleUserList"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+    SELECT DISTINCT
+		   a.STAFF_ID staff_id,
+		   a.STAFF_NAME staff_name,
+		   a.DEPARTMENT_CODE department_id,
+		   a.DEPARTMENT department, 
+		   b.region_id latn_id,
+		   b.region_name latn_name 
+	FROM 
+		sys_staff a,
+		sys_region b
+	WHERE CONVERT(a.REGION_ID USING utf8) = CONVERT(b.REGION_ID USING utf8)
+	AND (a.STATE='10A' OR a.STATE='1' )
+	<isNotEmpty prepend="and" property="latnId">
+		a.REGION_ID=#latnId#	    
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="departmentId">
+		a.DEPARTMENT_CODE=#departmentId#	    
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="departmentName">
+	    a.DEPARTMENT like concat('%', #departmentName#, '%')
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="staffName">
+	    a.STAFF_NAME like concat('%', #staffName#, '%')
+	</isNotEmpty>
+	<isNotEmpty  property="limit">
+		 limit $pageNum$,$pageSize$
+	</isNotEmpty>
+  </select>
+  
+  <!-- 保存角色用户 -->
+  <!-- 删除角色用户 -->
+  <delete id="saveRoleUserInfo_delete" parameterClass="java.util.HashMap">
+      DELETE FROM  tb_cpc_sys_role_o_rel  WHERE role_id = #role_id# 
+  </delete>
+  <!-- 增加角色用户 -->
+  <insert id="saveRoleUserInfo_insert" parameterClass="java.util.HashMap">
+       INSERT INTO  tb_cpc_sys_role_o_rel(role_id,o_rel_id, o_type) values
+	    <iterate property="roleUserInfoSet" conjunction=",">
+	     (
+	      	#roleUserInfoSet[].role_id#,#roleUserInfoSet[].o_rel_id#,#roleUserInfoSet[].o_type#
+	      )  
+	    </iterate>
+  </insert>
+  
+  <!-- 记录用户操作日志 -->
+  <insert id="saveOptRecordInfo" parameterClass="java.util.HashMap">
+       INSERT INTO tb_cpc_sys_opt_record (opt_id,user_code,fun_id,opt_attr,opt_time,latn_id,opt_from,sys_id) 
+       VALUES(#optId#,#userCode#,#funId#,#optAttr#,now(),#latnId#,#optFrom#,#sysId#)
+  </insert>
+  
+  <!-- 记录操作日志明细 -->
+  <insert id="saveOptAttrInfo" parameterClass="java.util.HashMap">
+       INSERT INTO tb_cpc_sys_opt_attr(opt_id, opt_type, opt_attr, opt_value) VALUES
+       <iterate property="optAttrInfoSet" conjunction=",">
+	     (
+	      	#optId#,#optAttrInfoSet[].optType#,#optAttrInfoSet[].optAttr#,#optAttrInfoSet[].optValue#
+	      )  
+	    </iterate>
+  </insert>
+  
+  <!-- 查询值班 -->
+   <select id="queryCallSchedule"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		    SELECT 
+		  t.call_id as id,
+		  t.staff_id,
+ 		  DATE_FORMAT(t.call_Month, "%Y-%m-%d") AS start,
+ 		  t1.staff_name,
+		  call_type AS call_type,
+		  t1.mob_tel
+		FROM
+		  tb_cpc_call_schedule t ,sys_staff t1
+		  where t1.STAFF_ID = t.staff_id
+	<isNotEmpty prepend="and" property="region_id">
+		t.REGION_ID=#region_id#	    
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="month">
+  	     DATE_FORMAT(t.call_Month, "%Y-%m") = #month#
+	</isNotEmpty>
+	<isNotEmpty  property="limit">
+		 limit $pageNum$,$pageSize$
+	</isNotEmpty>
+  </select>
+  
+   <select id="seq_CallSchedule"  parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		    SELECT  nextval('seq_call_schedule_id') from dual_test
+	 
+  </select>
+   
+    <!-- 增加值班-->
+  <insert id="addCallSchedule" parameterClass="java.util.HashMap">
+       INSERT INTO tb_cpc_call_schedule (call_id,staff_id,call_Month,create_Date,status,REGION_ID,call_type) 
+       VALUES( #call_id#,#staff_id#,#create_Date#,now(),'0',#region_id#,#call_type#)
+  </insert>
+  
+   <!-- 修改值班-->
+  <update id="updateCallSchedule" parameterClass="java.util.HashMap">
+      UPDATE tb_cpc_call_schedule
+		 SET staff_id =#staff_id#, 
+			 create_Date =now() 
+	 WHERE call_id =#call_id#  
+  </update>
+  
+  <!-- 接单池管理查询 -->
+  <select id="qryPoolListSum" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+      SELECT COUNT(1) FROM (
+      SELECT POOL_ID, POOL_NAME, CALIM_LIMIT, URGE_SPAN_TIME, DEFAULT_EVAL_TIME, DEFAULT_EVAL, DEFAULT_MOB_TEL,
+		LOGIN_CODE, (SELECT STAFF_NAME FROM SYS_STAFF C WHERE CONVERT(C.LOGIN_CODE USING UTF8) = CONVERT(A.LOGIN_CODE USING UTF8)) LOGIN_NAME,
+		REGION_ID,(SELECT B.REGION_NAME FROM SYS_REGION B WHERE B.REGION_ID = A.REGION_ID) REGION_NAME
+		FROM TB_CPC_POOL A WHERE REGION_ID = #regionId#) T
+  </select>
+  
+  <select id="qryPoolListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+      SELECT 
+  POOL_ID,
+  POOL_NAME,
+  CALIM_LIMIT,
+  URGE_SPAN_TIME,
+  DEFAULT_EVAL_TIME,
+  DEFAULT_EVAL,
+  DEFAULT_MOB_TEL,
+  LOGIN_CODE,
+  (SELECT 
+    STAFF_NAME 
+  FROM
+    SYS_STAFF C 
+  WHERE CONVERT(C.LOGIN_CODE USING UTF8) = CONVERT(A.LOGIN_CODE USING UTF8)) LOGIN_NAME,
+  REGION_ID,
+  (SELECT 
+    B.REGION_NAME 
+  FROM
+    SYS_REGION B 
+  WHERE B.REGION_ID = A.REGION_ID) REGION_NAME,
+  (SELECT 
+    s.`DEPARTMENT_id` 
+  FROM
+    sys_staff s 
+  WHERE s.login_code = a.`login_code`) ORG_ID 
+FROM
+  TB_CPC_POOL A 
+  
+WHERE 
+  	    REGION_ID = #regionId# 
+
+
+
+ORDER BY POOL_ID 
+		
+		
+  </select>
+  <!-- 服务单接单池管理查询 -->
+  <select id="qryServiceListSum" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+      SELECT COUNT(1)
+		FROM
+		  sys_org t1 
+		  LEFT JOIN sys_region t2 
+		    ON t1.region_id = t2.REGION_ID 
+		  LEFT JOIN sys_staff t3 
+		    ON t1.org_id = t3.DEPARTMENT_CODE 
+		WHERE 1=1
+		
+		
+		AND
+			 t2.REGION_CODE=#regionId#
+			 
+			  AND 
+			  t3.personnel_service=#personnel_service#
+			  AND 
+			  t3.personnel_type=#personnel_type#
+		 AND
+			  t1.org_flag ='2'
+  </select>
+  <select id="qryservicePage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+ 	SELECT DISTINCT 
+t3.`STAFF_NAME`,
+t3.`STAFF_ID`,
+		  t1.org_id,
+		  t1.pid,
+		  t1.org_name,
+		  t2.region_name,
+		  t2.region_code,
+		  t2.control_number,
+		  t1.org_flag,
+		   t3.LOGIN_CODE
+		FROM
+		  sys_org t1 
+		  LEFT JOIN sys_region t2 
+		    ON t1.region_id = t2.REGION_ID 
+		  LEFT JOIN sys_staff t3 
+		    ON t1.org_id = t3.DEPARTMENT_CODE 
+		WHERE 1=1
+		AND
+			 t2.REGION_CODE=#regionId#
+			 
+			  AND 
+			  t3.personnel_service=#personnel_service#
+			  AND 
+			  t3.personnel_type=#personnel_type#
+		 AND
+			  t1.org_flag ='2'
+	order by t1.pid desc
+		limit $limit$,$pagesize$
+  </select>
+    <!-- 员工信息查询 -->
+   <select id="qryStaffListSum" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+		SELECT COUNT(*) FROM 
+		(SELECT STAFF_ID, LOGIN_CODE, STAFF_NAME, MOB_TEL, EMAIL,
+	    REGION_ID, (SELECT B.REGION_NAME FROM SYS_REGION B WHERE B.REGION_ID = A.REGION_ID) REGION_NAME,
+	    STATE, (SELECT C.DIC_VALUE FROM TB_CPC_DIC C WHERE C.DIC_TYPE = 'ORGSTATE' 
+	      AND CONVERT(C.DIC_CODE USING UTF8) = CONVERT(A.STATE USING UTF8)) STATE_NAME,
+	    DEPARTMENT_CODE, DEPARTMENT 
+	  	FROM SYS_STAFF A 
+	 	WHERE 1=1
+		<isNotEmpty property="regionId" prepend="and">
+	    A.REGION_ID = #regionId#
+		</isNotEmpty>
+		<isNotEmpty property="state" prepend="and">
+	    A.STATE = #state#
+		</isNotEmpty>
+		<isNotEmpty property="staffName" prepend="and">
+	    A.STAFF_NAME LIKE concat('%', #staffName#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="loginCode" prepend="and">
+	    A.LOGIN_CODE LIKE concat('%', #loginCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="department" prepend="and">
+	    A.DEPARTMENT LIKE concat('%', #department#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="orgId" prepend="and">
+		
+		a.login_code IN (SELECT login_code FROM sys_staff xx WHERE xx.department_id = #orgId#)
+		</isNotEmpty>
+		ORDER BY STAFF_ID) M
+	</select>
+	
+	<select id="qryStaffListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT STAFF_ID, TRIM( REPLACE(LOGIN_CODE, '\r\n', ' ')) LOGIN_CODE, 
+		TRIM( REPLACE(STAFF_NAME, '\r\n', ' ')) STAFF_NAME,
+		 MOB_TEL, 
+		 EMAIL,
+	    a.REGION_ID, 
+	    (SELECT B.REGION_NAME FROM SYS_REGION B WHERE B.REGION_ID = A.REGION_ID) REGION_NAME,
+	    a.STATE,
+	     (SELECT C.DIC_VALUE FROM TB_CPC_DIC C WHERE C.DIC_TYPE = 'ORGSTATE' 
+	      AND CONVERT(C.DIC_CODE USING UTF8) = CONVERT(A.STATE USING UTF8)) STATE_NAME,
+	    b.org_code DEPARTMENT_CODE, 
+	    b.org_name DEPARTMENT 
+	  	FROM SYS_STAFF A 
+	  	left join sys_org b
+	  	 on a.DEPARTMENT_CODE = b.org_code
+	 	WHERE 1=1
+		<isNotEmpty property="regionId" prepend="and">
+	    A.REGION_ID = #regionId#
+		</isNotEmpty>
+		<isNotEmpty property="orgId" prepend="and">
+	   	b.ORG_ID= #orgId#
+		</isNotEmpty> 
+		
+		<isNotEmpty property="state" prepend="and">
+	    A.STATE = #state#
+		</isNotEmpty>
+		<isNotEmpty property="staffName" prepend="and">
+	    A.STAFF_NAME LIKE concat('%', #staffName#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="loginCode" prepend="and">
+	    A.LOGIN_CODE LIKE concat('%', #loginCode#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="department" prepend="and">
+	    A.DEPARTMENT LIKE concat('%', #department#, '%')
+		</isNotEmpty>
+		ORDER BY STAFF_ID
+		<isNotEmpty  property="limit">
+		 limit $limit$,$pagesize$
+	   </isNotEmpty>
+	</select>
+	 <!-- 修改接单池值班信息-->
+	  <update id="updatePoolInfo" parameterClass="java.util.HashMap">
+	      UPDATE TB_CPC_POOL SET LOGIN_CODE = #loginCode#, DEFAULT_MOB_TEL = #mobTel# WHERE POOL_ID = #poolId#
+	  </update>
+	   <!-- 修改原本值班人值班信息为null-->
+	  <update id="updateServiceInfo" parameterClass="java.util.HashMap">
+	    UPDATE  sys_staff  SET personnel_service=#personnel_service# WHERE LOGIN_CODE=#loginCode#
+	  </update>
+	   <!-- 修改选择后值班人值班信息service-->
+	  <update id="updateOldServiceInfo" parameterClass="java.util.HashMap">
+	    UPDATE  sys_staff  SET personnel_service=#old_service# WHERE LOGIN_CODE=#old_logincode#
+	  </update>
+	   <!-- 获取所有角色权限 -->
+	  <select id="qryAllOrgAuthList"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	      SELECT 
+		  A.ROLE_ID,
+		  A.ROLE_NAME,
+		  A.ROLE_DESC,
+		  A.STATUS,
+		  A.LATN_ID,
+		  B.REGION_NAME LATN_NAME 
+		FROM
+		  TB_CPC_SYS_ROLE A,
+		  SYS_REGION B 
+		WHERE 1 = 1 
+		  AND CONVERT(A.LATN_ID USING utf8) COLLATE utf8_unicode_ci = B.REGION_ID 
+		  AND A.STATUS = 'Y' 
+		ORDER BY ROLE_ID 
+	  </select>
+	  
+	  <!-- 获取已有的角色权限 -->
+	  <select id="qryUseOrgAuthList"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	      SELECT 
+		  A.O_REL_ID ORG_ID,
+		  A.ROLE_ID ROLE_ID,
+		  B.ROLE_NAME ROLE_NAME,
+		  B.LATN_ID LATN_ID,
+		  C.REGION_NAME LATN_NAME 
+		FROM
+		  TB_CPC_SYS_ROLE_O_REL A,
+		  TB_CPC_SYS_ROLE B,
+		  SYS_REGION C 
+		WHERE A.ROLE_ID = B.ROLE_ID 
+		  AND CONVERT(B.LATN_ID USING utf8) COLLATE utf8_unicode_ci = C.REGION_ID 
+		  AND A.O_TYPE = #dealType# 
+		  AND B.STATUS = 'Y' 
+		  AND A.O_REL_ID = #id#
+	      </select>
+	    <delete id="saveOrgAuthInfo_delete" parameterClass="java.util.HashMap">
+	      DELETE FROM TB_CPC_SYS_ROLE_O_REL WHERE O_TYPE = #dealType# AND O_REL_ID = #rel_id#
+	  </delete>
+	  
+	  <!-- 组织机构增加角色权限 -->
+	  <insert id="saveOrgAuthInfo_insert" parameterClass="java.util.HashMap">
+	       INSERT INTO TB_CPC_SYS_ROLE_O_REL(ROLE_ID,O_REL_ID,O_TYPE) VALUES
+		    <iterate property="roleAuthInfoSet" conjunction=",">
+		     (
+		      	#roleAuthInfoSet[].role_id#,#roleAuthInfoSet[].o_rel_id#,#roleAuthInfoSet[].o_type#
+		      )  
+		    </iterate>
+	  </insert>
+	  
+  	<!-- 组织机构查询 -->
+   <select id="queryOrganisationListSum" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+		SELECT COUNT(1) FROM (SELECT A.ORG_ID, A.ORG_NAME, A.PID,
+		 (SELECT COUNT(1) FROM sys_staff a1 WHERE a1.department_id = A.org_id AND a1.personnel_type='professional') professional,
+		(SELECT T.ORG_NAME FROM SYS_ORG T WHERE T.ORG_ID = A.PID) PID_NAME,
+		A.REGION_ID, (SELECT B.REGION_NAME FROM SYS_REGION B WHERE B.REGION_ID = A.REGION_ID) REGION_NAME,
+		A.STATE, 
+		(SELECT C.DIC_VALUE FROM TB_CPC_DIC C WHERE C.DIC_TYPE = 'ORGSTATE' AND CONVERT(C.DIC_CODE USING UTF8) = CONVERT(A.STATE USING UTF8)) STATE_NAME
+		FROM SYS_ORG A WHERE 1=1 
+		<isNotEmpty property="regionId" prepend="and">
+	    A.REGION_ID = #regionId#
+		</isNotEmpty>
+		<isNotEmpty property="orgId" prepend="and">
+	    A.ORG_ID LIKE concat('%', #orgId#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="orgName" prepend="and">
+	    A.ORG_NAME LIKE concat('%', #orgName#, '%')
+		</isNotEmpty>
+		 <isNotEmpty prepend="and" property="org_flag">	
+			 (
+			 
+				 a.ORG_FLAG=#org_flag#
+			 
+			 <isNotEmpty  property="professional">
+			 OR (SELECT COUNT(1) FROM sys_staff a1 WHERE a1.department_id = A.org_id AND a1.personnel_type=#professional#)
+			 </isNotEmpty>
+			 )
+			 </isNotEmpty>
+		
+		ORDER BY ORG_ID) M
+	</select>
+	<select id="queryOrganisationListPage" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT A.ORG_ID, A.ORG_NAME, A.PID,
+		(SELECT T.ORG_NAME FROM SYS_ORG T WHERE T.ORG_ID = A.PID) PID_NAME,
+		A.ORG_FLAG,
+		 (SELECT COUNT(1) FROM sys_staff a1 WHERE a1.department_id = A.org_id AND a1.personnel_type='professional') professional,
+   		A.REGION_ID, (SELECT B.REGION_NAME FROM SYS_REGION B WHERE B.REGION_ID = A.REGION_ID) REGION_NAME,
+		A.STATE, 
+		(SELECT C.DIC_VALUE FROM TB_CPC_DIC C WHERE C.DIC_TYPE = 'ORGSTATE' AND CONVERT(C.DIC_CODE USING UTF8) = CONVERT(A.STATE USING UTF8)) STATE_NAME
+		FROM SYS_ORG A WHERE 1=1 
+		<isNotEmpty property="regionId" prepend="and">
+	    A.REGION_ID = #regionId#
+		</isNotEmpty>
+		<isNotEmpty property="orgId" prepend="and">
+	    A.ORG_ID LIKE concat('%', #orgId#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="orgName" prepend="and">
+	    A.ORG_NAME LIKE concat('%', #orgName#, '%')
+		</isNotEmpty>
+		<isNotEmpty property="orgState" prepend="and">
+	    A.STATE = #orgState#
+		</isNotEmpty>
+		 <isNotEmpty prepend="and" property="org_flag">	
+			 (
+			 
+				 a.ORG_FLAG=#org_flag#
+			 
+			 <isNotEmpty  property="professional">
+			 OR (SELECT COUNT(1) FROM sys_staff a1 WHERE a1.department_id = A.org_id AND a1.personnel_type=#professional#)
+			 </isNotEmpty>
+			 )
+			 </isNotEmpty>
+		
+		 
+		
+		
+		ORDER BY ORG_ID
+		<isNotEmpty  property="limit">
+		 limit $limit$,$pagesize$
+	   </isNotEmpty>
+	</select>
+	   <!-- 校验loginCode唯一性 -->
+	 <select id="checkLoginCode" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+		SELECT COUNT(1) FROM SYS_STAFF WHERE LOGIN_CODE = #loginCode#
+	  </select>
+	 <!-- 修改工号资料-->
+	  <update id="updateStaffState" parameterClass="java.util.HashMap">
+	      UPDATE 
+			  SYS_STAFF 
+			SET
+			  STAFF_NAME = #staffName#,
+			  MOB_TEL = #tel#,
+			  EMAIL = #email#,
+			  DEPARTMENT = #department#,
+			  DEPARTMENT_CODE = #departmentCode#,
+			  STATE = #state#,  
+			  STATE_DATE = NOW() 
+			WHERE STAFF_ID = #staffId#  
+	  </update>
+	  <!-- 新增工号信息 -->
+	 <insert id="addStaffInfo" parameterClass="java.util.HashMap">
+	     INSERT INTO SYS_STAFF (STAFF_ID, STAFF_NAME, LOGIN_CODE, PASSWORD, SYSTEM_FROM, MOB_TEL, EMAIL, REGION_ID,
+		  DEPARTMENT, POST, STATE, STATE_DATE, DEPARTMENT_ID, DEPARTMENT_CODE ) 
+		 VALUES (#staffId#, #staffName#, #loginCode#, #pwd#, null, #tel#, #email#, #latnId#, 
+		  #departmentName#, null, #state#, now(), null, #departmentCode#);
+	 </insert>
+	   <!-- 查询工号ID，生成新的工号ID -->
+	 <select id="qryMaxStaffId" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+		SELECT MAX(STAFF_ID) FROM SYS_STAFF WHERE LENGTH(STAFF_ID) >= 5
+	  </select>
+</sqlMap>

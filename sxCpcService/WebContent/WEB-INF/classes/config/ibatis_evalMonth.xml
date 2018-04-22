@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="evalMonth">
+   <!-- 综支部门的人员的查询 -->
+    <select id="select_user_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        SELECT 
+             s.staff_id,
+             s.staff_name,
+             o.org_id,
+             o.org_name 
+        FROM
+             sys_staff s 
+        LEFT JOIN sys_org o 
+        ON s.region_id = o.region_id 
+        WHERE 1=1
+        <isNotEmpty property="staff_id" prepend="and">
+        s.staff_id = #staff_id# 
+        </isNotEmpty>
+        AND o.`ORG_FLAG` = 3 
+        AND DATE_FORMAT(NOW(),'%Y-%m') 
+        NOT IN(
+         SELECT DATE_FORMAT(t.`eval_time`,'%Y-%m') 
+         FROM  tb_cpc_evalmon_info t
+         WHERE t.`staff_id`=#staff_id#      
+        )
+    </select>
+    <!-- 保存综支部门的评价 -->
+    <insert id="save_evalMonZZ" parameterClass="java.util.HashMap">
+    insert into
+       tb_cpc_evalmon_info(
+       staff_id,
+       staff_name,
+       evalZZ_id,
+       evalZZ_name,
+       eval_time,
+       total_eval,
+       eval_td,
+       eval_jsd,
+       eval_myd,
+       eval_type
+       ) 
+       values(
+       #staff_id#,
+       #staff_name#,
+       #evalZZ_id#,
+       #evalZZ_name#,
+       SYSDATE(),
+       #total_eval#,
+       #eval_td#,
+       #eval_jsd#,
+       #eval_myd#,
+       #eval_type#
+       ) 
+      
+    </insert>
+    	<!-- 专业部门评价查询 -->
+    <select id="select_dept_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+    SELECT
+            o.org_id AS dept_id,
+             o.org_name AS dept_name,
+             o.org_flag
+         
+        FROM
+           sys_region s
+            
+        LEFT JOIN sys_org o
+        ON s.region_id = o.region_id 
+        WHERE 1=1
+       AND o.`ORG_FLAG`=2 
+       <isNotEmpty property="region_id" prepend="and">
+      o.`REGION_ID` = #region_id# 
+        </isNotEmpty>
+        AND       	
+       o.org_id NOT IN(
+        SELECT t.dept_id FROM 
+        tb_cpc_eval_dept t
+        WHERE 1=1
+       <isNotEmpty property="staff_id" prepend="and">
+        	t.staff_id=#staff_id#
+        </isNotEmpty>
+        AND DATE_FORMAT(t.eval_time  ,'%Y-%m')=DATE_FORMAT(NOW(),'%Y-%m') 
+       )
+        
+ 	ORDER BY dept_id
+       
+     
+  <!--  SELECT
+         dept_id,
+         dept_name,
+         dept_desc
+       FROM tb_cpc_dept
+       WHERE 
+       dept_type=#dept_type#
+       AND       
+       dept_id NOT IN(
+        SELECT t.dept_id FROM 
+        tb_cpc_eval_dept t
+        WHERE 1=1
+        <isNotEmpty property="staff_id" prepend="and">
+        	t.staff_id=#staff_id#
+        </isNotEmpty>
+        AND DATE_FORMAT(t.eval_time  ,'%Y-%m')=DATE_FORMAT(NOW(),'%Y-%m') 
+       ) -->
+
+    </select>
+    <!--  -->
+    <select id="select_score_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  SUM(t.`eval_integ`) AS score_total,
+		  (SELECT 
+		    COUNT(1) 
+		  FROM
+		    tb_cpc_eval_integration t1 
+		  WHERE t1.staff_id = t.`staff_id` 
+		    AND t1.eval_type IN('1','2')) AS eval_bill,
+		  (SELECT 
+		    COUNT(
+		      DISTINCT (
+		        DATE_FORMAT(t2.eval_time, '%Y-%m')
+		      )
+		    ) 
+		  FROM
+		    tb_cpc_eval_integration t2 
+		  WHERE t2.eval_type IN('3','4','5') 
+		    AND t2.staff_id = t.`staff_id`) AS eval_mon 
+		FROM
+		  tb_cpc_eval_integration t 
+		WHERE t.staff_id =#staff_id# 
+       
+    </select>
+    	<!-- 保存评价过的专业部门 -->
+    <insert id="save_eval_dept"  parameterClass="java.util.HashMap">
+	    INSERT INTO  
+	    tb_cpc_eval_dept(dept_id,dept_name,staff_id,eval_star,eval_time,eval_type) 
+	    values
+	     (
+	      	#deptId#,
+	      	#dept_name#,
+	      	#staff_id#,
+	      	#eval_star#,
+	      	SYSDATE(),
+	      	#eval_type#
+	      )  
+	   
+	</insert>
+	<!-- 保存评价过的综支部门 -->
+	<insert id="save_eval_integer" parameterClass="java.util.HashMap">
+	  insert into
+	  tb_cpc_eval_integration(staff_id,eval_time,eval_type,eval_integ,busi_id)
+	  values(
+	    #staff_id#,
+	    SYSDATE(),
+	    #eval_type#,
+	    #eval_integ#,
+	    #busi_id#
+	  )
+	</insert>
+    
+    <select id="search_date" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT dic_value FROM tb_cpc_dic  WHERE dic_code = 'YDZHPJ'
+    </select>
+    
+    <!-- 根据工号查询所对应的部门及状态  -->
+    <select id="select_deptment_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT * FROM (
+		    SELECT 
+		    	r.org_id, 
+		    	o.org_name, 
+		    	SUM(r.pg_value) pg_value
+		    FROM 
+		    	sys_result_pg r, 
+		    	SYS_ORG_PG o 
+		    WHERE r.org_id=o.org_id and r.staff_id=#staff_id# and r.date_id=#date_id#
+		    	<isNotEmpty prepend="AND" property="org_name" >
+		    	 	o.org_name like concat('%', #org_name#, '%')
+		    	</isNotEmpty>
+			GROUP BY 
+				r.org_id)t 
+		<!-- WHERE t.pg_value > 0; -->
+		WHERE 1=1
+		<isNotEmpty property="statusId" >
+			<isEqual prepend="AND" property="statusId" compareValue="1">
+				t.pg_value > 0
+			</isEqual>
+			<isEqual prepend="AND" property="statusId" compareValue="0">
+				t.pg_value = 0
+			</isEqual>
+		</isNotEmpty>
+    </select>
+    
+    <!-- 查询部门所对应的指标-->
+    <select id="select_index_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+	    	r.org_id, 
+	    	o.org_name, 
+	    	r.`index_id`, 
+	    	p.`index_name`, 
+	    	r.pg_value 
+	    FROM 
+	    	sys_result_pg r, 
+	    	SYS_ORG_PG o, 
+	    	sys_index_pg p 
+		WHERE 
+			r.org_id=o.org_id 
+		AND r.`index_id`=p.`index_id`
+			<isNotEmpty prepend="AND" property="org_id" >
+				r.org_id=#org_id#
+			</isNotEmpty> 
+			<isNotEmpty prepend="AND" property="staff_id" >
+			    r.staff_id=#staff_id#
+			</isNotEmpty>
+    </select>
+    <update id="updateAssessInfo" parameterClass="java.util.HashMap">
+    	UPDATE 
+    		sys_result_pg 
+    	SET pg_value = #pg_value#
+    	WHERE staff_id=#staff_id# and org_id=#org_id# and index_id = #index_id# and date_id = #date_id#
+  	</update>
+	
+  	<!-- 查询登录人能够打分的支撑部门和领导信息-->
+    <select id="qry_relation_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT sr.promoters_id,sr.promoters_name,sr.opt_id,sr.opt_name,sr.pro_role_type,sr.flag,
+  			sr.is_eval,sr.se_lie,sr.is_score,st.start_time,st.end_time FROM
+  		tb_cpc_score_relation sr, tb_cpc_score_time st WHERE sr.promoters_id = #promoters_id# 
+  		and sr.is_score = st.is_score ORDER BY se_lie 
+    </select>
+    <!-- 保存支撑部门和领导的分值 -->
+	<insert id="save_score_info" parameterClass="java.util.HashMap">
+		  INSERT INTO tb_cpc_score_info (promoters_id,opt_id,score,score_time,pro_role_type,flag) 
+		  VALUES(#promoters_id#,#opt_id#,#score#,SYSDATE(),#pro_role_type#,#flag#)
+	</insert>
+	<update id="updScoreRelationInfo" parameterClass="java.util.HashMap">
+    	UPDATE tb_cpc_score_relation SET is_eval='Y' WHERE promoters_id=#promoters_id#
+  	</update>
+	<!-- 判断本月是否有评价 -->
+	<select id="check_isEval" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+		SELECT COUNT(1) evalNum FROM tb_cpc_score_relation WHERE promoters_id=#promoters_id# AND is_eval='Y'
+    </select>
+    <!-- 查询bbs评论类型 -->
+	<select id="qry_demand_short_type" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+	    SELECT 
+		  d.`tree_id` AS 'ID',
+		  d.`tree_name` AS 'NAME',
+		  d.`tree_level` AS 'LEVEL',
+		  d.`pid` AS 'PID'
+		FROM
+		  demand_short_type_tree d 
+	</select>
+	<!-- 保存bbs评论 -->
+	<insert id="save_bbs_comment" parameterClass="java.util.HashMap">
+	  insert into
+	  bbs_demand_short_comment(theme,detail,promoters_id,bbs_type,create_time)
+	  values(
+	    #theme#,
+	    #content#,
+	    #staffId#,
+	    #bbsType#,
+	    SYSDATE()
+	  )
+	</insert>
+	<!-- 查询bbs列表 -->
+	<select id="qry_comment_list" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	    SELECT 
+	      b.`comment_id`,
+		  b.`theme`,
+		  b.`bbs_type`,
+		  b.`detail`,
+          b.`promoters_id`,
+          DATE_FORMAT(b.`create_time`, '%Y年%m月%d日  %T')  AS first_time,
+		  DATE_FORMAT( MAX(e.`create_time`), '%Y年%m月%d日  %T') AS last_time 
+		FROM
+		  bbs_demand_short_comment b 
+		  LEFT JOIN eval_bbs_comment e 
+		    ON b.`comment_id` = e.`comment_id`
+		  WHERE 1=1
+		  <isNotEmpty prepend="AND" property="bbs_type">
+		   b.`bbs_type`=#bbs_type#
+		  </isNotEmpty> 
+		  <isNotEmpty prepend="AND" property="comment_id">
+		   b.`comment_id`=#comment_id#
+		  </isNotEmpty>
+		  GROUP BY b.`comment_id` 
+		  ORDER BY e.`create_time`
+		  limit $page_num$,$pagesize$ 
+	</select>
+	<!-- 查询bbs跟帖数量-->
+	<select id="qry_eval_comment_sum" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+	      SELECT  COUNT(*) 
+	      FROM eval_bbs_comment e
+		  WHERE 1=1
+		  <isNotEmpty prepend="AND" property="comment_id">
+		   e.`comment_id`=#comment_id#
+		  </isNotEmpty> 
+		ORDER BY e.`create_time` 
+	</select>
+	<!-- 查询bbs跟帖列表-->
+	<select id="qry_eval_comment_list" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	      SELECT 
+	          e.`comment_id`,
+			  e.`eval_detail`,
+			  DATE_FORMAT(e.`create_time`, '%Y年%m月%d日  %T') AS create_time,
+			  e.`opt_id`  
+	      FROM eval_bbs_comment e
+		  WHERE 1=1
+		  <isNotEmpty prepend="AND" property="comment_id">
+		   e.`comment_id`=#comment_id#
+		  </isNotEmpty> 
+		ORDER BY e.`create_time` 
+	</select>
+	<!-- 查询bbs评论信息-->
+	<select id="qry_comment_info" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	     SELECT 
+			  t.`theme`,
+			  t.`detail`,
+			  t.`comment_id`,
+			  t.`bbs_type`,
+			  t.`promoters_id`,
+			  DATE_FORMAT(t.`create_time`, '%Y年%m月%d日  %T') AS create_time
+       FROM
+           bbs_demand_short_comment t
+		  WHERE 1=1
+		  <isNotEmpty prepend="AND" property="comment_id">
+		   t.`comment_id`=#comment_id#
+		  </isNotEmpty> 
+		  <isNotEmpty prepend="AND" property="bbs_type">
+		   t.`bbs_type`=#bbs_type#
+		  </isNotEmpty>
+	</select>
+	<!-- 保存bbs跟帖-->
+	<insert id="save_bbs_eval_comment" parameterClass="java.util.HashMap">
+	  insert into
+	  eval_bbs_comment(comment_id,eval_detail,opt_id,create_time)
+	  values(
+	    #comment_id#,
+	    #eval_detail#,
+	    #staff_id#,
+	    SYSDATE()
+	  )
+	</insert>
+	<!-- 查询bbs发帖列表的总数-->
+	<select id="qry_comment_list_sum" resultClass="String" parameterClass="java.util.HashMap">
+	      SELECT  COUNT(b.`comment_id`) 
+	      FROM
+		  bbs_demand_short_comment b 
+		  WHERE 1=1
+		  <isNotEmpty prepend="AND" property="bbs_type">
+		   b.`bbs_type`=#bbs_type#
+		  </isNotEmpty> 
+		  <isNotEmpty prepend="AND" property="comment_id">
+		   b.`comment_id`=#comment_id#
+		  </isNotEmpty>
+	</select>
+	<!-- 查询咸阳逆评时间配置信息-->
+	<select id="select_config_day" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	      SELECT 
+			  start_day,
+			  end_day,
+			  eval_type,
+			  latn_id 
+			FROM
+			  eval_date_config 
+			WHERE latn_id = #latn_id# 
+		  <isNotEmpty prepend="AND" property="eval_type">
+		      eval_type=#eval_type#
+		  </isNotEmpty>
+	</select>
+	<!-- 查询待评价支撑部门的列表-->
+	<select id="select_reverse_eval_dept" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	      SELECT 
+			  org_id,
+			  org_name,
+			  org_flag,
+			  region_id 
+			FROM
+			  sys_org 
+			WHERE is_eval_dept = 'Y'
+		  <isNotEmpty prepend="AND" property="latn_id">
+		      region_id=#latn_id#
+		  </isNotEmpty>
+	</select>
+	<!-- 咸阳逆评保存评价结果 -->
+	<insert id="insert_reverse_eval" parameterClass="java.util.HashMap">
+	   INSERT INTO reverse_eval_record (
+		  eval_id,
+		  eval_name,
+		  eval_type,
+		  eval_time,
+		  opt_id,
+		  opt_name,
+		  eval_value,
+		  latn_id
+		)VALUES(
+		#eval_id#,
+		#eval_name#,
+		#eval_type#,
+		SYSDATE(),
+		#opt_id#,
+		#opt_name#,
+		#eval_value#,
+		#latn_id#)  
+	</insert>
+	<!-- 查询已评价支撑部门或领导的列表-->
+	<select id="qry_reverse_dept_manager" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	      SELECT 
+		    id,
+		    eval_id,
+		    eval_name,
+		    eval_type,
+		    eval_time,
+		    opt_id,
+		    opt_name,
+		    eval_value 
+		  FROM
+		    reverse_eval_record 
+		  WHERE 1=1
+		  <isNotEmpty prepend="AND" property="eval_id">
+		      eval_id=#eval_id#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="AND" property="eval_type">
+		      eval_type=#eval_type#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="AND" property="eval_value">
+		      eval_value=#eval_value#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="AND" property="firstDay">
+		     <![CDATA[ DATE_FORMAT(eval_time, '%Y-%m-%d') >= #firstDay#]]>
+		  </isNotEmpty>
+	</select>
+	<!-- 查询员工信息-->
+	<select id="select_eval_manager_info" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	      SELECT 
+			  staff_id,
+			  staff_name,
+			  mob_tel,
+			  region_id,
+			  department,
+			  department_id,
+			  dept_id,
+			  dept_name,
+			  post_id 
+			FROM
+			  sys_staff s
+			WHERE 1=1
+		  <isNotEmpty prepend="AND" property="staff_id">
+		      staff_id=#staff_id#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="AND" property="dept_id">
+		      dept_id=#dept_id#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="AND" property="department_id">
+		      department_id=#department_id#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="AND" property="latn_id">
+		      region_id=#latn_id#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="AND" property="post_id">
+		      post_id in(1,2)
+		      order by post_id
+		  </isNotEmpty>
+	</select>
+	<!-- 保存红包的发放记录 -->
+	<insert id="save_urge_money_record" parameterClass="java.util.HashMap">
+	   INSERT INTO reverse_send_money_record (
+		  urge_id,
+		  urge_name,
+		  urge_dept_id,
+		  urge_dept_name,
+		  money_num,
+		  urge_time,
+		  send_id,
+		  send_name,
+		  urge_desc,
+		  latn_id
+		) 
+		VALUES
+		  (#urge_id#,
+		  #urge_name#,
+		  #urge_dept_id#,
+		  #urge_dept_name#,
+		  #money_num#,
+		  SYSDATE(),
+		  #send_id#,
+		  #send_name#,
+		  #urge_desc#,
+		  #latn_id#)
+	</insert>
+	<!-- 查询小CEO的红包信息 -->
+	<select id="select_urge_money_info" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	      SELECT 
+			  s.`STAFF_ID`,
+			  s.`STAFF_NAME`,
+			  s.`dept_id`,
+			  t.`small_type_id`,
+			  t.`money_num`
+			FROM
+			  sys_staff s,
+			  (SELECT 
+			    a.`dept_id`,
+			    a.`latn_id`,
+			    a.`small_type_id`,
+			    m.`money_num`,
+			    m.`create_time` 
+			  FROM
+			    act_workflow_dept_info a,
+			    money_number_config m 
+			  WHERE a.`small_type_id` = m.`small_type_id`
+			        and a.`latn_id`=m.`latn_id`
+			        and m.`latn_id`=#latn_id#) t 
+			WHERE s.`dept_id` = t.dept_id 
+			  AND s.`REGION_ID` = t.`latn_id` 
+			  AND s.`STAFF_ID` = #staff_id#
+	</select>
+	<!-- 查询小CEO本月发放的红包总数额 -->
+	<select id="select_send_money_sum" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+	      SELECT 
+			  SUM(r.`money_num`) send_sum 
+			FROM
+			  reverse_send_money_record r 
+			WHERE DATE_FORMAT(r.`urge_time`, '%Y-%m-%d') >=#firstDay# 
+			  AND r.`send_id` = #staff_id#
+	</select> 
+	<!-- 查询小CEO领导班子的信息-->
+	<select id="qry_manager_list" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	      SELECT 
+			  s.`STAFF_ID` staff_id,
+			  s.`STAFF_NAME` staff_name
+		  FROM
+			  sys_staff s 
+		  WHERE s.`dept_id` = 
+			  (SELECT 
+			    a.`area_id` 
+			  FROM
+			    ACT_WORKFLOW_DEPT_INFO a 
+			  WHERE a.`dept_id` = 
+			    (SELECT 
+			      f.`dept_id` 
+			    FROM
+			      sys_staff f 
+			    WHERE f.`STAFF_ID` = #staff_id#))
+		  and post_id in(1,2)
+		  ORDER BY s.`post_id`
+	</select>
+</sqlMap>

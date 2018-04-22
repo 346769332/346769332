@@ -1,0 +1,71 @@
+﻿<script type="text/javascript" src="js/orderSend/orderSends.js"></script>
+<script type="text/javascript" src="js/common/jquery-form.js"></script>
+<div class="list-main">
+<h2>需求发起</h2>
+<div id="orderSendPagez" class="bb-box-01 mt10">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab5 mt10 lines">
+        <tbody>
+            <tr>
+                <th align="right">需求主题</th>
+                <td colspan="3"><input id="demand_theme" type="text" style="width:80%" maxlength="50"></td>
+            </tr>
+            <tr>
+              <th align="right">需求单号</th>
+              <td id="demandId"></td>
+              <th align="right">发起时间</th>
+              <td id="createTime"></td>
+            </tr>
+            <tr>
+              <th align="right">发单人</th>
+              <td style="width:450px;"><input id="sendUserName" type="text" style="width:25%;" readonly/>
+              </td>
+               <th align="right">发单部门</th>
+               <td id="sendOrgName"></td>
+            </tr>
+            <tr>
+              <th align="right" >联系电话</th>
+              <td colspan="3"><input type="text" style="width:150px;" id="tel" maxlength="11" readonly="readonly"></td>
+            </tr>
+            <tr id="getUser" style="display:none;">
+               <th style="text-align:right;width:20%;">接单人</th>
+               <td><input id="getUserName" type="text" style="width:30%;" readonly/>
+              		<span style="color:red;">*只能选择综合支撑服务部门和四中心七部门</span>
+              </td>
+              <th style="text-align:right;width:20%;">发单等级</th>
+              <td >
+                  <select id="demandRank" style="width:50%;height:26px;">
+                  </select>
+              </td>
+            </tr>
+            <tr>
+               <th align="right" >附件上传</th> 
+               <td colspan="3"> 
+ 	               <form id="attachForm" enctype="multipart/form-data" method="post">
+	              		<input type="file" style="width:400px;" name="attachment" id="attachment"> 
+ 	              		<input type="button" class="but" id="attachSubs" style="width:100px;" value="上传"> 
+	              		
+               		</form> 
+              </td>
+             </tr> 
+             <tr> 
+               <th align="right" >附件信息</th> 
+               <td colspan="3"> 
+               	<div id="attachmentInfoY" ></div> 
+               </td> 
+             </tr>   
+            <tr>
+              <th align="right">需求详情</th>
+              <td colspan="3">
+                <textarea rows="10" name="textarea" id="medDetail" style="width: 90%; border:1px solid #D7D7D7;line-height: 20px;" maxlength="500"></textarea>
+              </td>
+            </tr>
+            <tr>
+            <td align="center" colspan="4" style="padding:10px;"><a href="#" id="send" class="but">发起</a>&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="#" id="back" class="but">返回</a></td>           
+<!--             <td align="center" colspan="2" style="padding:10px;"></td> -->
+            </tr>
+        </tbody>
+    </table>
+    </div>
+    </div>

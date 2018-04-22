@@ -1,0 +1,83 @@
+<script type="text/javascript" src="js/shortProcess/fullBusinessProcessList.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/common.js"></script>
+
+<div class="list-main" id="fullBusinessProcessPage"  >
+	
+	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;业务全流程&nbsp;&nbsp;--&nbsp;&nbsp;定单信息查询</div>
+	<div class="bd-list" style="overflow: hidden;">
+		<div class="form-group">
+		    <label class="form-label">号码类型:</label>
+		    <select class="select_w153" name="userType" id="userType" style="width: 160px;">
+		    	<option value="0">用户号码</option>
+		    	<option value="1">客户定单编码</option>
+		    </select>
+		</div>
+		<div class="form-group">
+		    <label class="form-label">区号:</label>
+		    <select  class="select_w153" name="areaNo" id="areaNo" style="width: 120px;">
+		    	<option value="">-请选择-</option>
+		    	<option value="0991">0991</option>
+		    	<option value="0992">0992</option>
+		    	<option value="0993">0993</option>
+		    	<option value="0994">0994</option>
+		    	<option value="0995">0995</option>
+		    	<option value="0996">0996</option>
+		    	<option value="0997">0997</option>
+		    	<option value="0998">0998</option>
+		    	<option value="0999">0999</option>
+		    	<option value="0901">0901</option>
+		    	<option value="0902">0902</option>
+		    	<option value="0903">0903</option>
+		    	<option value="0906">0906</option>
+		    	<option value="0908">0908</option>
+		    	<option value="0909">0909</option>
+		    	<option value="0990">0990</option>
+		    </select>
+		</div>
+		<div class="form-group" >
+		   <label class="form-label">查询值:</label>
+		   <input id="billingNo" name="billingNo" type="text"  class=" w130" style="width: 120px;"/>
+		   
+		   <input id="reUserType" name="reUserType" type="hidden" value=""    />
+		   <input id="reAreaNo" name="reAreaNo" type="hidden"  value=""  />
+		   <input id="reBillingNo" name="reBillingNo" type="hidden" value="" />
+		</div>
+		
+		<div class="form-search">
+		    <a href="#" class="but" id="search" >查询</a>
+		</div>
+		<!-- 
+		<div class="form-search" >
+		    <a href="#" class="but" id="reset">重置</a>
+		</div>
+		 -->
+	</div>
+	
+	<div class="lable-box" style="margin-top: 12px">
+	   <a  href="javascript:void(0)" class="lable" id="orderInfor">工单信息查看</a>
+	</div>
+	
+	<div id="dateQuery"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10 d_top">
+		<thead>
+			<tr>
+			    <td style="width:2%;text-align: right;"></td>
+				<td>定单编码 </td>
+				<td>定单主题</td>				
+				<td>业务号码</td>
+				<td>定单类型</td>				
+				<td>定单状态</td>
+				<td>服务</td>
+				<td>客户订单编码</td>
+				<td>申请日期</td>
+				<td>区域</td>
+				<td>局向</td>
+				<td>受理人</td>
+				<td>电话</td>
+			</tr>
+		</thead>
+		<tbody id="fullBusinessProcessBody"></tbody>
+	</table>
+	<div class="page mt10" id="fullBusinessProcessyListFoot"></div>
+</div>

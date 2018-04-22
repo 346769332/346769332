@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <title></title>
+    <link href="../css/css.css" rel="stylesheet" type="text/css">
+	<link href="../css/dlc.css" rel="stylesheet" type="text/css">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/animate.min.css" rel="stylesheet">
+	<link href="../css/common.css" rel="stylesheet">
+	<link href="../css/style.min.css" rel="stylesheet">
+	<link href="../font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<script src="../js/jquery-2.1.1.js"></script>
+	<script src="../js/pace.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script src="../js/jq.ui.js"></script>
+	<script src="../js/common.js"></script>
+	<script src="../js/servlet.url.js"></script>
+	<script src="../js/iscroll.js"></script>
+	<script src="../js/icenter_plugin/cordova.js"></script>
+	<script src="../js/icenter_plugin/icenter_plugin.js"></script>
+	<script src="../js/icenter_plugin/cordova_plugins.js"></script>
+	
+	<script src="../js/validateTel.js"></script>
+	<script src="../js/pages/shortProcessInstructionsInfo.js"></script>
+</head>
+
+<body class="bodyBackColor">
+<div id="showDialogDiv">
+<div class="modal fade" id="myModal_1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="dialogTitle"></h4>
+      </div>
+      <div class="modal-body" id="dialogMsg">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div id="lockScreen"  style="display:none"><div  class="showbg"></div><div class="loading"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div></div>
+<div style="height: 100%;z-index:2000;position:fixed;top:0;left:0;width:100%;transform:scale(1, 1);display:block;background:#ececec">
+<div class="header">
+	<div class="background-img">
+        <div class="header_top">
+                <div class="zuo_img" >
+                    <div><img src="../images/zjt.png"/>
+                    <a id="backA">返回</a></div>
+                </div>
+            <h1 class="biaoti">短流程需求详情</h1>
+            <a id="backB"><img src="../images/home_on.png" style="padding: 8px;width: 40px;  float: right; margin-top: -8px;"></a>
+        </div>
+    </div>
+</div>
+<div class="d_list"> 短流程环节说明</div>
+<!--srys-->
+  <div class="srys" style="margin:0px;">
+<!--        <dl class="srys_box">
+            <dt>终端资源申请</dt>
+            <dd></dd>
+        </dl>
+-->        <dl class="list">
+            <dt>
+                <div class="wcz" style="width:30%;">是否并发处理：</div>
+                <div class="dxf" style="width:50%;"><a href="">是</a></div>
+            </dt>
+        </dl>
+        <dl class="list">
+            <dt>
+                <div class="wcz" style="width:30%;">并发处理部门：</div>
+                <div class="dxf" style="width:50%;">市公司市场部   市公司财务部</div>
+            </dt>        
+        </dl>        
+        <dl class="list">
+            <dt>
+                <div class="wcz" style="width:30%;">下环节流转要求：</div>
+                <div class="dxf" style="width:50%;">并发部门均处理通过</div>
+            </dt>        
+        </dl>        
+        
+        <dl class="list">
+            <dt>
+                <div class="wcz" style="width:30%;">环节未通过回退：</div>
+                <div class="dxf" style="width:50%;">短流程需求发起</div>
+            </dt>        
+        </dl>        
+        
+ </div>     
+ 
+  <div class="srys" style="margin-top:10px;">
+        <dl class="bm_box">
+            <dt><img src="../images/img_10.png"><span>部门1:</span></dt>
+            <dd></dd>
+        </dl>
+       <dl class="list">
+            <dt>
+                <div class="wcz">处理部门：</div>
+              	<div class="wcz">******</div>
+			</dt>
+            <dd>
+                <div class="dxf" >处理人：</div>
+                <div class="dxf">*******</div>
+
+            </dd>
+            
+        </dl> 
+        <dl class="list">
+            <dt>
+                <div class="wcz">处理时限：</div>
+              	<div class="wcz">******</div>
+			</dt>
+            <dd>
+                <div class="dxf" ></div>
+                <div class="dxf"></div>
+
+            </dd>
+        </dl>  
+               <dl class="list">
+            <dt>
+                <div class="wcz">处理动作：</div>
+              	<div class="wcz">******</div>
+			</dt>
+            <dd>
+                <div class="dxf" >处理结论：</div>
+                <div class="dxf">*******</div>
+
+            </dd>
+            
+        </dl> 
+        <dl class="list">
+            <dt>
+                <div class="wcz">处理意见：</div>
+              	<div class="wcz">******</div>
+			</dt>
+            <dd>
+                <div class="dxf" ></div>
+                <div class="dxf"></div>
+
+            </dd>
+        </dl>   
+ </div> 
+ 
+   <div class="srys" style="margin-top:10px;">
+        <dl class="bm_box">
+            <dt><img src="../images/img_10.png"><span>部门2:</span></dt>
+            <dd></dd>
+        </dl>
+       <dl class="list">
+            <dt>
+                <div class="wcz">处理部门：</div>
+              	<div class="wcz">******</div>
+			</dt>
+            <dd>
+                <div class="dxf" >处理人：</div>
+                <div class="dxf">*******</div>
+
+            </dd>
+            
+        </dl> 
+        <dl class="list">
+            <dt>
+                <div class="wcz">处理时限：</div>
+              	<div class="wcz">******</div>
+			</dt>
+            <dd>
+                <div class="dxf" ></div>
+                <div class="dxf"></div>
+
+            </dd>
+        </dl>  
+               <dl class="list">
+            <dt>
+                <div class="wcz">处理动作：</div>
+              	<div class="wcz">******</div>
+			</dt>
+            <dd>
+                <div class="dxf" >处理结论：</div>
+                <div class="dxf">*******</div>
+
+            </dd>
+            
+        </dl> 
+        <dl class="list">
+            <dt>
+                <div class="wcz">处理意见：</div>
+              	<div class="wcz">******</div>
+			</dt>
+            <dd>
+                <div class="dxf" ></div>
+                <div class="dxf"></div>
+
+            </dd>
+        </dl>   
+ </div>       
+<!--        <dl class="list_last">
+                <dt>
+                    <a href="fqxq1.html"><div class="btn_f">发起</div></a>
+                </dt>
+                <dd>
+                    <a href="search.html"><div class="btn_x">详情</div></a>
+                </dd>
+			</dl>
+-->
+</div>
+</body>
+</html>

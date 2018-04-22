@@ -1,0 +1,71 @@
+<script type="text/javascript" src="js/eval/needEvalList.js"></script>
+<div class="list-main" id="needEvalListPage">
+
+	<h2>待评价</h2>
+
+	<dl class="bd-list">
+		<dt style="margin:8px 5px;width:80px;">需求单号：</dt>
+		<dd>
+			<input id="demandId" type="text" class=" w130">
+		</dd>
+		<dt style="margin:8px 0px;width:80px;">需求类型：</dt>
+		<dd>
+			<select  id="demandType" class="w130" style="width: 156px;height:26px;"> </select>
+		</dd>
+		<dt>办结开始时间：</dt>
+		<dd>
+			<input id="overLimitBeginDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearOverLimitBeginDate">
+		</dd>
+		<dt>办结截止时间：</dt>
+		<dd>
+			<input id="overLimitEndDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearOverLimitEndDate">
+		</dd>
+		<dd>
+			<a href="javascript:void(0)"class="butInit" id="senior">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+	<div style="margin-top:5px;">
+		<a href="javascript:void(0)"class="but" style="float:right;margin-right:80px;" id="submit">提 交</a>
+	</div>
+	<div class="clear"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10">
+		<thead>
+			<tr>
+				<td style="width:8%;">需求单ID</td>
+				<td style="width:10%;">需求主题</td>
+				<td style="width:8%;">发起时间</td>
+				<td style="width:8%;">办结时间</td>
+				<td style="width:10%;">综支回复结果</td>
+				<td style="width:8%;">小CEO评分</td>
+				<th style="width:10%;">小CEO评价</th>
+				<th style="width:8%;">参与部门</th>
+				<td style="width:10%;">评价可选</td>
+				<td style="width:15%;">评价意见</td>
+			</tr>
+		</thead>
+		<tbody id="orderLstBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="orderLstFoot"></div>
+	<div id="tableContentHeight" style="height:260px;"></div>
+	<div class="clear"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10">
+		<thead>
+			<tr>
+				<td style="width:10%;">服务单ID</td>
+				<td style="width:20%;">服务单内容</td>
+				<td style="width:10%;">时限</td>
+				<td style="width:15%;">分派时间</td>
+				<td style="width:15%;">回复时间</td>
+				<td style="width:10%;">处理时长</td>
+				<th style="width:20%;">回复结果</th>
+			</tr>
+		</thead>
+		<tbody id="serviceLstBody">
+		</tbody>
+	</table>
+	<br/><br/><br/><br/>
+</div>

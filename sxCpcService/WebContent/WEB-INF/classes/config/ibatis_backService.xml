@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="backService">
+    
+    <!-- 具有某数据权限的角色 -->
+    <sql id="sql_role_auth_data">
+		SELECT DISTINCT 
+		  e.*,
+		  ss.login_code,
+ 		  ss.mob_tel,
+		  ss.staff_id 
+		FROM
+		  tb_cpc_sys_role a,
+		  tb_cpc_sys_role_a_rel b,
+		  tb_cpc_sys_auth c,
+		  tb_cpc_sys_auth_f_rel d,
+		  tb_cpc_sys_data e,
+		  tb_cpc_sys_role_o_rel f 
+		  LEFT JOIN sys_staff ss 
+		    ON IF(
+		      f.o_type = 'STAFF',
+		      CONVERT(f.o_rel_id USING utf8) COLLATE utf8_unicode_ci = ss.staff_id,
+		      CONVERT(f.o_rel_id USING utf8) COLLATE utf8_unicode_ci = ss.department_code
+		    ) 
+		WHERE a.role_id = b.role_id 
+		  AND b.a_id = c.a_id 
+		  AND c.a_id = d.a_id 
+		  AND d.f_rel_id = e.data_id 
+		  AND a.role_id = f.role_id 
+		  AND d.f_type = 'DATA' 
+		  AND a.status = 'Y' 
+		  AND b.a_status = 'Y' 
+		  AND c.a_status = 'Y' 
+		  AND d.f_status = 'Y' 
+		  AND e.status = 'Y' 
+		  AND e.data_type = #data_type#
+		  AND ss.staff_id IS NOT NULL
+    </sql>
+    
+    <!-- 根据数据ID获取配置下的角色数据集合 -->
+    <sql id="sql_data_role">
+        SELECT DISTINCT 
+		    c.o_rel_id value_id,
+		    c.o_type value_type,
+		    b.role_id
+		  FROM
+		    tb_cpc_sys_data_r_rel a,
+		    tb_cpc_sys_role b,
+		    tb_cpc_sys_role_o_rel c 
+		  WHERE a.role_id = b.role_id 
+		    AND b.role_id = c.role_id 
+		    AND a.data_id in (#data_id#)
+		    <isNotEmpty prepend="AND" property="o_type">
+		        c.o_type = #o_type#
+		    </isNotEmpty>
+		   
+    </sql>
+    
+    <!-- 查询五星评价 短消息发送小CEO  -->
+    <select id="select_auth_star_eval" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT 
+		  tto.*,
+		  nextval ('seq_news_id') news_id,
+		  nextval ('seq_eval_total_id') eval_total_id 
+		FROM
+		  (<include refid="sql_role_auth_data"/>) tto 
+    </select>
+    
+    <!-- 插入小CEO短信消息推送表 -->
+    <insert id="insert_ceo_news" parameterClass="java.util.HashMap">
+        INSERT INTO tb_cpc_news (
+		  news_id,
+		  news_name,
+		  news_desc,
+		  news_type,
+		  create_time,
+		  eff_time,
+		  exp_time,
+		  status,
+		  is_look,
+		  staff_id
+		)VALUES(
+		  #news_id#,
+		  #news_name#,
+		  #news_desc#,
+		  #news_type#,
+		  #create_time#,
+		  #eff_time#,
+		  #exp_time#,
+		  'Y',
+		  'N',
+		  #staff_id#
+		)
+    </insert>
+    
+    <!-- 保存   可评价组织机构&个人 -->
+    <insert id="insert_ceo_star_eval_info" parameterClass="java.util.HashMap">
+        INSERT INTO tb_cpc_eval_info (
+		  eval_id,
+		  total_id,
+		  value_id,
+		  value_type,
+		  create_time,
+		  is_eval,
+		  role_id
+		) 
+		SELECT 
+		  nextval ('seq_eval_id') ,
+		  #eval_total_id# total_id,
+		  cc.value_id,
+		  cc.value_type,
+		  NOW() create_time,
+		  'N'  is_eval,
+		  cc.role_id
+		FROM
+		  (
+		  	<include refid="sql_data_role"/>
+		  ) cc 
+        
+    </insert>
+    
+     <!-- 保存   小CEO评价汇总记录 -->
+    <insert id="insert_ceo_star_eval_total" parameterClass="java.util.HashMap">
+    	INSERT INTO tb_cpc_eval_total (
+		  total_id,
+		  staff_id,
+		  total,
+		  already_total,
+		  eval_cycle,
+		  news_id
+		) 
+		SELECT 
+		  total_id,
+		  #staff_id#,
+		  COUNT(1),
+		  0,
+		  #eval_cycle#,
+		  #news_id#
+		FROM
+		  tb_cpc_eval_info 
+		WHERE total_id = #eval_total_id# 
+    </insert>
+    
+    
+    <!-- 将短消息失效 -->
+    <update id="update_expTime_news" parameterClass="java.util.HashMap">
+        
+        update tb_cpc_news 
+        set status = 'N' 
+        where exp_time <![CDATA[<=]]> #exp_time#
+        and status = 'Y'
+    </update>
+    
+    <!-- 查询待发送主任短信 对应的主任 -->
+    <select id="select_dir_data" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+         <include refid="sql_role_auth_data"/>
+    </select>
+    
+    <!-- 查询主任监控主任 -->
+    <select id="select_data_role_demand" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+        SELECT
+        	a.demand_id,
+        	a.demand_theme,
+        	a.promoters,
+        	c.opt_name,
+        	DATE_FORMAT(a.over_limit, '%Y-%m-%d %T') over_limit
+        FROM
+	        tb_cpc_demand a
+	        LEFT JOIN tb_cpc_flow_record d  ON d.record_id = a.curr_record_id  AND d.record_status = 0
+	        LEFT JOIN sys_staff e ON e.staff_id = d.opt_id,
+	        (<include refid="sql_data_role"/>) b,
+	        tb_cpc_flow_record c
+	   	WHERE
+	   		(
+	   			(d.opt_id = CONVERT(b.value_id USING utf8) COLLATE utf8_unicode_ci AND b.value_type ='STAFF')
+	   		 OR (e.department_code = CONVERT(b.value_id USING utf8) COLLATE utf8_unicode_ci  AND b.value_type ='ORG')
+	   		)
+	   	AND a.curr_record_id = c.record_id
+	   	AND a.over_time is null
+	   	AND a.over_limit >= #startDate#
+  		AND a.over_limit <![CDATA[<]]>= #endDate#
+    </select>
+    
+    <!-- 定时任务 根据值班安排同步工单池默认员工-->
+    <update id="updatePoolStaff" parameterClass="java.util.HashMap">
+     	   UPDATE 
+			  tb_cpc_pool t 
+			  INNER JOIN tb_cpc_call_schedule t1,
+			  sys_staff t2 
+			SET
+			  t.login_code = t2.login_code,
+			  default_mob_tel = t2.mob_tel 
+			WHERE t1.staff_id = t2.staff_id 
+			  AND t1.region_id = t.region_id 
+			  AND t1.call_type = #call_type# 
+			  AND DATE_FORMAT(t1.call_Month, "%Y-%m-%d") = DATE_FORMAT(NOW(), "%Y-%m-%d")
+    </update>
+    
+    <!-- 查询 需求单时限过半提醒 -->
+    <select id="select_half_limit_sms" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		SELECT 
+		 	a.demand_id busiId,
+		 	a.demand_details busiDetails,
+		 	DATE_FORMAT(a.over_limit, "%Y-%m-%d %T") over_limit,
+		 	IF(ss.staff_name IS NULL,p.staff_name,ss.staff_name) staff_name,
+		 	IF(ss.mob_tel IS NULL,p.mob_tel,ss.mob_tel) mobTel
+		FROM
+		  	`tb_cpc_demand` a,
+		  	`tb_cpc_flow_record` b
+			LEFT JOIN sys_staff ss
+		   		ON CONVERT(b.opt_id USING utf8) COLLATE utf8_unicode_ci = ss.staff_id
+		  	LEFT JOIN (SELECT p.pool_id,ss.staff_id,ss.staff_name,ss.mob_tel FROM tb_cpc_pool p,sys_staff ss WHERE CONVERT(p.login_code USING utf8) COLLATE utf8_unicode_ci = ss.login_code) p
+		   		ON b.opt_id = p.pool_id
+		WHERE over_time IS NULL
+		  AND a.curr_record_id = b.record_id
+		  AND over_limit IS NOT NULL 
+		  AND (a.create_time+ INTERVAL (UNIX_TIMESTAMP(a.over_limit)-UNIX_TIMESTAMP(a.create_time))/2 SECOND)
+		       BETWEEN #startTime# AND #endTime#
+    </select>
+</sqlMap>

@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="paperApply">
+<!--保存申领流程信息  -->
+<insert id="addPaperApplyInfo" parameterClass="java.util.HashMap">
+insert into act_documents_manage_process(
+ documents_mp_id,
+ staff_id,
+ staff_name,
+ gender,
+ nation,
+ company,
+ post_name,
+ politics_status,
+ telphone,
+ apply_reason,
+ <isNotEmpty property="destination">
+  destination,
+ </isNotEmpty>
+<isNotEmpty property="des_reason">
+  des_reason,
+ </isNotEmpty>
+ <isNotEmpty property="cstart_date">
+   cstart_date,
+ </isNotEmpty>
+ <isNotEmpty property="cend_date">
+   cend_date,
+ </isNotEmpty>
+ <isNotEmpty property="sum_day">  
+ sum_day,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_tq">  
+  holidays_tq,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_year">  
+   holidays_year,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_fd">  
+   holidays_fd,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_gx">  
+   holidays_gx,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_matter">  
+   holidays_matter,
+ </isNotEmpty>
+<isNotEmpty property="other_holidays_name">  
+   other_holidays_name,
+ </isNotEmpty>
+<isNotEmpty property="holidays_other">  
+    holidays_other,
+ </isNotEmpty>
+<isNotEmpty property="sum_holidays">  
+    sum_holidays,
+ </isNotEmpty>
+ <isNotEmpty property="return_date">  
+   return_date,
+ </isNotEmpty>
+ <isNotEmpty property="spouse_name">  
+   spouse_name,
+ </isNotEmpty>
+ <isNotEmpty property="spouse_politics">  
+   spouse_politics,
+ </isNotEmpty>
+ <isNotEmpty property="spouse_comAndJob">  
+   spouse_comAndJob,
+ </isNotEmpty>
+   apply_memo,
+   status,
+ <isNotEmpty property="loan_paper">  
+    loan_paper,
+ </isNotEmpty>
+<isNotEmpty property="birthday">  
+    birthday,
+ </isNotEmpty>
+<isNotEmpty property="banli_paper">  
+    banli_paper,
+ </isNotEmpty>
+ <isNotEmpty property="other_paper">  
+    other_paper,
+ </isNotEmpty>
+ <isNotEmpty property="qianzhu_check">  
+     qianzhu_check,
+ </isNotEmpty>
+ create_time
+)values(
+ #documentApplyId#,
+ #staff_Id#,
+ #staff_Name#,
+ #gander#,
+ #nation#,
+ #company#,
+ #post_name#,
+ #politics_status#,
+ #telphone#,
+ #applyreason#,
+ <isNotEmpty property="destination">
+  #destination#,
+ </isNotEmpty>
+ <isNotEmpty property="des_reason">
+   #des_reason#,
+ </isNotEmpty>
+ <isNotEmpty property="cstart_date">
+   date_format(#cstart_date#,'%y-%c-%d'),
+ </isNotEmpty>
+ <isNotEmpty property="cend_date">
+   date_format(#cend_date#,'%y-%c-%d'),
+ </isNotEmpty>
+<isNotEmpty property="sum_day">
+   #sum_day#,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_tq">
+   #holidays_tq#,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_year">
+   #holidays_year#,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_fd">
+   #holidays_fd#,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_gx">
+   #holidays_gx#,
+ </isNotEmpty>
+<isNotEmpty property="holidays_matter">
+   #holidays_matter#,
+ </isNotEmpty>
+ <isNotEmpty property="other_holidays_name">
+   #other_holidays_name#,
+ </isNotEmpty>
+ <isNotEmpty property="holidays_other">
+   #holidays_other#,
+ </isNotEmpty>
+ <isNotEmpty property="sum_holidays">
+   #sum_holidays#,
+ </isNotEmpty>
+ <isNotEmpty property="return_date">
+   date_format(#return_date#,'%y-%c-%d'),
+ </isNotEmpty>
+ <isNotEmpty property="spouse_name">
+   #spouse_name#,
+ </isNotEmpty>
+ <isNotEmpty property="spouse_politics">
+   #spouse_politics#,
+ </isNotEmpty>
+ <isNotEmpty property="spouse_comAndJob">
+   #spouse_comAndJob#,
+ </isNotEmpty>
+ 1,
+ 0,
+ <isNotEmpty property="loan_paper">
+   #loan_paper#,
+ </isNotEmpty>
+ <isNotEmpty property="birthday">
+   date_format(#birthday#,'%y-%c-%d'),
+ </isNotEmpty>
+ <isNotEmpty property="banli_paper">
+   #banli_paper#,
+ </isNotEmpty>
+ <isNotEmpty property="other_paper">
+   #other_paper#,
+ </isNotEmpty>
+  <isNotEmpty property="qianzhu_check">
+   #qianzhu_check#,
+ </isNotEmpty>
+ now()
+)
+</insert>
+<!--保存申领流程任务发起节点  -->
+<insert id="addCurNodeApplyTask" parameterClass="java.util.HashMap">
+insert into act_paper_apply_task(
+ doc_apply_id,
+ workflow_id,
+ node_id,
+ node_name,
+ status,
+ create_date,
+ person,
+ person_id,
+ dept_name,
+ dept_id
+)values(
+ #documentApplyId#,
+ #flow_id#,
+ #current_node#,
+ #current_node_name#,
+ 1,
+ now(),
+ #staff_Name#,
+ #staff_Id#,
+ #current_dept_name#,
+ #current_dept_id# 
+)
+</insert>
+<!--保存申领流程任务下一节点任务  -->
+<insert id="addNextNodeApplyTask" parameterClass="java.util.HashMap">
+insert into act_paper_apply_task(
+ doc_apply_id,
+ workflow_id,
+ last_node_id,
+ last_node_name,
+ node_id,
+ node_name,
+ node_post_id,
+ node_level,
+ person_id,
+ person,
+ dept_name,
+ dept_id,
+ status,
+ create_date,
+ last_person,
+ last_person_id
+)values(
+ #documentApplyId#,
+ #flow_id#,
+ #current_node#,
+ #current_node_name#,
+ #next_node#,
+ #next_node_name#,
+ #next_node_post_id#,
+ #next_node_level#,
+ #next_person_id#,
+ #next_person#,
+ #next_dept#,
+ #next_dept_id#,
+ 0,
+ now(),
+ #staff_Name#,
+ #staff_Id# 
+)
+</insert>
+<!--保存申领流程任务日志  -->
+<insert id="addCurNodeApplyLog" parameterClass="java.util.HashMap">
+insert into act_paper_apply_task_log(
+ doc_apply_id,
+ workflow_id,
+ current_node_id,
+ current_node_name,
+ opreation_id,
+ opreation_name,
+ opreation_date,
+ opreation_memo,
+ opreation_reject,
+ create_date,
+ opreation_dept_id,
+ opreation_dept_name
+)values(
+  #documentApplyId#,
+  #flow_id#,
+ #current_node#,
+ #current_node_name#,
+ #staff_Id#,
+ #staff_Name#,
+ now(),
+ #opreation_memo#,
+ #opreation_reject#,
+ now(),
+ #current_dept_id#,
+ #current_dept_name#
+)
+</insert>
+<!--保存申领流程家庭成员信息  -->
+<insert id="addPaperApplyFamily" parameterClass="java.util.HashMap">
+insert into act_family_members(
+task_id,
+between_name,
+the_name,
+face_name,
+job_name,
+post_name,
+state
+)values(
+#documentApplyId#,
+#bename#,
+#thename#,
+#facename#,
+#jobname#,
+#jobpostname#,
+1
+)
+</insert>
+<select id="queryMaxNode" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+select max(node_id) NODE_ID from tb_leave_flow_node where flow_id=#flow_id#
+
+</select>
+<select id="queryCountTask" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+select count(*) cnt from act_paper_apply_task tt 
+where tt.node_id in (SELECT node_id FROM tb_leave_flow_node where
+flow_id=#flow_id# and node_id!=#current_node# and node_level=#current_node_level#
+) and tt.status=0 and tt.doc_apply_id=#documentApplyId#
+</select>
+<!--更新任务状态  -->
+<update id="updatePaperTaskStatus" parameterClass="java.util.HashMap" >
+update act_paper_apply_task set status=1 where task_id=#task_id#
+</update>
+<!--将该申请的所有未处理任务都作废  -->
+<update id="updatePaperOtherTask" parameterClass="java.util.HashMap">
+update act_paper_apply_task set status=2 where doc_apply_id=#documentApplyId# and status=0
+</update>
+<!--打回后流程结束  -->
+<update id="updateDocApplyStatus" parameterClass="java.util.HashMap">
+update act_documents_manage_process set status=1 where documents_mp_id=#documentApplyId#
+</update>
+
+<!--查询流程申请内容  -->
+<select id="queryDocApplyInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+select documents_mp_id,
+staff_id,
+staff_name,
+gender,
+nation,
+company,
+post_name,
+(select type_name from act_certificate_handle_type where value=politics_status and type_id=1) politics_status,
+telphone,
+apply_reason,
+destination,
+des_reason,
+date_format(t.cstart_date,'%Y-%c-%d') cstart_date,
+date_format(t.cend_date,'%Y-%c-%d') cend_date, 
+sum_day,
+holidays_tq,
+holidays_year,
+holidays_fd,
+holidays_gx,
+holidays_matter,
+other_holidays_name,
+holidays_other,
+sum_holidays,
+date_format(t.return_date,'%Y-%c-%d') return_date,
+spouse_name,
+(select type_name from act_certificate_handle_type where value=spouse_politics and type_id=1) spouse_politics,
+spouse_comAndJob,
+apply_memo,
+status,
+date_format(t.create_time,'%Y-%c-%d %h:%i:%s') create_time,
+loan_paper,
+date_format(t.birthday,'%Y-%c-%d') birthday,
+banli_paper,
+other_paper,
+qianzhu_check
+ from act_documents_manage_process t
+where t.documents_mp_id=#documentApplyId#
+
+</select>
+<!--查询待办任务，已处理任务  -->
+<select id="queryDocApplyTask" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+select X.* from (select t.staff_id applyId,t.staff_name applyName,t.company comName,t.post_name postName,
+date_format(t.create_time,'%Y-%c-%d %h:%i:%s') applyDate,t.status,t1.dept_name deptName,t1.person chuliName,
+t.documents_mp_id applyDocId,t1.task_id taskId,t1.node_name nodeName
+from act_documents_manage_process t,act_paper_apply_task t1
+where t1.doc_apply_id=t.documents_mp_id
+and t1.status=#taskStatus#
+and t1.person_id=#staff_id#
+<isNotEmpty prepend="and" property="staffName">
+ t.staff_name like  CONCAT('%', #staffName#, '%') 
+</isNotEmpty>
+<isNotEmpty prepend="and" property="company">
+ t.company like CONCAT('%', #company#, '%') 
+</isNotEmpty>
+<isNotEmpty prepend="and" property="apply_time">
+ t1.create_date=date_format(#apply_time#,'%y-%c-%d')
+</isNotEmpty>
+ORDER BY t.create_time DESC) X
+where 1=1
+<isNotEmpty prepend="" property="pageSize">
+	limit $limit$,$pageSize$
+</isNotEmpty>
+</select>
+<select id="queryDocApplyTaskCount" resultClass="String" parameterClass="java.util.HashMap">
+select count(*) from (
+select t.staff_id applyId,t.staff_name applyName,t.company comName,t.post_name postName,
+date_format(t.create_time,'%Y-%c-%d %h:%i:%s') applyDate,t.status,t1.dept_name deptName,t1.person chuliName,
+t.documents_mp_id applyDocId,t1.task_id taskId,t1.node_name nodeName
+from act_documents_manage_process t,act_paper_apply_task t1
+where t1.doc_apply_id=t.documents_mp_id
+and t1.status=#taskStatus#
+and t1.person_id=#staff_id#
+<isNotEmpty prepend="and" property="staffName">
+ t.staff_name like CONCAT('%', #staffName#, '%') 
+</isNotEmpty>
+<isNotEmpty prepend="and" property="company">
+ t.company like CONCAT('%', #company#, '%') 
+</isNotEmpty>
+<isNotEmpty prepend="and" property="apply_time">
+ t1.create_date=date_format(#apply_time#,'%y-%c-%d')
+</isNotEmpty>
+ORDER BY t.create_time DESC
+) X
+</select>
+<!--查询流程流转信息  -->
+<select id="queryDocApplyTaskLog" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+select * from (select t1.task_log_id,t1.current_node_name nodeName,t1.opreation_dept_name deptName,
+t1.opreation_name chuliName,t1.current_node_id nodeId,
+date_format(t1.opreation_date,'%Y-%c-%d %h:%i:%s') chuliDate,t1.opreation_reject reject,
+t1.opreation_memo memo,1 status
+from act_paper_apply_task_log t1
+where t1.doc_apply_id=#documentApplyId#
+UNION ALL
+select 10000000 task_log_id,
+       t2.node_name nodeName,
+       t2.dept_name deptName,
+       t2.person chuliName,
+       t2.node_id nodeId,
+       '' chuliDate,
+       '' reject,
+       '' memo,
+       0 status
+ from act_paper_apply_task t2
+ where t2.doc_apply_id=#documentApplyId#
+ and t2.status=0 ) D
+  ORDER BY D.task_log_id,D.nodeId
+</select>
+<select id="queryApplyPerDept" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+select distinct d.dept_id,d.dept_name
+ from act_workflow_dept_info d,act_workflow_post_staff s
+where d.dept_id=s.post_dept_id
+and s.post_staff_id=#staffId#
+</select>
+<!--查询申请人家庭成员信息  -->
+<select id="queryDocApplyFamily" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+select task_id,
+between_name,
+the_name,
+(select type_name from act_certificate_handle_type where value=face_name and type_id=1) face_name,
+job_name,
+post_name,
+state
+from act_family_members where task_id=#documentApplyId# and state=1
+</select>
+<select id="queryCurrentTaskInfo" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+select * from act_paper_apply_task where task_id=#taskId# and doc_apply_id=#documentApplyId#
+</select>
+</sqlMap>

@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="flow">
+
+	<select id="qry_recordId" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		SELECT nextval('seq_record_id') FROM dual_test
+	</select>
+	
+	<select id="qry_demandId" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		SELECT nextval('seq_demand_id') FROM dual_test
+	</select>
+	
+	<select id="qry_service_Id" parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		SELECT nextval('seq_service_id') FROM dual_test
+	</select>
+	
+
+	<!-- 保存需求单信息 -->
+	<insert id="save_demand_info" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_cpc_demand (
+		demand_id,
+		demand_theme,
+		demand_details,
+		promoters_id,
+		promoters,
+		department_id,
+		department,
+		tel,
+		create_time,
+		urge_count,
+		curr_record_id,
+		up_photo_names,
+		operator_name,
+		operator_id,
+		rank_id,
+		rank_name
+		)VALUES(
+		#demand_id#,
+		#demand_theme#,
+		#demand_details#,
+		#promoters_id#,
+		#promoters#,
+		#department_id#,
+		#department#,
+		#tel#,
+		SYSDATE(),
+		'0',
+		#record_id#,
+		#up_photo_names#,
+		#operator_name#,
+		#operator_id#,
+		#rank_id#,
+		#rank_name#
+		)
+	</insert>
+	
+	<!-- 保存服务单信息 -->
+	<insert id="save_service_info" parameterClass="java.util.HashMap">
+		INSERT INTO tb_cpc_service (
+		  service_id,
+		  service_theme,
+		  service_desc,
+		  promoters_id,
+		  promoters,
+		  department_id,
+		  department,
+		  tel,
+		  send_time,
+		  over_limit,
+		  limit_time
+		) 
+		VALUES
+		  (
+		  #service_id#,
+		   #service_theme#,
+		   #service_desc#,
+		   #promoters_id#,
+		   #promoters#,
+		   #department_id#,
+		   #department#,
+		   #tel#, 
+		   #send_time#,
+		   #over_limit#,
+		   #limit_time#
+		   )  
+	</insert>
+
+	<!-- 保存流转过程信息 -->
+	<insert id="save_record_info" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_cpc_flow_record(
+		record_id,
+		on_record_id,
+		curr_node_id,
+		curr_node_name,
+		opt_id,
+		opt_name,
+		opt_time,
+		next_node_id,
+		next_node_name,
+		default_opt_id,
+		default_opt_name,
+		time_count,
+		urge_count,
+		busi_id,
+		opt_desc,
+		mob_tel,
+		record_status,
+		fun_id,
+		opt_limit
+		)VALUES(
+		#record_id#,
+		#on_record_id#,
+		#curr_node_id#,
+		#curr_node_name#,
+		#opt_id#,
+		#opt_name#,
+		#opt_time#,
+		#next_node_id#,
+		#next_node_name#,
+		#default_opt_id#,
+		#default_opt_name#,
+		#time_count#,
+		'0',
+		#busi_id#,
+		#opt_desc#,
+		#mobTel#,
+		#record_status#,
+		#fun_id#,
+		#opt_limit#
+		)
+	</insert>
+
+	<!-- 查询流程发起条件表 -->
+	<select id="qry_flow_limit" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT limit_id,limit_attr,limit_value,limit_group,sort_table FROM tb_cpc_flow_limit where sort_table = #sort_table# and  limit_group = #limit_group#  
+	</select>
+	
+	<select id="qry_flow_limit_groupId" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT l.limit_group FROM tb_cpc_flow_limit l WHERE l.sort_table = #sort_table# GROUP BY l.limit_group
+	</select>
+
+	<!--查询流转环节表 -->
+	<select id="qry_flow_node" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT flow_id, node_id , node_name , node_level FROM tb_cpc_flow_node WHERE flow_id = #flow_id#
+	</select>
+	
+	<!-- 查询节点信息 -->
+	<select id="qry_node_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		   SELECT n.flow_id,n.node_id,n.node_name,n.node_level,n.group_id FROM tb_cpc_flow_node n WHERE 1=1
+		   <isNotEmpty prepend="AND" property="qryColSet" >
+	         <iterate  property="qryColSet" conjunction="or" close=")" open="(">
+			    n.node_id  = #qryColSet[].node_id# 
+			</iterate>
+          </isNotEmpty>
+	</select>
+	
+	<!--查询单池流表 -->
+	<select id="qry_pol_rel" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT node_id,pool_id FROM tb_cpc_flow_node_pol_rel WHERE 1=1 
+		<isNotEmpty prepend="AND" property="node_id" >
+	    	node_id = #node_id#
+	    </isNotEmpty>
+	    <isNotEmpty prepend="AND" property="limit_id" >
+	    	limit_id = #limit_id#
+	    </isNotEmpty>
+	</select>
+
+	<!--查询单池 -->
+	<select id="qry_cpc_pool" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  p.pool_id,
+		  p.pool_name,
+		  p.calim_limit,
+		  p.urge_span_time,
+		  p.default_eval_time,
+		  p.default_eval,
+		  p.default_mob_tel ,
+		  p.login_code,
+		  p.region_id
+		FROM
+		  tb_cpc_pool p 
+		  WHERE 1=1 
+		  <isNotEmpty prepend="and" property="pool_id">
+		    pool_id =#pool_id#
+		  </isNotEmpty>
+		  <isNotEmpty prepend="and" property="region_id">
+		    region_id=#region_id#
+		  </isNotEmpty>
+	</select>
+	
+	<!-- 修改需求单信息 -->
+	<update id="update_demandInfo"  parameterClass="java.util.HashMap">
+		UPDATE tb_cpc_demand SET curr_record_id = #curr_record_id# 
+		 <dynamic>  
+            <isNotEmpty property="demand_details" prepend=",">  
+                <![CDATA[ 
+                    demand_details = #demand_details# 
+                ]]>  
+            </isNotEmpty>  
+            <isNotEmpty property="demand_theme" prepend=",">  
+                <![CDATA[  
+                    demand_theme = #demand_theme# 
+                ]]>  
+            </isNotEmpty>  
+            <isNotEmpty property="calim_limit" prepend=",">  
+                <![CDATA[  
+                    calim_limit = #calim_limit# 
+                ]]>  
+            </isNotEmpty> 
+           <isNotEmpty property="promoters_id" prepend=",">  
+                <![CDATA[  
+                    promoters_id = #promoters_id# 
+                ]]>  
+            </isNotEmpty> 
+            <isNotEmpty property="promoters" prepend=",">  
+                <![CDATA[  
+                    promoters = #promoters# 
+                ]]>  
+            </isNotEmpty> 
+             <isNotEmpty property="curr_record_id" prepend=",">  
+                <![CDATA[  
+                    curr_record_id = #curr_record_id# 
+                ]]>  
+            </isNotEmpty>
+            <isNotEmpty property="create_time" prepend=",">
+                   create_time=#create_time#
+            </isNotEmpty>
+            <isNotEmpty property="operator_id" prepend=",">
+                   operator_id=#operator_id#
+            </isNotEmpty>
+            <isNotEmpty property="operator_name" prepend=",">
+                   operator_name=#operator_name#
+            </isNotEmpty>
+            <isNotEmpty property="rank_id" prepend=",">
+                   rank_id=#rank_id#
+            </isNotEmpty>
+            <isNotEmpty property="rank_name" prepend=",">
+                   rank_name=#rank_name#
+            </isNotEmpty>
+        </dynamic>  
+		where demand_id = #demand_id#
+	</update>
+	
+	<!-- 修改服务单信息 -->
+	<update id="update_service_info"  parameterClass="java.util.HashMap">
+		UPDATE tb_cpc_service SET curr_record_id = #curr_record_id# 
+		 <dynamic>  
+            <isNotEmpty property="service_details" prepend=",">  
+                <![CDATA[ 
+                    service_details = #service_details# 
+                ]]>  
+            </isNotEmpty>  
+            <isNotEmpty property="service_theme" prepend=",">  
+                <![CDATA[  
+                    service_theme = #service_theme# 
+                ]]>  
+            </isNotEmpty>  
+            <isNotEmpty property="calim_limit" prepend=",">  
+                <![CDATA[  
+                    calim_limit = #calim_limit# 
+                ]]>  
+            </isNotEmpty> 
+           <isNotEmpty property="promoters_id" prepend=",">  
+                <![CDATA[  
+                    promoters_id = #promoters_id# 
+                ]]>  
+            </isNotEmpty> 
+            <isNotEmpty property="promoters" prepend=",">  
+                <![CDATA[  
+                    promoters = #promoters# 
+                ]]>  
+            </isNotEmpty> 
+             <isNotEmpty property="curr_record_id" prepend=",">  
+                <![CDATA[  
+                    curr_record_id = #curr_record_id# 
+                ]]>  
+            </isNotEmpty>
+        </dynamic>  
+		where service_id = #service_id#
+	</update>
+	
+	<!-- 查询需求单信息 -->
+	<select id="qry_demand_info" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select * from tb_cpc_demand where  demand_id = #demand_id#
+	</select>
+	
+	<!-- 查询服务单信息 -->
+	<select id="qry_service_info" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select * from tb_cpc_service where  service_id = #service_id#
+	</select>
+	
+	<!-- 查询当前流转是否最后一步 -->
+	<select id="qry_next_flow" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT next_node_id,next_node_name,opt_id,opt_name,curr_node_id,curr_node_name ,opt_time ,busi_id FROM tb_cpc_flow_record WHERE record_id =#record_id#
+	</select>
+	
+	<!-- 查询下一节点信息 -->
+	<select id="qry_next_node_info" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT 
+		  n.flow_id,
+		  n.node_id,
+		  n.node_name,
+		  n.node_level 
+		FROM
+		  tb_cpc_flow_node n 
+		WHERE n.node_level = 
+		  (SELECT 
+		    nn.node_level+1
+		  FROM
+		    tb_cpc_flow_node  nn
+		  WHERE nn.node_id = #nodeId# 
+		  <isNotEmpty property="group_id" prepend="AND">  
+                <![CDATA[  
+                    nn.group_id = #group_id#
+                ]]>  
+            </isNotEmpty>
+            )
+	</select>
+	
+	<!-- 保存属性表 -->
+	<insert id="save_cpc_record_proc" parameterClass="java.util.HashMap">
+		INSERT INTO tb_cpc_record_proc (
+	    record_id,
+	    attr_id,
+	    attr_value,
+	    busi_id,
+	    attr_group
+	  ) 
+	  VALUES
+	    (
+	    #record_id#,
+	    #attr_id#,
+	    #attr_value#,
+	    #busi_id#,
+	    #attr_group#
+	    )
+	</insert>
+	
+	<update id="updateFlowRecord" parameterClass="java.util.HashMap">
+		update tb_cpc_flow_record 
+			SET 
+			<iterate  property="updateColSet" conjunction=",">
+			    $updateColSet[].col_name$ = #updateColSet[].col_value# 
+			</iterate>
+			WHERE  1=1 
+		   <isNotEmpty property="record_id" prepend="AND">  
+                <![CDATA[  
+                    record_id = #record_id#
+                ]]>  
+            </isNotEmpty>
+            <isNotEmpty property="busi_id" prepend="AND">  
+                <![CDATA[  
+                   busi_id = #busi_id#
+                ]]>  
+            </isNotEmpty>
+            <isNotEmpty property="recordStatus" prepend="AND">  
+                <![CDATA[  
+                    record_status = #recordStatus#
+                ]]>  
+            </isNotEmpty>
+	</update>
+	
+	<select id="query_mobTel" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT s.MOB_TEL FROM sys_staff s WHERE s.STAFF_ID =#staff_id#
+	</select>
+	
+	<select id="qryLoginCodeById" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT s.LOGIN_CODE FROM sys_staff s WHERE s.STAFF_ID=#staffId#
+	</select>
+	<!-- 服务单最新状态 -->
+	<select id="getServiceList_states" resultClass="java.lang.String"  parameterClass="java.util.HashMap">
+	  SELECT curr_node_id FROM tb_cpc_flow_record WHERE record_id =#curr_record_ids#;
+	  </select>
+	  	<!-- 获取服务单的待查看领导人的相关信息 -->
+	<select id="getServiceList_states_on" resultClass="java.lang.String"  parameterClass="java.util.HashMap">
+	  SELECT on_record_id FROM tb_cpc_flow_record WHERE record_id =#curr_record_ids#;	  
+	  	</select>
+	<select id="getServiceList_states_busi_id" resultClass="java.lang.String"  parameterClass="java.util.HashMap">
+	  SELECT busi_id FROM tb_cpc_flow_record WHERE record_id =#curr_record_ids#;	  
+	  	</select>
+	<select id="getServiceList_states_mob_tel" resultClass="java.lang.String"  parameterClass="java.util.HashMap">
+	  SELECT mob_tel FROM tb_cpc_flow_record WHERE record_id =#curr_record_ids#;	  
+	  	</select>
+	<select id="getServiceList_states_opt_name" resultClass="java.lang.String"  parameterClass="java.util.HashMap">
+	  SELECT opt_name FROM tb_cpc_flow_record WHERE record_id =#curr_record_ids#	  
+	  	</select>
+	  	<select id="qry_org_name" resultClass="java.lang.String"  parameterClass="java.util.HashMap">
+			  SELECT
+		  t1.org_name
+		FROM
+		  sys_org t1 
+		WHERE t1.`ORG_CODE` = #opt_id#  
+	  	</select>
+</sqlMap>

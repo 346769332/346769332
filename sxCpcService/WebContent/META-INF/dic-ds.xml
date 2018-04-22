@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:jee="http://www.springframework.org/schema/jee" xmlns:fw="http://www.tydic.com/schema/fw"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   
+                        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+                        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+                        http://www.tydic.com/schema/fw http://www.tydic.com/schema/fw/core.xsd">
+
+     
+   	<!--定义JNDI -->
+	<jee:jndi-lookup id="ds0" jndi-name="jndi/crm20_cpc" />  
+	<jee:jndi-lookup id="ds1" jndi-name="jndi/crm20_role_portal" />  
+	<jee:jndi-lookup id="ds2" jndi-name="jndi/crm20_ecp_sms" />  
+	
+	<!-- <jee:jndi-lookup id="ds0" jndi-name="jdbc/lportal" />
+	<jee:jndi-lookup id="ds1" jndi-name="jdbc/lportal" />
+	<jee:jndi-lookup id="ds2" jndi-name="jdbc/lportal" /> -->
+	<!--创建多数据源 -->
+	<bean id="dataSource" class="com.tydic.common.dynamicDbSource.DynamicDataSource">     
+		<property name="targetDataSources">     
+			<map key-type="java.lang.String">     
+				<entry key="0" value-ref="ds0"/> 
+				<entry key="1" value-ref="ds1"/>  
+				<entry key="2" value-ref="ds2"/>  
+			</map>     
+		</property>     
+		<property name="defaultTargetDataSource" ref="ds0"/>     
+	</bean>  
+	
+	<!--注册ibatis，并关联数据源-->
+	<bean id="sqlMapClient"
+		class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" 
+			value="classpath:config/ibatis-default.xml"/>
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="sqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient">
+			<ref bean="sqlMapClient" />
+		</property>
+	</bean>
+	
+	
+	
+</beans>

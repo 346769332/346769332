@@ -1,0 +1,13 @@
+eclipse.preferences.version=1
+encoding//WebContent/html/menu/menu.html=UTF-8
+encoding//WebContent/html/order/orderList.html=UTF-8
+encoding//WebContent/html/top/top.html=UTF-8
+encoding//WebContent/web/html/order/serviceToBeProList.html=UTF-8
+encoding//WebContent/web/html/sysReport/searchReportPublic.html=UTF-8
+encoding//WebContent/web/html/top/indexsingle.html=UTF-8
+encoding//config/configuration.properties=UTF-8
+encoding//mvc/com/tydic/framework/web/mvc/core/WebServletContextListener.java=UTF-8
+encoding//src/com/tydic/sale/service=UTF-8
+encoding//src/com/tydic/workflow/model/UserTaskBean.java=gbk
+encoding//src/serviceentry.properties=UTF-8
+encoding/<project>=UTF-8

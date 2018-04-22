@@ -1,0 +1,88 @@
+<script type="text/javascript" src="js/sysManage/roleList.js"></script>
+<div class="list-main" id="roleListPage">
+<form  style="height: 0px;" id="roleListPageForm" >
+	<input type="hidden" name="type" value="saveRoleList">
+	<input type="hidden" name="role_id" value="角色ID">
+	<input type="hidden"  name="role_name" value="角色名称">
+	<input type="hidden"  name="role_desc" value="角色描述">
+	<input type="hidden"  name="role_status" value="权限状态">
+	<input type="hidden"  name="role_status_name" value="权限状态名称">
+	<input type="hidden"  name="role_type" value="角色类型">
+	<input type="hidden"  name="role_type_name" value="角色类型名称">
+	<input type="hidden"  name="latn_id" value="本地网ID">
+	<input type="hidden"  name="latn_name" value="本地网名称">
+</form>
+ 	<!-- 标题 -->
+ 	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;系统管理&nbsp;&nbsp;--&nbsp;&nbsp;角色管理</div>
+	
+	<!-- 查询条件 -->
+	<!-- 
+	<dl class="bd-list">
+		<dt>本地网：</dt>
+		<dd>
+			<select id="latnId" class="w130" style="width: 156px;height:26px;"></select>
+		</dd>
+		<dt>角色名称：</dt>
+		<dd>
+			<input id="roleName" type="text" class=" w130">
+		</dd>
+		<dt>角色类型：</dt>
+		<dd>
+			<select  id="roleType" class="w130" style="width: 156px;height:26px;"> </select>
+		</dd>
+		<dt>状态：</dt>
+		<dd>
+			<select id="roleState" class="w130" style="width: 156px;height:26px;"></select>
+		</dd>
+		<dd>
+			<a href="javascript:void(0)"class="but ml20" id="senior">查询</a>
+	        <a href="javascript:void(0)"class="but hs_bg" id="reset">重置</a>
+		</dd>
+	</dl>
+	 <div class="lable-title fr"><a  href="javascript:void(0)"id="export">导出Excel</a></div>
+	<div class="clear"></div>
+	
+	 -->
+	<div class="seach-box mt20  ">
+	    <ul class="hx-list  clearfix">
+	        <li>本地网:<select id="latnId" class="w100">  <option>乌鲁木齐</option></select></li>
+	        <li>角色名称：<input id="roleName" type="text" class=" w100"></li>
+	        <li>角色类型：<select id="roleType" class="w100">  <option>选择</option></select></li>
+	        <li>状态：<select id="roleState" class="w100">  <option>选择</option></select></li>
+	        <li><a href="javascript:void(0)"class="but ml20" id="senior">查询</a></li>
+	        <li><a href="javascript:void(0)"class="but hs_bg" id="reset">重置</a></li>
+	    </ul>
+	    <div class="lable-title fr"><a  href="javascript:void(0)" style="color:#141DE6;cursor: pointer;text-decoration:underline" id="export">导出Excel</a></div>
+	</div>
+	
+	<!-- 按钮操作 -->
+	<div class="lable-box">
+		<a  href="javascript:void(0)"class="lable" id="addRoleInfo">新增角色</a>
+		<a  href="javascript:void(0)"class="lable btn-success" id="roleAuthBtn">权限指派</a>
+		<a  href="javascript:void(0)"class="lable btn-info" id="roleUserBtn">工号指派</a>
+	</div>
+	
+	<div class="clear"></div>
+	
+	<!-- 角色列表 -->
+	<div style="margin-top:5px;" id="roleDataQuery">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10">
+			<thead>
+				<tr>
+					<th style="width:2%;text-align: right;"></th>
+					<td style="width:10%;">角色ID</td>
+					<td style="width:15%;">角色名称</td>
+					<th style="width:10%;">角色类型</th>
+					<td style="width:8%;">本地网</td>
+					<td style="width:8%;">状态</td>
+					<td style="width:10%;">操作</td>
+				</tr>
+			</thead>
+			<tbody id="roleListBody">
+				
+			</tbody>
+		</table>
+		<div class="page mt10" id="roleListFoot"></div>
+	</div>
+
+</div>

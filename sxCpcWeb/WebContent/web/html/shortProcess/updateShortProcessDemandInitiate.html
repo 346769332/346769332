@@ -1,0 +1,95 @@
+<script type="text/javascript"src="/CpcWeb/web/js/shortProcess/updateShortProcessDemandInitiate.js"></script>
+<script type="text/javascript" src="js/common/jquery-form.js"></script>
+<link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/css/GooFlow2.css"/>
+<!-- <link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow2.css"/> -->
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/data.js"></script>
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/jquery.min.js"></script> -->
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFunc.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/json2.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow.js"></script>
+<style type="text/css">
+#workflow .GooFlow_head {
+	display: none;
+}
+
+#workflow .GooFlow_tool {
+	display: none;
+}
+</style>
+<div class="list-main" id='demandDetailInfo'>
+	<div class="page-title mt10">
+		<img src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;短流程需求发起
+	</div>
+	<div class="bd-list">
+		<table id="templateInfos" width="100%" border="0" cellspacing="0" cellpadding="0"
+			class="tab5 mt10 lines">
+			<thead>
+				<tr>
+					<th colspan="4"><span class="fl" id='demand_theme'>短流程需求发起</span>
+					<span class="fr" id="urge_count"></span></th>
+				</tr>
+			</thead>
+			<tbody id="templateInfo">
+				<tr>
+					<td >短流程名称</td>
+					<td id="ccc"><input id="workflowName" type="text" disabled="disabled" style="width: 95%;"></td>
+					<td>工单主题</td>
+					<td colspan='3'><input id='demandName' type='text' style='width: 95%;'></td>
+				</tr>
+				<tr>
+					<td>发起人</td>
+					<td><input id="releasePersonName" type="text"disabled="disabled" style="width: 95%;"></td>
+					<td>发起人部门</td>
+					<td><input id="releaseDeptName" type="text"disabled="disabled" style="width: 95%;"></td>
+				</tr>
+				<tr>
+					<td>联系电话</td>
+					<td><input id="releasePersonNum" type="text"style="width: 95%;"></td>
+					<td>工单流程类型</td>
+					<td><input id="workflowSort" type="text" disabled="disabled" style="width: 95%;"></td>
+				</tr>
+				<tr id="aaa">
+					<td>发往人员</td>
+					<td><input id="disposePersonName" type="text" disabled="disabled" style="width: 95%;"></td>
+					<td>发往组织</td>
+					<td><input id="disposeDeptName" type="text" disabled="disabled" style="width: 95%;"></td>
+				</tr>
+				<tr>
+					<td>工单描述</td>
+					<td style='width:440px' colspan='3'>
+					<textarea id='demandDesc' placeholder='请输入工单描述' style='line-height:25px;width: 95%;' maxlength='500'></textarea>
+					</td>
+				<tr/>
+				<tr id="bbb">
+				</tr>
+				<tr>
+					<td>附件上传</td>
+					<td colspan="3" style="vertical-align: middle;">
+
+					<form id="attachForm" enctype="multipart/form-data" method="post" >
+						<table>
+				            <tr><td><input type="file" style="width:465px;" id="attachment" name="attachment" multiple="multiple" />
+				            <input type="button" class="but" id="attachSub" style="width:100px;" value="上传" /></td></tr>
+				        </table>
+				        </form>
+				    </td>
+				</tr>
+				<tr>
+					<td>附件：</td>
+					<td colspan=3>
+						<div id="attachmentInfo" name="attachmentInfo" style="width:800px;"></div>
+				    </td>
+	   			</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td align="center" colspan="4">
+					<a href="#" class="but" id="submitInfo">发起需求</a> 
+					<a href="#" class="but" id="backInfo">返回</a>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+		<div id="workflow"></div>
+	</div>
+</div>

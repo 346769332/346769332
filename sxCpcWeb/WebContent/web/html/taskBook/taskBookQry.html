@@ -1,0 +1,73 @@
+<!-- 
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>综支工作台</title>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<link href="/CpcWeb/web/css/common.css" rel="stylesheet" type="text/css">
+ <link href="/CpcWeb/web/css/jquery.datetimepicker.css" rel="stylesheet" type="text/css"> 
+ <script type="text/javascript" src="/CpcWeb/web/js/common/jquery-1.9.1.min.js"></script>
+<script  type="text/javascript" src="/CpcWeb/web/js/common/layer/layer.min.js"></script>
+<script  type="text/javascript" src="/CpcWeb/web/js/common/servlet.url.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/util.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/common.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/jq.ui.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/common/jquery.datetimepicker.js"></script> 
+
+<script type="text/javascript" src="/CpcWeb/web/js/common/orderDealData.js"></script>
+ -->
+<script type="text/javaScript" src="/CpcWeb/web/js/taskBook/taskBookQry.js"></script>
+
+<div class="list-main" id="taskBookQryPage">
+   <div><img src="/CpcWeb/web/images/home.png">责任书查询</div>
+   <div style="border:2px slolid #dedede">
+     <div style="margin-top:10px;">
+	     <a href="#" id="bookInfo" class="but">责任书</a>
+	     <a href="#" id="fillBlank" class="but">责任书填写照片</a>
+	     <a href="#" id="signedPhone" class="but">责任书签订照片</a>
+	     <a href="#" id="flowInfo" class="but">责任书流程信息</a>
+     </div>
+     <div style="width:100%;height:400px;text-align:center;margin-top:20px;" id="infoContent">
+        <div id="bookInfoDiv">
+           <div><img src="/CpcWeb/web/images/task.png"></div>
+        </div>
+        <div id="fillBlankDiv">
+          <table width="100%" padding="0" cellspacing="0" cellpadding="0" class="tab5 mt10 lines">
+           <tr>
+               <th align="right" >附件上传</th> 
+               <td colspan="3"> 
+ 	               <form id="attachForm" enctype="multipart/form-data" method="post">
+	              		<input type="file" style="width:400px;" name="attachment" id="attachment"> 
+ 	              		<input type="button" class="but" id="attachSubs" style="width:100px;" value="上传"> 
+	              		
+               		</form> 
+              </td>
+             </tr> 
+             <tr> 
+               <th align="right" >附件信息</th> 
+               <td colspan="3"><div id="attachmentInfoY" ></div></td> 
+             </tr> 
+             </table>    
+        </div>
+        <div id="flowInfoDiv">
+           <table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10">
+				<thead>
+					<tr>
+						<td>序号</td>
+						<td>流程节点</td>
+						<td>操作</td>
+						<td>处理人</td>
+						<td>处理时间</td>
+						<td>处理意见</td>
+					</tr>
+				</thead>
+				<tbody id="flowTable">
+				</tbody>  
+			</table>
+        </div>
+        <div><a href="#" id="goback" class="but">返回</a></div>
+     </div>
+   </div>
+</div>

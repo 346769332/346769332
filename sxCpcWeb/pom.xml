@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>Crm-ODM</groupId>
+	<artifactId>ODM-SaleWeb4WS</artifactId>
+	<name>Crm-ODM-SaleWeb4WS</name>
+	<version>V1.x</version>
+	<properties>
+		<project.build.sourceEncoding>
+			UTF-8
+		</project.build.sourceEncoding>
+	</properties>
+	<scm>
+		<connection>
+			scm:svn:http://192.168.161.59:8888/svn/CRM/SourceCode/1_Develop/11_ODM/Core/SALE/SaleWeb4WS
+		</connection>
+		<developerConnection>
+			scm:svn:http://192.168.161.59:8888/svn/CRM/SourceCode/1_Develop/11_ODM/Core/SALE/SaleWeb4WS
+		</developerConnection>
+		<url>
+			http://192.168.161.59:8888/svn/CRM/SourceCode/1_Develop/11_ODM/Core/SALE/SaleWeb4WS
+		</url>
+	</scm>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven Repository Switchboard</name>
+			<layout>default</layout>
+			<url>http://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>${basedir}/test</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>${basedir}/src/conf</directory>
+				<includes>
+					<include>META-INF/*.*</include>
+					<include>**/*.*</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.svn</exclude>
+					<exclude>**/*.java</exclude>
+					<exclude>**/*.class</exclude>
+					<exclude>site/*.*</exclude>
+				</excludes>
+			</resource>
+
+		</resources>
+		<plugins>
+
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<warSourceDirectory>
+						${basedir}/WebRoot
+					</warSourceDirectory>
+					<!--  	<packagingExcludes>**/*.svn</packagingExcludes>
+						<warSourceExcludes>**/*.svn</warSourceExcludes>
+						<warSourceIncludes>**/*.js,**/*.jsp,**/*.jpg,**/*.css,**/*.tld,**/*.xml</warSourceIncludes>
+					-->
+					<webXml>${basedir}/WebRoot/WEB-INF/web.xml</webXml>
+				</configuration>
+			</plugin>
+			<!--  -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<testFailureIgnore>true</testFailureIgnore>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>2.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.sonar</groupId>
+				<artifactId>sonar-maven3-plugin</artifactId>
+				<version>3.4.1</version>
+			</plugin>
+
+		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-webdav</artifactId>
+				<version>1.0-beta-2</version>
+			</extension>
+		</extensions>
+		<!---->
+	</build>
+	<dependencies>
+
+		<dependency>
+			<groupId>oracle</groupId>
+			<artifactId>ojdbc14</artifactId>
+			<version>10</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+</project>

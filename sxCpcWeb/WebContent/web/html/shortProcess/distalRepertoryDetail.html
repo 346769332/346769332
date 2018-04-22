@@ -1,0 +1,72 @@
+<script type="text/javascript"src="/CpcWeb/web/js/shortProcess/distalRepertoryDetail.js"></script>
+
+<div class="list-main" id='distalRepertoryDetail'>
+	<div class="page-title mt10">
+		<img src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;末梢库存短流程需求详细信息
+	</div>
+	<div class="bd-list">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0"
+			class="tab5 mt10 lines">
+			<thead>
+				<tr>
+					<th colspan="4"><span class="fl" id='demand_theme'>短流程需求发起</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>短流程名称</td>
+					<td colspan="3">
+						<input id="workflowName" type="text" style="width: 65%;" readonly="readonly" >
+					</td>
+				</tr>
+				<tr>
+					<td>发单人</td>
+					<td><input id="releasePersonName" type="text" readonly="readonly" style="width: 95%;">
+						<input id="releasePersonId" type="hidden" readonly="readonly" style="width: 95%;">
+					</td>
+					<td>发单人部门</td>
+					<td><input id="releaseDeptName" type="text" readonly="readonly" style="width: 95%;"></td>
+				</tr>
+				<tr>
+					<td>联系电话</td>
+					<td><input id="releasePersonNum" type="text"
+						style="width: 95%;" readonly="readonly"></td>
+				</tr>
+				<tr>
+					<td>支局名称</td>
+					<td>
+						<input id="subofficeName" type="text" readonly="readonly" style="width: 95%;">
+					</td>
+					<td>所属上级仓库</td>
+					<td><input id="centerRepositoryName" type="text" readonly="readonly" style="width: 95%;"></td>
+				</tr>
+				<tr>
+					<td>
+						备注
+					</td>
+					<td colspan="3">
+						<textarea style="width: 95%;" id="remark" readonly="readonly"></textarea>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<br/>
+		<hr/>
+		<div style="height: 30px">
+		</div>
+
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab5 mt10 lines">
+			<thead>
+				<tr>
+					<th>物料编码</th>
+					<th>物料名称</th>
+					<th>物料规格型号</th>
+					<th>物料类型</th>
+					<th>数量</th>
+				</tr>
+			</thead>
+			<!-- 物料信息 -->
+			<tbody id="materialInfo">
+			</tbody>
+		</table>
+	</div>

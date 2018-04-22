@@ -1,0 +1,41 @@
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/flowlist.js"></script>
+
+<div class="list-main" id="flowListPage">
+	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;短流程需求发起</div>
+		<dl class="bd-list">
+		<dt style="margin:8px 5px;width:80px;">流程编号：</dt>
+		<dd>
+			<input id="workflowNbr" type="text" class=" w130">
+		</dd>
+		<dt style="margin:8px 0px;width:80px;">流程名称：</dt>
+		<dd>
+			<input id="workflowName" type="text" class=" w130">
+		</dd>
+		<dt style="margin:8px -5px">流程类型：</dt>
+		<dd>
+			<select class="w130" style="width: 156px;height:26px;" name="flowTime" id="flowTime">
+		    	<option >全部</option>	    	
+		    </select>
+		</dd>
+		<dd>
+			<a href="javascript:void(0)" class="but ml20" id="search">查询</a>
+	        <a href="javascript:void(0)" class="but ml20" id="reset">重置</a>
+		</dd>
+	</dl>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10 d_top">
+		<thead>
+			<tr>
+				<td style="width:10%;">流程编号</td>
+				<td style="width:50%;">流程名称</td>
+				<td style="width:10%;">流程类型</td>
+				<td style="width:10%;">流程状态</td>
+				<td style="width:10%;">适用本地网</td>
+				<td style="width:10%;">操作</td>
+			
+			</tr>
+		</thead>
+		<tbody id="flowListBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="flowListFoot"></div>
+</div>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings cacheModelsEnabled="true" enhancementEnabled="false"
+		lazyLoadingEnabled="false" useStatementNamespaces="true"
+		statementCachingEnabled="true" classInfoCacheEnabled="true" />
+	
+	<sqlMap resource="config/ibatis_sql.xml" />
+	<sqlMap resource="config/ibatis_flow.xml" />
+	<sqlMap resource="config/ibatis_search.xml" />
+	<sqlMap resource="config/ibatis_sms.xml" />
+	<sqlMap resource="config/ibatis_useAuth.xml" />
+	<sqlMap resource="config/ibatis_backService.xml" />
+	<sqlMap resource="config/ibatis_timer.xml" />
+	<sqlMap resource="config/ibatis_sysManage.xml" />
+	<sqlMap resource="config/ibatis_report.xml" />
+	<sqlMap resource="config/ibatis_policyManual.xml" />
+	<sqlMap resource="config/ibatis_appVersion.xml" />
+	<sqlMap resource="config/ibatis_evalMonth.xml" />
+	<sqlMap resource="config/ibatis_taskBook.xml" />
+	<sqlMap resource="config/ibatis_shortProcess.xml" />
+	<sqlMap resource="config/ibatis_pushInfo.xml" />
+	<sqlMap resource="config/ibatis_leadStroke.xml" />
+	<sqlMap resource="config/ibatis_paperApply.xml" />
+	<sqlMap resource="config/ibatis_outCommon.xml" />
+</sqlMapConfig>
+

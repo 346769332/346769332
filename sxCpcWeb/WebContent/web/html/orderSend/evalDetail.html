@@ -1,0 +1,81 @@
+<script type="text/javascript" src="js/orderSend/evalDetail.js"></script>
+<div class="list-main" id='evalDetailPage'>
+<div class="list-nav f18 mt10" style="margin:5px;padding-bottom:5px;">
+	<div style="float:right">
+		<a href="#" class="but" id="ceoTurnBack" style="margin-right:20px;">回退</a>
+		<a href="#" class="but" id="ceoEvalBtn">评价</a>
+		<a href="#" class="but1" id="goBackBtn">返回</a>
+ 	</div>
+</div>
+<div>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0"  class="tab5 mt10 lines">
+        <thead>
+            <tr>
+                <th colspan="4"><span class="fl" id='demand_theme'>需求主题：主题名称</span><span class="fr" id="urge_count"></span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th align="right" style="width:60px;">需求单号</th>
+                <td id="demand_id"></td>
+                <th align="right" style="width:60px;">发起时间</th>
+                <td id="create_time"></td>
+            </tr>
+            <tr>
+	            <th align="right">发单人</th>
+	            <td id="promoters">&nbsp;</td>
+	            <th align="right">发单部门</th>
+	            <td id="department">&nbsp;</td>
+            </tr>
+            <tr>
+              <th align="right">联系电话</th>
+              <td id="tel">&nbsp;</td>
+              <th align="right">需求类型</th>
+              <td id="demand_type">&nbsp;</td>
+            </tr>
+            <tr>
+              <!-- <th align="right">办结时间</th>
+              <td id="over_time">&nbsp;</td> -->
+              <th align="right">处理时限</th>
+              <td id="limit_time">&nbsp;</td>
+              <th align="right">需求描述</th>
+              <td id="demand_details">&nbsp;</td>
+            </tr>
+            <tr>
+              <th align="right">附件信息</th>
+              <td colspan="3"><div id="attachment"></div></td>
+            </tr>
+            <tr>
+              <th align="right">时间评价</th>
+              <td id="time_eval" index="0">&nbsp;</td>
+              <th align="right">结果评价</th>
+              <td id="over_eval" index="0">&nbsp;</td>
+            </tr>
+            <tr>
+              <th align="right">态度评价</th>
+              <td colspan="3" id="attitude_eval" index="0">&nbsp;</td>
+            </tr>
+            <tr>
+              <th align="right">评价意见</th>
+              <td colspan="3">&nbsp;<textarea id="over_opinion" style="line-height:25px;width:98%;border: 1px solid #dedede;" maxlength="200"></textarea></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div style="margin-top:15px;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0"  class="tab5 mt10 lines f14">
+        <thead>
+            <tr>
+                <th align="center" style="width: 5%;">序号</th>
+                <th align="center" style="width: 15%;">当前环节</th>
+                <th align="center" style="width: 17%;">处理人</th>
+                <th align="center" style="width: 15%;">处理时间</th>
+                <th align="center" style="width: 30%;">处理描述</th>
+                <th align="center" style="width: 10%;">环节耗时</th>
+                <th align="center" style="width: 8%;">催单</th>
+            </tr>
+        </thead>
+        <tbody id="recordOfDemandInfo"></tbody>
+    </table>
+</div>
+</div>

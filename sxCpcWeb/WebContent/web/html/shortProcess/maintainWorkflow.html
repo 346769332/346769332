@@ -1,0 +1,79 @@
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/maintainWorkflow.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/css/GooFlow2.css"/>
+<!-- <link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow2.css"/> -->
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/data.js"></script>
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/jquery.min.js"></script> -->
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFunc.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/json2.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow.js"></script>
+<style type="text/css">
+	#workflow .GooFlow_head{
+		display: none;
+	}
+	#workflow .GooFlow_tool{
+		display: none;
+	}
+	#workflow .GooFlow_work .GooFlow_item  .ico{
+	cursor:default;
+	}
+</style>
+
+<div class="list-main" id='maintainWorkflowPage'>
+	<div class="page-title mt10"><img src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;短流程维护</div>
+	<div  >
+		<table  border="0" cellspacing="0" cellpadding="0"  style="width:100%" >
+			<tbody>
+				<tr>
+					<td style="height:40px;"id="wlan">
+						流程名称&nbsp;&nbsp;<input id="workflowName" name="workflowName" type="text" style="width:100px">
+						流程分类&nbsp;&nbsp;
+						<select id="workflowClass" name="workflowClass" style="width:100px;height: 25px">
+						</select>
+						流程类型&nbsp;&nbsp;
+						<select id="workflowType" name="workflowType" style="width:100px;height: 25px">
+						</select>
+					</td>
+				</tr>
+					<!-- <td style="width:320px;height:30px;">
+						&nbsp;流程单类型&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+						流程单类型&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<input id="workflowSingleType" type="text" style="width:190px" readonly>
+					</td>
+					<td style='width:100px;'>流程定制类型</td>
+					<td  style="height:30px;"   >
+						<span id="workflowCustomType_0"><input type="radio" name="workflowCustomType"  style="width:30px" value="0">省定制&nbsp;&nbsp;&nbsp;</span>
+						<span id="workflowCustomType_1"><input type="radio" name="workflowCustomType"  style="width:30px" value="1">省市协同定制&nbsp;&nbsp;&nbsp;</span>
+						<span id="workflowCustomType_2"><input type="radio" name="workflowCustomType"  style="width:30px" value="2" checked="checked">市定制&nbsp;&nbsp;&nbsp;
+						</span>
+					</td>					
+				</tr>-->
+<!-- 				<tr> -->
+<!-- 					<td colspan="6" style="height:45px;"> -->
+<!-- 					短流程需求模板 -->
+<!-- 						<input id="workflowTemplate" type="text" style="width:45%"> -->
+<!-- 						<a href="#" class="but" id="chooseTemplate">选择</a> -->
+<!-- 					</td> -->
+<!-- 				</tr> -->
+				<tr>
+					<td colspan="4">
+						<div id="workflow" >
+						</div>
+					</td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td align="center" colspan="6" style="height:55px;">
+						<a href="#" class="but" id="save">发布</a>
+						<a href="#" class="but" id="back">返回</a>
+						<!--  
+						<a href="#" class="but" id="save">保存</a>
+						<a href="javascript:void(0)" class="but" id="discard">作废</a>
+						<a href="#" class="but" id="back">返回</a>-->
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>

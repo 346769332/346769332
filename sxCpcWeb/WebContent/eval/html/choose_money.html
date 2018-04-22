@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title></title>
+   	
+   	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/animate.min.css" rel="stylesheet">
+	<link href="../css/common.css" rel="stylesheet">
+	<link href="../css/style.min.css" rel="stylesheet">
+	<link href="../font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<script src="../js/jquery-2.1.1.js"></script>
+	<script src="../js/pace.min.js"></script>
+	<script src="../js/bootstrap.min.js"></script>
+	<script src="../js/jq.ui.js"></script>
+	<script src="../js/common.js"></script>
+	<script src="../js/servlet.url.js"></script>
+	<script src="../js/iscroll.js"></script>
+	<script src="../cordova.js"></script>
+	<script type="text/javascript" src="../js/star-rating.min.js"></script>
+	<script src="../js/validateTel.js"></script>
+	<script type="text/javascript" src="../js/pages/choose_money.js"></script>
+	
+</head>
+
+<body>
+<div id="showDialogDiv">
+<div class="modal fade" id="myModal_1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="dialogTitle"></h4>
+      </div>
+      <div class="modal-body" id="dialogMsg">
+      </div>
+      
+      <div class="modal-footer">
+       <div id="myModel_newButton"></div> 
+        <button id="dialogClose" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="row border-bottom ng-scope">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+             <a class="navbar-minimalize minimalize-styl-2 " id="backA"><span class="glyphicon glyphicon-chevron-left" ></span> </a>
+        </div>
+        
+    </nav>
+</div>
+<div class="panel panel-default" style="margin-bottom:0px;">
+    		<div class="panel-heading" style=" background-color: #F2F1F1;" role="tab" id="heading1">
+      			<h4 class="panel-title" id="eval_title">
+      			您目前已使用XX元打赏，请选择打赏金额：
+      			</h4>
+    		</div>
+</div>
+<div id="scrollDiv" class="container-fluid wrapper">
+    <div id="moneyDiv" style="margin-top:10%;">
+       <input id='money1' type="radio" name="moneyNum" value="10" style="width:10%;">
+       <label for='money1' style="width:20%;">10</label>
+       <input id='money2' type="radio" name="moneyNum" value="20" style="width:10%;">
+       <label for='money2' style="width:20%;">20</label>
+       <input id='money3' type="radio" name="moneyNum" value="30" style="width:10%;">
+       <label for='money3' style="width:20%;">30</label>
+    </div>
+    <div style="margin-top:10%;">
+        <input id="desc" type="textarea" value="请输入打赏事由，最多150个字" style="width:100%;height:300px;">
+     </div>
+</div>
+
+<div class="row fixed p-l-n-r-n-xs text-center gray-bg">
+	<div class="col-xs-6"><button id="goBack" type="button" class="btn btn-primary" style="padding:6px 20px;">返回</button></div>
+	<div class="col-xs-6"><button id="submit"type="button" class="btn btn-primary" style="padding:6px 20px;">提交</button></div>
+</div>
+</body>
+</html>

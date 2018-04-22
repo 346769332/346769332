@@ -1,0 +1,56 @@
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/singatureDemandSolve.js"></script>
+<div class="list-main" id='demandDetailInfo'>
+<div class="page-title mt10"><img src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;会签需求处理</div>
+	<div class="bd-list">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0"
+			class="tab5 mt10 lines">
+			<thead>
+				<tr>
+					<th colspan="4"><span class="fl" id='demand_theme'>会签需求处理</span><span
+						class="fr" id="urge_count"></span></th>
+				</tr>
+			</thead>
+			<tbody id="templateInfo">
+				<tr>
+					<td>短流程名称</td>
+					<td id="ccc"><input id="workflowName" type="text" readonly="readonly" style="width: 95%;"></td>
+				</tr>
+				<tr>
+					<td>发起人</td>
+					<td><input id="releasePersonName" type="text" readonly="readonly" style="width: 95%;"></td>
+					<td>发起人部门</td>
+					<td><input id="releaseDeptName" type="text" readonly="readonly" style="width: 95%;"></td>
+				</tr>
+				<tr>
+					<td>联系电话</td>
+					<td><input id="releasePersonNum" type="text" style="width: 95%;" readonly="readonly"></td>
+					<td>工单流程类型</td>
+					<td><input id="workflowType" type="text" readonly="readonly" style="width: 95%;"></td>
+				</tr>
+				<tr id="aaa">
+					<td>会签发起人</td>
+					<td><input id="disposePersonName" type="text" readonly="readonly" style="width: 95%;"></td>
+					<td>会签发起人部门</td>
+					<td><input id="disposeDeptName" type="text" readonly="readonly" style="width: 95%;"></td>
+				</tr>
+				<tr id="bbb">
+					<td>附件：</td>
+					<td colspan="3"><div id="attachment"></div></td>
+			    </tr>
+				<tr>
+					<td>处理意见</td>
+					<td colspan="3" style="height: 40%"><textarea id="disposeDesc" style="width: 95%;"></textarea></td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td align="center" colspan="4">
+						<a href="#" class="but" id="submitInfo">提交</a>
+						<a href="#" class="but" id="backInfo">返回</a>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+	<div id="workflow">
+	</div>
+</div>

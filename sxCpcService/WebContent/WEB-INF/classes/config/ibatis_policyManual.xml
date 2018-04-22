@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="policyManual">
+
+	<!--获取政策手册列表 -->
+	<select id="getPolicyManualInfoAttr" parameterClass="java.lang.String" resultClass="java.util.HashMap" >
+		SELECT   
+			t.`o_rel_id`,
+			t.`attr_id`,
+			t.`attr_value`
+		FROM tb_cpc_policy_manual_attr t
+		WHERE t.`o_rel_id`=#id#
+	</select>
+	<select id="queryUseAreaAttr" parameterClass="java.lang.String"  resultClass="java.util.HashMap" >
+		SELECT DISTINCT 
+		  t.`o_type`,
+		  t.`prov`,
+		  a.`p_name` prov_name,
+		  t.`latn`,
+		  b.`p_name` latn_name,
+		  t.`area`,
+		  c.`area_name` 
+		FROM
+		  `tb_cpc_policy_manual_release` t 
+		  LEFT JOIN 
+		    (SELECT 
+		      t.`area_code`,
+		      t.`area_name`,
+		      t.`p_code`,
+		      t.`p_name`,
+		      t.`level` 
+		    FROM
+		      sys_area t 
+		    WHERE t.`level` IN ('2', '3')) a 
+		    ON t.`prov` = a.`p_code` 
+		  LEFT JOIN 
+		    (SELECT 
+		      t.`area_code`,
+		      t.`area_name`,
+		      t.`p_code`,
+		      t.`p_name`,
+		      t.`level` 
+		    FROM
+		      sys_area t 
+		    WHERE t.`level` IN ('2', '3')) b 
+		    ON t.`latn` = b.`p_code` 
+		  LEFT JOIN 
+		    (SELECT 
+		      t.`area_code`,
+		      t.`area_name`,
+		      t.`p_code`,
+		      t.`p_name`,
+		      t.`level` 
+		    FROM
+		      sys_area t 
+		    WHERE t.`level` IN ('2', '3')) c 
+		    ON t.`area` = c.`area_code` 
+		WHERE  t.`policy_id` = #id#
+  </select>
+	
+
+	<resultMap id="policyManualInfoMap" class="com.tydic.sale.service.crm.po.PolicyManualInfoBean" >
+		<result property="id" 	 column="id"/>
+		<result property="policyTheme"  column="policyTheme"/>
+		<result property="type"  	column="policyType"/>
+		<result property="detailType"  column="xszcType"/>
+		<result property="beginDate"  column="beginDate"/>
+		<result property="endDate"  column="endDate"/>
+		<result property="content"  column="content"/>
+		<result property="optId"  column="optId"/>
+		<result property="optName"  column="optName"/>
+		<result property="createTime"  column="creteTime"/>	
+		<result property="state"  	column="state"/>	
+		<result property="stateName"  column="policyStateType"/>	
+		<result property="o_type"  column="o_type"/>
+		<result property="o_type_d"  column="o_type_d"/>
+		<result property="picture"  column="picture"/> 
+		<result property="theme"  column="policyTheme"/>
+ 		<result property="infoAttr" column="id" select="policyManual.getPolicyManualInfoAttr"/>
+ 		<result property="releaseArea" column="id" select="policyManual.queryUseAreaAttr"/>
+	</resultMap>
+	
+   <!-- 查询功能点 -->
+	<select id="queryPolicyManualListSum" resultClass="java.lang.String" parameterClass="java.util.HashMap">
+	 	select count(*) from (
+			 	SELECT 
+			  a.id,
+			  c.`dic_value` AS policyType,
+			  d.`dic_value` AS xszcType,
+			  DATE_FORMAT( a.`o_begin_date`,'%Y-%m-%d') AS beginDate,
+			  DATE_FORMAT(a.`o_end_date`,'%Y-%m-%d') AS endDate,
+			  <isNotNull property="id">
+   			  	a.`o_content` AS content,
+			  </isNotNull>
+			   <isNull property="id">
+   			  ''  AS content,
+			  </isNull>
+			  a.`theme` policyTheme,
+			  a.`opt_id` optId,
+			  s.`STAFF_NAME` optName,
+			  e.`dic_value` AS policyStateType,
+			   a.`o_type`,
+  			  a.`o_type_d`,
+			  a.`state`,
+			   <isNotNull property="id">
+   			   a.`picture` ,
+			  </isNotNull>
+			   <isNull property="id">
+   			  '' picture,
+			  </isNull>
+			  
+			  DATE_FORMAT(a.`create_time` ,'%Y-%m-%d') creteTime 
+			FROM
+			  `tb_cpc_policy_manual` a 
+			    INNER JOIN(SELECT DISTINCT 
+					  t.`policy_id` id 
+					FROM
+					  `tb_cpc_policy_manual_release` t 
+					WHERE t.`o_type` = 'LATN'
+					<isNotEmpty property="latn_id">						
+					    <isNotEqual prepend=" and " property="latn_id" compareValue="888">
+						    t.`latn`=#latn_id#
+						</isNotEqual>
+					</isNotEmpty>
+					 )m
+			  ON a.ID=m.id
+			  INNER JOIN sys_staff s
+  			  ON  CONVERT (a.`opt_id` USING utf8) COLLATE utf8_unicode_ci=s.`STAFF_ID`
+			  LEFT JOIN tb_cpc_policy_manual_attr b
+			  ON a.`ID`=b.`o_rel_id` 
+			  LEFT JOIN tb_cpc_dic c 
+			    ON a.`o_type` = c.`dic_code` 
+			    AND c.`dic_type` = 'policyType' 
+			  LEFT JOIN tb_cpc_dic d 
+			    ON a.`o_type_d` = d.`dic_code` 
+			    AND d.`dic_type` = 'xszcType'  
+			    LEFT JOIN tb_cpc_dic e 
+			    ON a.`state` = e.`dic_code` 
+			    AND e.`dic_type` = 'policyStateType'
+			    <dynamic prepend="where">
+                      <isNotEmpty prepend="and" property="policyId">
+                              a.`o_type`= #policyId#
+                      </isNotEmpty>
+                      <isNotEmpty prepend="and" property="polChilId">
+                              a.`o_type_d`= #polChilId#
+                      </isNotEmpty> 
+                      <isNotEmpty prepend="and" property="polContent">
+                              a.`theme` like CONCAT('%',#polContent#,'%')
+                      </isNotEmpty>
+					  <isNotEmpty prepend="AND" property="sendData" >
+					     <![CDATA[ 
+							 	DATEDIFF(a.`o_begin_date`,#sendData#)>=0
+							]]>
+					  </isNotEmpty>  
+                      <isNotEmpty prepend="AND" property="endData" >
+					    <![CDATA[ 
+								DATEDIFF(a.`o_end_date`,#endData#)<=0
+							]]>
+					  </isNotEmpty>
+					  <isEqual prepend="AND" property="state" compareValue="N">
+							a.`state` = 'N'
+					  </isEqual>
+					  <isEqual prepend="AND" property="state" compareValue="P">
+							a.`state` = 'O'
+					  </isEqual>
+					  <isEqual prepend="AND" property="state" compareValue="Y">
+							a.`state` != 'N' 
+					  </isEqual>
+					  <isNotEmpty property="id" prepend=" AND ">
+						    a.`ID` =#id#
+				      </isNotEmpty>
+              	</dynamic>
+		GROUP BY a.`ID`  
+	 	)m
+	</select>
+	<select id="queryPolicyManualListPage" resultMap="policyManual.policyManualInfoMap" parameterClass="java.util.HashMap">
+		SELECT 
+			  a.id,
+			  c.`dic_value` AS policyType,
+			  d.`dic_value` AS xszcType,
+			  DATE_FORMAT( a.`o_begin_date`,'%Y-%m-%d') AS beginDate,
+			  DATE_FORMAT(a.`o_end_date`,'%Y-%m-%d') AS endDate,
+			  <isNotNull property="id">
+   			  	a.`o_content` AS content,
+			  </isNotNull>
+			   <isNull property="id">
+   			  ''  AS content,
+			  </isNull>
+			  a.`theme` policyTheme,
+			  a.`opt_id` optId,
+			  s.`STAFF_NAME` optName,
+			  e.`dic_value` AS policyStateType,
+			   a.`o_type`,
+  			  a.`o_type_d`,
+			  a.`state`,
+			   <isNotNull property="id">
+   			   a.`picture` ,
+			  </isNotNull>
+			   <isNull property="id">
+   			  '' picture,
+			  </isNull>
+			  
+			  DATE_FORMAT(a.`create_time` ,'%Y-%m-%d') creteTime 
+			FROM
+			  `tb_cpc_policy_manual` a 
+		  	  INNER JOIN(SELECT DISTINCT 
+					  t.`policy_id` id 
+					FROM
+					  `tb_cpc_policy_manual_release` t 
+					WHERE t.`o_type` = 'LATN'
+					<isNotEmpty property="latn_id">						
+					    <isNotEqual prepend=" and " property="latn_id" compareValue="888">
+						    t.`latn`=#latn_id#
+						</isNotEqual>
+					</isNotEmpty>
+					 )m
+			  ON a.ID=m.id
+			  INNER JOIN sys_staff s
+  			  ON  CONVERT (a.`opt_id` USING utf8) COLLATE utf8_unicode_ci=s.`STAFF_ID`
+			  LEFT JOIN tb_cpc_policy_manual_attr b
+			  ON a.`ID`=b.`o_rel_id` 
+			  LEFT JOIN tb_cpc_dic c 
+			    ON a.`o_type` = c.`dic_code` 
+			    AND c.`dic_type` = 'policyType' 
+			  LEFT JOIN tb_cpc_dic d 
+			    ON a.`o_type_d` = d.`dic_code` 
+			    AND d.`dic_type` = 'xszcType'  
+			    LEFT JOIN tb_cpc_dic e 
+			    ON a.`state` = e.`dic_code` 
+			    AND e.`dic_type` = 'policyStateType'
+			    <dynamic prepend="where">
+                      <isNotEmpty prepend="and" property="policyId">
+                              a.`o_type`= #policyId#
+                      </isNotEmpty>
+                      <isNotEmpty prepend="and" property="polChilId">
+                              a.`o_type_d`= #polChilId#
+                      </isNotEmpty> 
+                      <isNotEmpty prepend="and" property="polContent">
+                              a.`theme` like  CONCAT('%',#polContent#,'%') 
+                      </isNotEmpty>
+					  <isNotEmpty prepend="AND" property="sendData" >
+					     <![CDATA[ 
+							 	DATEDIFF(a.`o_begin_date`,#sendData#)>=0
+							]]>
+					  </isNotEmpty>  
+                      <isNotEmpty prepend="AND" property="endData" >
+					    <![CDATA[ 
+								DATEDIFF(a.`o_end_date`,#endData#)<=0
+							]]>
+					  </isNotEmpty>
+					  <isEqual prepend="AND" property="state" compareValue="N">
+							a.`state` = 'N'
+					  </isEqual>
+					   <isEqual prepend="AND" property="state" compareValue="P">
+							a.`state` = 'O'
+					  </isEqual>
+					  <isEqual prepend="AND" property="state" compareValue="Y">
+							a.`state` != 'N' 
+					  </isEqual>
+					  <isNotEmpty property="id" prepend=" AND ">
+						    a.`ID` =#id#
+				      </isNotEmpty>
+              	</dynamic>
+		GROUP BY a.`ID` order by a.`create_time` desc
+		<isNotEmpty  property="limit">
+			 limit $page_num$,$pagesize$
+		</isNotEmpty>
+	</select>
+	<!-- 刪除政策手册信息 -->
+	<delete id="deletePolicyManualListPage" parameterClass="java.util.HashMap">
+       	UPDATE tb_cpc_policy_manual
+		 SET state='N'
+	 	WHERE ID in(
+	 	  	<iterate property="policyIdSet" conjunction=",">
+	     			#policyIdSet[].policyId#
+	   		 </iterate>
+	    	 )  
+	</delete>
+	<!-- 发布政策手册信息 -->
+	<update id="releasePolicyManualListPage" parameterClass="java.util.HashMap">
+       	UPDATE tb_cpc_policy_manual
+		 SET state='Y'
+	 	WHERE ID =#policyId#  
+	</update>
+	<!-- 审批政策手册 -->
+	<update id="approvalPolicyManualListPage" parameterClass="java.util.HashMap">
+       	UPDATE tb_cpc_policy_manual
+		 SET state='Y'
+	 	WHERE ID =#PMId#  
+	</update>
+	<update id="approvalNotPolicyManualListPage" parameterClass="java.util.HashMap">
+       	UPDATE tb_cpc_policy_manual
+		 SET state='E'
+	 	WHERE ID =#PMId#  
+	</update>
+	
+    <!-- 获取政策手册类型列表 -->
+    <select id="searchPolicyManualTypeListPage"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        SELECT 
+			  b.`dic_code` policyType,
+			  b.`dic_value` policyTypeName,
+			  COUNT(DISTINCT a.`ID`) num 
+			FROM  `tb_cpc_dic` b 
+			   LEFT JOIN `tb_cpc_policy_manual` a 
+			     INNER JOIN(SELECT DISTINCT 
+					  t.`policy_id` id 
+					FROM
+					  `tb_cpc_policy_manual_release` t 
+					WHERE t.`o_type` = 'LATN'
+					<isNotEmpty property="latn_id">						
+					    <isNotEqual prepend=" and " property="latn_id" compareValue="888">
+						    t.`latn`=#latn_id#
+						</isNotEqual>
+					</isNotEmpty>
+					 )m
+			  ON a.ID=m.id
+			    ON a.`o_type` = b.`dic_code` 
+			    AND a.`state`='Y'
+			     <![CDATA[ 
+					 AND  DATEDIFF(a.`o_begin_date`,now())<=0
+					 AND  DATEDIFF(a.`o_end_date`,now())>=0
+				]]>
+			 WHERE b.`dic_type` = 'policyType' 
+		GROUP BY b.`dic_code`
+		<isNotEmpty  property="limit">
+			 limit $page_num$,$pagesize$
+		</isNotEmpty>
+    </select>
+    
+    <!-- 获取政策手册类型详细列表 -->
+    <select id="searchPolicyManualTypeDetailListPage"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        SELECT  
+			  b.`dic_code` policyTypeD,
+			  b.`dic_value` policyTypeDName,
+			  COUNT(DISTINCT a.`ID`) num  
+			FROM  `tb_cpc_dic` b 
+			   LEFT JOIN `tb_cpc_policy_manual` a 
+			     INNER JOIN(SELECT DISTINCT 
+					  t.`policy_id` id 
+					FROM
+					  `tb_cpc_policy_manual_release` t 
+					WHERE t.`o_type` = 'LATN'
+					<isNotEmpty property="latn_id">						
+					    <isNotEqual prepend=" and " property="latn_id" compareValue="888">
+						    t.`latn`=#latn_id#
+						</isNotEqual>
+					</isNotEmpty>
+					 )m
+			  ON a.ID=m.id
+			    ON a.`o_type_d` = b.`dic_code` 
+			    AND a.`state`='Y'
+			    <![CDATA[ 
+					 AND  DATEDIFF(a.`o_begin_date`,now())<=0
+					 AND  DATEDIFF(a.`o_end_date`,now())>=0
+				]]>
+			 WHERE   b.`dic_type` = CONCAT(LOWER(#policyType#),'Type')
+			GROUP BY b.`dic_code`
+		<isNotEmpty  property="limit">
+			 limit $page_num$,$pagesize$
+		</isNotEmpty>
+    </select>
+    <!-- 获取政策手册信息 -->
+      <select id="searchPolicyManualInfoListPage"  resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+         SELECT 
+			  a.`ID` id,
+			  a.`theme` policyTheme,
+  			  a.`picture` policyPicture,
+			  a.`o_type`  policyType,
+			  b.`dic_value` policyTypeName,
+			  a.`o_type_d` policyTypeD,
+			  c.`dic_value` policyTypeDName,
+			  <isNotEmpty property="source">
+			    a.`o_content`content,
+			  </isNotEmpty>
+			  a.`opt_id` optId,
+			  s.`STAFF_NAME` optName,
+			  DATE_FORMAT(a.`create_time`, '%Y-%m-%d %H:%i') createTime ,
+			  d.`attr_value` ztqd
+			FROM
+			  `tb_cpc_policy_manual` a 
+			    INNER JOIN(SELECT DISTINCT 
+					  t.`policy_id` id 
+					FROM
+					  `tb_cpc_policy_manual_release` t 
+					WHERE t.`o_type` = 'LATN'
+					<isNotEmpty property="latn_id">						
+					    <isNotEqual prepend=" and " property="latn_id" compareValue="888">
+						    t.`latn`=#latn_id#
+						</isNotEqual>
+					</isNotEmpty>
+					 )m
+			  ON a.ID=m.id
+			 INNER JOIN sys_staff s
+  			  ON  CONVERT (a.`opt_id` USING utf8) COLLATE utf8_unicode_ci=s.`STAFF_ID`
+			   LEFT JOIN `tb_cpc_dic` b 
+			    ON a.`o_type` = b.`dic_code` 
+			  LEFT JOIN `tb_cpc_dic` c 
+			    ON a.`o_type_d` = c.`dic_code` 
+			  LEFT JOIN `tb_cpc_policy_manual_attr` d 
+			    ON a.`id` = d.`o_rel_id` 
+			    AND d.`attr_id`='ZTQD'
+			WHERE  a.`state`='Y'
+			<![CDATA[ 
+					 AND  DATEDIFF(a.`o_begin_date`,now())<=0
+					 AND  DATEDIFF(a.`o_end_date`,now())>=0
+				]]>
+			<isNotEmpty property="policyType" prepend=" AND ">
+				 a.`o_type` = #policyType# 
+			 </isNotEmpty>
+			<isNotEmpty property="policyTypeD" prepend=" AND ">
+			    a.`o_type_d`=#policyTypeD#
+			</isNotEmpty>
+			GROUP BY  a.`ID` 
+			ORDER BY a.`create_time` DESC
+		<isNotEmpty  property="limit">
+			 limit $page_num$,$pagesize$
+		</isNotEmpty>
+    </select>
+    
+      <select id="selectNextVal"  parameterClass="java.util.HashMap"
+		resultClass="java.lang.String">
+		    SELECT  nextval('$seq_name$') as nextVal from dual_test
+      </select>
+      
+      <insert id="savePM" parameterClass="java.util.HashMap">
+           insert into tb_cpc_policy_manual(ID,theme,picture,o_type,o_type_d,o_begin_date,o_end_date,o_content,opt_id,create_time,state,curr_record_id)
+           values(#PMId#,#theme#,#picture#,#o_type#,#o_type_d#,#o_begin_date#,#o_end_date#,#o_content#,#opt_id#,now(),#state#,#record_id#) 
+      </insert>
+      
+   <insert id="savePMAtrr" parameterClass="java.util.HashMap">
+       INSERT INTO  tb_cpc_policy_manual_attr(id,o_rel_id,attr_id,attr_value) values
+	    <iterate property="AttrSet" conjunction=",">
+	     (
+	      	nextval('seq_policy_manual_attr_id'),#PMId#,#AttrSet[].attr_id#,#AttrSet[].attr_value#
+	      )  
+	    </iterate>
+  </insert>
+  
+   <delete id="deletePMAtrr" parameterClass="java.util.HashMap">
+        delete from   tb_cpc_policy_manual_attr where o_rel_id=#PMId#
+  </delete>
+  
+    
+  <insert id="saveReleaseArea" parameterClass="java.util.HashMap">
+       INSERT INTO  tb_cpc_policy_manual_release  (policy_id,prov,latn,area,o_type) values
+	    <iterate property="releaseSet" conjunction=",">
+	     (
+	      	#PMId#,#releaseSet[].prov#,#releaseSet[].latn#,#releaseSet[].area#,#releaseSet[].type#
+	      )  
+	    </iterate>
+  </insert>
+   
+  <delete id="deleteReleaseArea" parameterClass="java.util.HashMap">
+         delete from   tb_cpc_policy_manual_release  where policy_id=#PMId#  
+  </delete>
+  
+  <update id="updatePM"  parameterClass="java.util.HashMap">
+       update tb_cpc_policy_manual t set curr_record_id = #curr_record_id# 
+          <isNotEmpty property="theme" prepend=",">  
+      			 t.theme=#theme#
+      	  </isNotEmpty>
+      	  <isNotEmpty property="picture" prepend=",">  
+	       		t.picture=#picture#
+	       </isNotEmpty>
+	      <isNotEmpty property="o_type" prepend=",">  
+	       		t.o_type=#o_type#
+	       </isNotEmpty>
+	       <isNotEmpty property="o_type_d" prepend=","> 
+	      		 t.o_type_d=#o_type_d#
+	       </isNotEmpty>
+	       <isNotEmpty property="o_begin_date" prepend=","> 
+	      		 t.o_begin_date=#o_begin_date#
+	       </isNotEmpty>
+	       <isNotEmpty property="o_end_date" prepend=","> 
+	      		 t.o_end_date=#o_end_date#
+	       </isNotEmpty>
+	       <isNotEmpty property="o_content" prepend=","> 
+	      		 t.o_content=#o_content#
+	       </isNotEmpty>
+	       <isNotEmpty property="opt_id" prepend=","> 
+	      		 t.opt_id=#opt_id# 
+	       </isNotEmpty>
+	       <isNotEmpty property="state" prepend=","> 
+	      		 t.state=#state# 
+	       </isNotEmpty> 
+       where t.id = #PMId#
+  </update>
+  
+    <update id="updatePMState"  parameterClass="java.util.HashMap">
+       update tb_cpc_policy_manual t set t.state=#state# 
+       where t.id = #PMId#
+  </update>
+  <!-- 获取区域本地网 -->
+  <!-- 
+	  <select id="queryAllAreaData"   resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+			  SELECT 
+				  t.`area_code`,
+				  t.`area_name`,
+				  t.`p_code`,
+				  t.`p_name`,
+				  t.`level` 
+				FROM
+				  sys_area t 
+				WHERE t.`level` IN ('2', '3')
+	  </select>
+   -->
+    <select id="queryAllAreaData"   resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		  SELECT 
+			  t.`area_code`,
+			  t.`area_name`,
+			  t.`p_code`,
+			  t.`p_name`,
+			  t.`level` 
+			FROM
+			  sys_area t 
+			WHERE t.`level` IN ('2')
+			<isNotEqual prepend=" and " property="latn_id" compareValue="888">
+			    t.`area_code`=#latn_id#
+			</isNotEqual>
+	  </select>
+   
+  <select id="queryUseAreaList"   resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		SELECT DISTINCT 
+		  t.`o_type` type,
+		  t.`prov`,
+		  a.`p_name` prov_name,
+		  t.`latn`,
+		  b.`p_name` latn_name,
+		  t.`area`,
+		  c.`area_name` 
+		FROM
+		  `tb_cpc_policy_manual_release` t 
+		  LEFT JOIN 
+		    (SELECT 
+		      t.`area_code`,
+		      t.`area_name`,
+		      t.`p_code`,
+		      t.`p_name`,
+		      t.`level` 
+		    FROM
+		      sys_area t 
+		    WHERE t.`level` IN ('2', '3')) a 
+		    ON t.`prov` = a.`p_code` 
+		  LEFT JOIN 
+		    (SELECT 
+		      t.`area_code`,
+		      t.`area_name`,
+		      t.`p_code`,
+		      t.`p_name`,
+		      t.`level` 
+		    FROM
+		      sys_area t 
+		    WHERE t.`level` IN ('2', '3')) b 
+		    ON t.`latn` = b.`p_code` 
+		  LEFT JOIN 
+		    (SELECT 
+		      t.`area_code`,
+		      t.`area_name`,
+		      t.`p_code`,
+		      t.`p_name`,
+		      t.`level` 
+		    FROM
+		      sys_area t 
+		    WHERE t.`level` IN ('2', '3')) c 
+		    ON t.`area` = c.`area_code` 
+		WHERE 1=1
+		 
+			<isNotEmpty prepend=" and " property="PMId">
+			   t.`policy_id` = #PMId#
+			</isNotEmpty>
+			<isEmpty prepend=" and " property="PMId">
+			   t.`policy_id` = ''
+			</isEmpty>
+  </select>
+  
+  <!-- 
+   <select id="getApprovePeopleList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+			SELECT DISTINCT 
+			  d.`STAFF_ID` staff_id,
+			  d.`LOGIN_CODE` login_code,
+			  d.`STAFF_NAME` staff_name,
+			  d.`MOB_TEL` mob_tel,
+			  d.`DEPARTMENT_CODE` department_code 
+			FROM
+			  `tb_cpc_sys_auth_f_rel` a 
+			  INNER JOIN `tb_cpc_sys_role_a_rel` b 
+			    ON a.`a_id` = b.`a_id` 
+			    AND a.`f_type` = 'FUN' 
+			    AND a.`f_rel_id` = '100091' 
+			  INNER JOIN `tb_cpc_sys_role_o_rel` c 
+			    ON b.`role_id` = c.`role_id`,
+			  `sys_staff` d 
+			WHERE (
+			    c.`o_type` = 'STAFF' 
+			    AND CONVERT (c.`o_rel_id` USING utf8) COLLATE utf8_unicode_ci = d.`STAFF_ID`
+			  ) 
+			  OR (
+			    c.`o_type` = 'ORG' 
+			    AND CONVERT (c.`o_rel_id` USING utf8) COLLATE utf8_unicode_ci = d.`DEPARTMENT_CODE`
+			  )
+   </select>
+   -->
+   <select id="getApprovePeopleList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		 SELECT DISTINCT 
+			  a.`STAFF_ID` staff_id,
+			  a.`LOGIN_CODE` login_code,
+			  a.`STAFF_NAME` staff_name,
+			  a.`MOB_TEL` mob_tel,
+			  a.`DEPARTMENT_CODE` department_code 
+			FROM
+			  `sys_staff` a 
+			  INNER JOIN tb_cpc_approver_config b 
+			    ON a.`STAFF_ID` = CONVERT (b.`staff_id` USING utf8) COLLATE utf8_unicode_ci 
+			    AND b.`source_type` = 'policyManual' 
+			  INNER JOIN 
+			    (SELECT 
+			      CONVERT( t.`DEPARTMENT_CODE` USING utf8)department_code 
+			    FROM
+			      sys_staff t 
+			      INNER JOIN tb_cpc_policy_manual p 
+			        ON t.`STAFF_ID` = CONVERT (p.`opt_id` USING utf8) COLLATE utf8_unicode_ci
+			         AND p.`ID`='70'
+			        ) c 
+		 ON b.`rel_id` = c.department_code 
+   </select>
+   
+    <select id="getPolicyManualPeople" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+		 SELECT DISTINCT 
+		  d.`STAFF_ID` staff_id,
+		  d.`LOGIN_CODE` login_code,
+		  d.`STAFF_NAME` staff_name,
+		  d.`MOB_TEL` mob_tel,
+		  d.`DEPARTMENT_CODE` department_code,
+		  a.`theme` busiTheme,
+		  c.`dic_value`  busiType
+		FROM
+		  tb_cpc_policy_manual a 
+		  LEFT JOIN tb_cpc_dic c 
+		    ON a.`o_type` = c.`dic_code` 
+		    AND c.`dic_type` = 'policyType' 
+		  INNER JOIN sys_staff d 
+		    ON CONVERT (a.`opt_id` USING utf8) COLLATE utf8_unicode_ci = d.`STAFF_ID` 
+		WHERE a.`ID` = #PMId#
+   </select>
+</sqlMap>

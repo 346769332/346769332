@@ -1,0 +1,98 @@
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/solveProcessDetail.js"></script>
+
+<link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/css/GooFlow2.css"/>
+<!-- <link rel="stylesheet" type="text/css" href="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow2.css"/> -->
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/data.js"></script>
+<!-- <script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/jquery.min.js"></script> -->
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFunc.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/json2.js"></script>
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/jQueryGooFlow/GooFlow.js"></script>
+<style type="text/css">
+	#workflow .GooFlow_head{display:none;}
+	#workflow .GooFlow_tool{display:none;}
+</style>
+<div class="list-main" id='solveProcessInfo'>
+<div class="page-title mt10"><img src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;已处理短流程需求详细信息</div>
+	<div>
+	<div>
+		<table id="templateInfos" width="100%" border="0" cellspacing="0" cellpadding="0" class="tab5 mt10 lines">
+			<thead>
+	            <tr>
+	                <th colspan="4">需求详细信息</th>
+	            </tr>
+        	</thead>
+			<tbody>
+				<tr>
+					<td style="width: 15%;">短流程名称</td>
+					<td style="width: 20%;"><input id="workflowName" type="text" readonly="readonly" style="width: 95%;"></td>
+					<td style="width: 15%;">需求名称</td>
+					<td style="width: 20%;"><input id="demandName" type="text" readonly="readonly" style="width: 95%;"></td>
+				</tr>
+				<tr>
+				</tr>
+				<tr>
+					<td>发起人</td>
+					<td style="width: 20%;"><input id="releasePersonName" type="text" disabled="disabled" style="width: 95%;"></td>
+					<td>发起人部门</td>
+					<td style="width: 20%;"><input id="releaseDeptName" type="text" disabled="disabled" style="width: 95%;"></td>
+				</tr>	
+				<tr>
+					<td>需求描述</td>
+					<td>
+						<textarea id="demandDesc"
+							style="line-height:25px;width:80%" placeholder=""
+							maxlength="800" readonly="readonly">
+						</textarea>
+					</td>
+					<td>需求状态</td>
+					<td style="width: 20%;"><input id="demand_status" type="text" disabled="disabled" style="width: 95%;"></td>
+					
+				</tr>
+				<tr>	
+				<td>附件</td>
+					<td colspan="3"><div id="attachment"></div></td>	
+				</tr>
+				<tr id="evalTr" style="display:none;">
+				   <td>评价星级</td>
+				   <td id="evalNum">
+	               </td>
+				   <td>评价意见</td>
+				   <td>
+				       <textarea id="evalDesc"
+							style="line-height:25px;width:80%" placeholder=""
+							maxlength="800" readonly="readonly">
+						</textarea>
+				   </td>
+				</tr>	
+			</tbody>
+		</table>
+	<div class="page mt10" id="demandDetailInfoFoot"></div>
+	<div  id="workflow"  >
+	</div>
+</div>
+	<div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab5 mt10 lines">
+			<thead>
+	            <tr>
+	                <th colspan="9">短流程处理记录</th>
+	            </tr>
+        	</thead>
+			<tbody id="processRecord">
+				<tr>
+					<th align="center" style="width: 4%;">序号</th>
+					<th>处理节点</th>
+					<th align="center" >处理部门</th>
+					<th align="center" >处理人</th>
+					<th>处理时间</th>
+					<th align="center" style="width: 10%;">审批操作</th>
+					<th align="center" style="width: 10%;">审批意见</th>
+					<th align="center" style="width: 10%;">是否超时</th>
+					<th id="conductorInfos">下一步处理部门</th>
+					<th id="conductorInfo" align="center" style="width: 10%;">下一步处理人</th>
+					<th align="center" style="width: 10%;">处理状态</th>
+				</tr>
+			</tbody>
+		</table>
+</div>
+<div style="text-align: center;width: 100%;margin-top: 1%;"><a href="#" class="but" id="evalSubmit">评价</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" class="but" id="back">返回</a></div>	
+</div>

@@ -1,0 +1,70 @@
+<script type="text/javascript" src="js/policyManual/addPolicyManual.js"></script>
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="ckeditor/config.js"></script>
+<link href="ckeditor/samples.css" rel="stylesheet" type="text/css">
+<style>
+body { color: #585858; font: 14px \5FAE\8F6F\96C5\9ED1; background-color: #fff; }
+</style>
+<!-- 新增政策 -->  
+<div id='showAddPolicyManual'>
+	<div class="list-main"  >
+ 	  <div class="page-title mt10" id ="addPM" style="display: none"><img   src="images/home.png" alt="">&nbsp;政策手册&nbsp;&nbsp;--&nbsp;&nbsp;新增政策
+ 	  </div>
+  	  <div class="page-title mt10" id ="updatePM" style="display: none"><img   src="images/home.png" alt="">&nbsp;政策手册&nbsp;&nbsp;--&nbsp;&nbsp;修改政策
+  	  </div>
+  	  
+  	  <div class="clear"></div>
+  	  <div style="vertical-align: middle;padding: 5px 15px;margin-top: 10px;">
+			<ul class="hx-list"> 
+			 	 <li> 政策类型:<select class="w100" id='PMA'></select> </li>
+				 <li id="childLi">  政策子类:<select class="w100" id='PMZ'></select> </li>
+				 <li> 销售起止时间：<input id="addSendDate" type="text" class=" w130" style="cursor: pointer;" readonly> 
+						  至&nbsp;<input id="addEndDate" type="text" class=" w130" style="cursor: pointer;" readonly>
+				 </li>
+				 <li>
+				 	<a href="javascript:void(0)" class="but ml20" id="savePM">保存</a> 
+				 	
+				 	<a href="javascript:void(0)" class="but ml20" id="tijiaoPM">提交</a> 
+				 </li>
+		  </ul>
+  	  </div>
+  	  
+  	  <div class="clear"></div>
+  	  <div style="vertical-align: middle;padding: 5px 15px;">
+  	  	<div style="vertical-align: middle;width: 68px;float: left;height: 100%;">
+			 发布区域:&nbsp;&nbsp;
+		</div>
+		<div style="float: left">
+			 <input type='text' style='width:760px;cursor: pointer;' id='release'  readonly>
+		 </div>
+  	  </div>
+  	  
+  	  <div class="clear"></div>
+  	  <div style="padding: 5px 15px;">
+  	  	<div style="vertical-align: middle;width:68px;float: left;height: 100%;">
+			政策标题:&nbsp;&nbsp;
+		</div>
+		<div style="float: left">
+			 <input type='text' style='width:760px;' id='PMtheme'>
+		 </div>
+	  </div>
+	  <div class="clear"></div>
+	 <div style="padding: 5px 15px;width: 700px;">
+		<div style="vertical-align: middle;width:68px;float: left;height: 100%;">
+			 政策图标:&nbsp;&nbsp;
+		</div>
+		<div style="float: left">
+			<input type='file' style='width:200px;padding: 0px;' id='PMpicture' />
+		</div>
+	  	<div id='updateImg' style="float: left"></div>
+	 </div>
+	 
+	  <div class="clear"></div>
+	  <table id="showAttr"></table>
+	  
+	  <div class="clear"></div>
+	  <div style="width:auto;padding-top: 10px; ">
+			<div id="editor1" > </div>
+	   </div>
+    </div>
+</div>

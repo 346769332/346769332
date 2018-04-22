@@ -1,0 +1,63 @@
+<script type="text/javascript" src="js/order/serviceOrderList.js"></script>
+<div class="list-main" id="serviceOrderLstPage">
+
+	<h2>待认领</h2>
+
+	<dl class="bd-list">
+		<dt style="margin:8px 5px;width:80px;">主题搜索：</dt>
+		<dd>
+			<input id="themeSeach" type="text" class=" w130">
+		</dd>
+		<dt style="margin:8px 0px;width:80px;">发起人：</dt>
+		<dd>
+			<input id="sendUserName" type="text" class=" w130" readonly>
+		</dd>
+		<dt style="margin:8px -5px">发起时间：</dt>
+		<dd>
+			<input id="sendDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearSendDate">
+		</dd>
+		<dt style="margin:8px -5px">认领截止时间：</dt>
+		<dd>
+			<input id="endDate" type="text" class=" w130" readonly><img src="images/del.png" alt="" style="margin-left:-40px;" id="clearEndDate">
+		</dd>
+		<dd>
+			<a href="#" class="butInit" id="senior">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+	<div style="margin-top:5px;" id="dateQuery">
+		<a href="#" class="but" id="today">今    天</a>
+		<a href="#" class="butInit" id="week">近一周</a>
+		<a href="#" class="butInit" id="month">近一月</a>
+		<!--  <span id="claimSum" style="margin-left:640px;">认领总数：</span>
+		<span id="claimNum">123</span>-->
+	</div>
+	<div class="clear"></div>
+	<!--  <div class="gy_tab mt10" id="orderTab">
+		<ul>
+			<li id="jiedan" class="hover">接单池</li>
+			<li id="dairen">待认领</li>
+		</ul>
+	</div>-->
+	<div class="clear"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10">
+		<thead>
+			<tr>
+				<td>服务单号</td>
+				<td>服务主题</td>
+				<th>发起人</th>
+				<td>联系电话</td>
+				<td>发起部门</td>
+				<td>发起时间</td>
+				<td>认领剩余时间</td>
+				<td>默认处理人</td>
+				<td>催单</td>
+				<td>操作</td>
+			</tr>
+		</thead>
+		<tbody id="orderLstBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="orderLstFoot"></div>
+</div>

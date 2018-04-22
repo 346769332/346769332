@@ -1,0 +1,48 @@
+<script type="text/javascript" src="js/order/sysOrderList.js"></script>
+<div class="list-main" id="sysOrderLstPage">
+
+	<h2>专业系统查询</h2>
+
+	<dl class="bd-list">
+		<dt style="margin:8px 5px;width:80px;">主题搜索：</dt>
+		<dd>
+			<input id="themeSeach" type="text" class=" w130">
+		</dd>
+		<dt style="margin:8px 0px;width:80px;">操作人：</dt>
+		<dd>
+			<input id="sendUserName" type="text" class=" w130">
+		</dd>
+		<dt style="margin:8px -5px">发起时间：</dt>
+		<dd>
+			<input id="sendDate" type="text" class=" w130" readonly><!--  <img src="images/del.png" alt="" style="margin-left:-40px;" id="clearSendDate">-->
+		</dd>
+		<dt style="margin:8px -5px">专业系统：</dt>
+		<dd>
+			<select id="sysId" class="w130" style="width:185;height:26px;"></select>
+		</dd>
+		<dd>
+			<a href="#" class="butInit" id="senior">查询</a>
+		</dd>
+	</dl>
+	<div class="clear"></div>
+	<div class="clear"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10">
+		<thead>
+			<tr>
+				<td>流程单号</td>
+				<td>流程主题</td>
+				<th>操作人</th>
+				<td>环节名称</td>
+				<td>创建时间</td>
+				<td>操作人部门</td>
+				<td>专业系统</td>
+				<td>处理状态</td>
+				<td>操作</td>
+			</tr>
+		</thead>
+		<tbody id="orderLstBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="orderLstFoot"></div>
+</div>

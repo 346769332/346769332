@@ -1,0 +1,58 @@
+<script type="text/javascript" src="js/shortProcess/hasSolveProcessList.js"></script>
+
+<div class="list-main" id="hasSolveProcessPage">
+	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;已处理短流程需求列表</div>
+		<dl class="bd-list">
+	<!-- 0:代表短流程需求查询标识 ,1:代表历史短流程查询标识-->
+		<input type="hidden" name="flag" value="0"  id="flag"/>
+		<dt style="margin-top: 10px;">需求编号:</dt>
+		<dd>
+			<input id="demandCode" name="demandCode" type="text" class="w130">
+		</dd>
+		<dt style="margin-top: 10px;">需求名称:</dt>
+		<dd>
+			<input id="demandName" name="demandName" type="text" class="w130">
+		</dd>
+		<!--<dt style="margin-top: 10px;width: 120px">所属短流程名称:</dt>
+		<dd>
+			<input id="workflowName" name="workflowName" type="text" class="w130">
+		</dd>-->
+		<dt style="margin-top: 10px;">需求状态:</dt>
+		<dd>
+			<select style="width: 156px;height:26px;"  name="demandStatus" id="demandStatus">
+		    	<option value="">-请选择-</option>
+		    	<option value="1000">审批中</option>
+		    	<option value="1001">审批完结</option>   	
+		    </select>
+		</dd>
+		<!--<dt style="margin-top: 10px;">是否超时:</dt>
+		<dd>
+			<select style="width: 156px;height:26px;"  name="overTime" id="overTime" >
+				<option value="">-请选择-</option>
+		    	<option value="1">是</option>
+		    	<option value="0">否</option>	
+		    </select>
+		</dd>-->
+		<dd>
+			<a href="javascript:void(0)" class="but ml20" id="search">查询</a>
+	        <a href="javascript:void(0)" class="but ml20" id="reset">重置</a>
+		</dd>
+	</dl>
+	<div id="dateQuery"></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="0"
+		class="tab2 mt10 d_top">
+		<thead>
+			<tr>
+				<td style="width: 10%">需求编号</td>
+				<td style="width: 30%">需求名称</td>
+				<td style="width: 10%">需求状态</td>
+				<td style="width: 20%">所属短流程名称</td>
+				<td style="width: 10%">评价状态</td>
+				<td style="width: 20%">操作</td>
+			</tr>
+		</thead>
+		<tbody id="hasSolveProcessBody">
+		</tbody>
+	</table>
+	<div class="page mt10" id="hasSolveProcessFoot"></div>
+</div>

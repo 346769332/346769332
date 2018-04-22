@@ -1,0 +1,56 @@
+<script type="text/javascript" src="/CpcWeb/web/js/shortProcess/workflowPublish.js"></script>
+
+<div class="list-main" id='workflowPublishPage'>
+	<div class="page-title mt10"><img src="images/home.png" alt="">&nbsp;短流程&nbsp;&nbsp;--&nbsp;&nbsp;流程发布</div>
+	<div  class="bd-list">
+		<table  border="0" cellspacing="0" cellpadding="0"  style="width:100%" class="tab2 mt10 d_top">
+			<tbody>
+				<tr id="parentWorkflow"><td style="text-align:left" ><font size="5">父流程</font></td></tr>
+				<tr>
+					<td style="height:45px;text-align:left" colspan="6">
+						流程名称&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="workflowName" name="workflowName" type="text" style="width:200px" readonly>
+						流程分类&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<select id="workflowClass" name="workflowClass" style="width:200px;height:25px" disabled="disabled">
+						</select>
+						流程类型&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<select id="workflowType" name="workflowType" style="width:200px;height:25px" disabled="disabled">
+						</select>					
+					</td>
+				</tr>
+				<tr>
+					<td colspan="6" style="height:45px;text-align:left" id="wlan">
+					</td>
+				</tr>
+<!-- 				<tr> -->
+<!-- 					<td colspan="6" style="height:45px;text-align:left"> -->
+<!-- 					短流程需求模板 -->
+<!-- 						<input id="workflowTemplate" type="text" style="width:45%"> -->
+<!-- 						<a href="#" class="but" id="chooseTemplate">选择</a> -->
+<!-- 					</td> -->
+<!-- 				</tr> -->
+			</tbody>
+			
+			<tbody id="sonWorkflow" >
+			</tbody>
+			<tbody>
+<!-- 				<tr> -->
+<!-- 					<td   colspan="6" style="height:25px;text-align: left" id="wisUpdate"> -->
+<!-- 					子流程维护权限 -->
+<!-- 						<input type="radio" name="authorityMaintain" style="width:40px" value="0">省统一维护 -->
+<!-- 						<input type="radio" name="authorityMaintain"  style="width:40px" value="1">省、本地网统一维护 -->
+<!-- 						<input type="radio" name="authorityMaintain"  style="width:40px" value="2">本地网自主维护 -->
+<!-- 					</td> -->
+<!-- 				</tr> -->
+			</tbody>
+			<tfoot>
+				<tr>
+					<td  colspan="6" style="height:55px;" >
+						<a href="#" class="but" id="publish">发布</a>
+						<a href="#" class="but" id="back">返回</a> 
+<!-- 						<a href="#" class="but" id="saveDraft">保存草稿</a> -->
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>

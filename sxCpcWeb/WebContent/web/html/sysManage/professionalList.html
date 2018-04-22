@@ -1,0 +1,45 @@
+<script type="text/javascript" src="js/sysManage/professionalList.js"></script>
+<div class="list-main" id="listPage">
+ 	<!-- 标题 -->
+ 	<div class="page-title mt10"><img   src="images/home.png" alt="">&nbsp;系统管理&nbsp;&nbsp;--&nbsp;&nbsp;服务单默认接单人管理</div>
+	
+	
+	<div class="seach-box mt20  ">
+	    <ul class="hx-list  clearfix">
+	        <li>本地网:<select id="latnId" class="w100"> <!--  <option>乌鲁木齐</option> --></select></li>
+	        <li><a href="javascript:void(0)" class="but ml20" id="senior">查询</a></li>
+	    </ul>
+	</div>
+	
+	<!-- 按钮操作 -->
+	<div class="lable-box">
+		<a  href="javascript:void(0)" class="lable" id="updatePoolInfo">属性变更</a>
+	</div> 
+	
+	<div class="clear"></div>
+	
+	<!-- 工号列表 -->
+	<div style="margin-top:5px;" id="dataQuery">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" class="tab2 mt10">
+			<thead>
+				<tr>
+					<th style="width:2%;text-align: right;"></th>
+					<!-- <td style="width:8%;">单池ID</td> -->
+					<td style="width:20%;">单池名称</td>
+					<!-- <th style="width:10%;">认领时限(小时)</th>
+					<td style="width:10%;">催单时间(小时)</td> -->
+					<!-- <td style="width:10%;">评价时间</td>
+					<td style="width:10%;">评价等级</td> -->
+					<td style="width:10%;">接单人</td>
+					<td style="width:10%;">接单人电话</td>
+					<td style="width:10%;">本地网</td>
+				</tr>
+			</thead>
+			<tbody id="listBody">
+				
+			</tbody>
+		</table>
+		<div class="page mt10" id="listFoot"></div>
+	</div>
+
+</div>
